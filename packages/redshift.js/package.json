@@ -1,0 +1,26 @@
+{
+  "name": "@radar-redshift/redshift.js",
+  "version": "0.1.0",
+  "description": "",
+  "main": "dist/main.js",
+  "scripts": {
+    "test": "ava"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@radar-redshift/htlc": "^0.1.0",
+    "@types/node": "^8.0.28",
+    "minimist": "^1.2.0"
+  },
+  "devDependencies": {
+    "ava": "^0.22.0",
+    "typescript": "~3.0.0"
+  },
+  "ava": {
+    "files": [
+      "dist/**/*.spec.js"
+    ]
+  }
+}
