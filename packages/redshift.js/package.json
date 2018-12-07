@@ -4,23 +4,12 @@
   "description": "",
   "main": "dist/main.js",
   "scripts": {
-    "test": "ava"
+    "test": "mocha -r @ts-tools/node \"test/**/*.test.ts\" --watch-extensions ts --colors"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@radar-redshift/htlc": "^0.1.0",
-    "@types/node": "^8.0.28",
-    "minimist": "^1.2.0"
-  },
-  "devDependencies": {
-    "ava": "^0.22.0",
-    "typescript": "~3.0.0"
-  },
-  "ava": {
-    "files": [
-      "dist/**/*.spec.js"
-    ]
+    "@radar-redshift/htlc": "^0.1.0"
   }
 }

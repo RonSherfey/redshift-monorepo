@@ -1,6 +1,6 @@
 import { awesomeFn } from "@radar-redshift/htlc";
 
-export function cli() {
+export function callAwesomeFn() {
   awesomeFn();
   return Promise.resolve(true);
 }
