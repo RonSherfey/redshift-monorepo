@@ -1,0 +1,37 @@
+{
+  "name": "@radar-redshift/eth-htlc-contracts",
+  "version": "0.1.0",
+  "description": "Simple Ethereum HTLCs",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "generate": "truffle compile && typechain --target truffle '../contract-artifacts/**/*.json' && yarn trim-artifacts",
+    "trim-artifacts": "node scripts/trim-artifacts.js",
+    "prepare": "yarn generate",
+    "test": "truffle test && yarn tsc",
+    "deploy": "truffle migrate --network dev",
+    "tsc": "tsc --noEmit",
+    "lint": "tslint -c tslint.json '{src,test}/**/*.ts' --fix"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/bignumber.js": "^5.0.0",
+    "@types/chai-as-promised": "^7.1.0",
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^10.12.12",
+    "bignumber.js": "^8.0.1",
+    "chai-as-promised": "^7.1.1",
+    "truffle-core": "^4.1.14",
+    "truffle-hdwallet-provider": "^0.0.6",
+    "truffle-test-utils": "^0.1.0",
+    "truffle-typings": "^1.0.5",
+    "ts-generator": "^0.0.8",
+    "ts-node": "^7.0.1",
+    "typechain": "^0.3.8"
+  },
+  "dependencies": {
+    "truffle": "^4.1.14"
+  }
+}

@@ -1,7 +1,6 @@
 {
   "private": true,
   "scripts": {
-    "bootstrap": "lerna bootstrap",
     "build": "tsc -b packages/htlc packages/redshift.js",
     "test": "lerna run test --stream --parallel",
     "clean": "rimraf packages/**/dist"
@@ -10,6 +9,7 @@
     "@ts-tools/node": "^0.7.4",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.5",
+    "@types/node": "^10.12.12",
     "chai": "^4.2.0",
     "lerna": "^2.9.0",
     "mocha": "^5.2.0",
@@ -17,6 +17,6 @@
     "typescript": "^3.2.1"
   },
   "workspaces": [
-    "packages/*"
+    "packages/**"
   ]
 }
