@@ -1,4 +1,2 @@
-import blockchainUtils from './bitcoinjs_override';
-
-export default blockchainUtils;
-export * from './bitcoinjs_override';
+export { default } from './bitcoinjs-override';
+export * from './bitcoinjs-override';

@@ -26,7 +26,7 @@ import {
 
 export class UtxoHtlc<N extends Network> extends Htlc<N> {
   private _redeemScript: string;
-  private _htlcDetails: UtxoSwapDetails;
+  private _details: UtxoSwapDetails;
 
   get redeemScript(): string {
     return this._redeemScript;
@@ -36,8 +36,8 @@ export class UtxoHtlc<N extends Network> extends Htlc<N> {
     return Buffer.from(this.redeemScript, 'hex');
   }
 
-  get htlcDetails(): UtxoSwapDetails {
-    return this._htlcDetails;
+  get details(): UtxoSwapDetails {
+    return this._details;
   }
 
   /**
@@ -55,7 +55,7 @@ export class UtxoHtlc<N extends Network> extends Htlc<N> {
     this._redeemScript = isString(scriptArgs)
       ? scriptArgs
       : createSwapRedeemScript(scriptArgs);
-    this._htlcDetails = getSwapRedeemScriptDetails(
+    this._details = getSwapRedeemScriptDetails(
       this._network,
       this._subnet,
       this._redeemScript,
@@ -77,7 +77,7 @@ export class UtxoHtlc<N extends Network> extends Htlc<N> {
     });
 
     // Add output containing the p2sh address
-    tx.addOutput(this.htlcDetails.p2sh_p2wsh_address, amount);
+    tx.addOutput(this.details.p2sh_p2wsh_address, amount);
 
     // The signing key
     const signingKey = ECPair.fromWIF(
