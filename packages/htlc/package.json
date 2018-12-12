@@ -4,9 +4,20 @@
   "description": "",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "scripts": {
-  },
+  "scripts": {},
   "keywords": [],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "bip65": "^1.0.3",
+    "bitcoinjs-lib": "^4.0.2",
+    "bn.js": "^4.11.8",
+    "varuint-bitcoin": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/bip32": "^1.0.0",
+    "@types/bitcoinjs-lib": "^4.0.0",
+    "@types/bn.js": "^4.11.3",
+    "@types/web3": "^1.0.14"
+  }
 }

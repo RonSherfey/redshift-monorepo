@@ -7,6 +7,9 @@
     "sourceMap": true,
     "strict": true,
     "composite": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "preserveConstEnums": true,
+    "resolveJsonModule": true,
+    "suppressImplicitAnyIndexErrors": true
   }
 }

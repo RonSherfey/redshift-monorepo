@@ -1,3 +1,1 @@
-export function awesomeFn() {
-  console.log("Hello");
-}
+export { EthereumHtlc, UtxoHtlc } from './networks';
