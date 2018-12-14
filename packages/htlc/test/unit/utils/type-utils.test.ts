@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 import {
   isArray,
   isDefined,
@@ -6,7 +5,8 @@ import {
   isNumber,
   isOneOf,
   isString,
-} from '../../src/utils';
+} from '../../../src/utils';
+import { expect } from '../../lib/helpers';
 
 describe('utils/type-utils', () => {
   const aString = 'string';

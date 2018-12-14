@@ -7,7 +7,7 @@ const sequenceLength = 4; // Sequence Number Byte Length
 
 /**
  * Estimate the weight of a transaction after signed SegWit inputs are added
- * @param unlock Claim Preimage, Refund Pubkey, Dummy Preimage Hex String
+ * @param unlock Claim secret (preimage) or refund public key
  * @param utxos The funding utxos
  * @param weight Weight Without Signed Inputs Number
  * @param redeem The redeem script buffer

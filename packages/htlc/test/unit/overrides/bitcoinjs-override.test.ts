@@ -1,6 +1,6 @@
-import { expect } from 'chai';
-import blockchainUtils from '../../src/overrides/bitcoinjs-lib';
-import config from '../../src/overrides/bitcoinjs-lib/config.json';
+import blockchainUtils from '../../../src/overrides/bitcoinjs-lib';
+import config from '../../../src/overrides/bitcoinjs-lib/config.json';
+import { expect } from '../../lib/helpers';
 
 describe('overrides/bitcoinjs-override', () => {
   it('should add additional blockchains from the configuration file', () => {

@@ -1,5 +1,5 @@
-import { expect } from 'chai';
-import { addHexPrefix, isHexPrefixed } from '../../src/utils';
+import { addHexPrefix, isHexPrefixed } from '../../../src/utils';
+import { expect } from '../../lib/helpers';
 
 describe('utils/format-utils', () => {
   const nonPrefixedHexString = 'deadbeef';

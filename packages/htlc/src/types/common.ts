@@ -1,3 +1,4 @@
+import { BIP32 } from 'bip32';
 import { Network, Subnet } from './constants';
 
 export interface UnsignedTx {
@@ -56,4 +57,16 @@ export interface TxOutput {
   script: Buffer;
   tokens: number; // amount of tokens in this output
   index: number; // vout index of this output
+}
+
+export interface KeyPair {
+  network: Network;
+  subnet: Subnet;
+  public_key: string;
+  public_key_hash: string;
+  private_key: string;
+  p2wpkh_address: string;
+  p2pkh_address: string;
+  index: number;
+  key_pair: BIP32;
 }

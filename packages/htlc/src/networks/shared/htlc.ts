@@ -10,6 +10,7 @@ export abstract class Htlc<N extends Network> {
    * @param subnet The on-chain subnet
    */
   constructor(network: N, subnet: ConditionalSubnet<N>) {
+    // TODO: Throw on invalid
     this._network = network;
     this._subnet = subnet;
   }

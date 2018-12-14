@@ -212,7 +212,6 @@ export function getSwapRedeemScriptDetails(
 
     default:
       throw new Error(SwapError.INVALID_REDEEM_SCRIPT_LENGTH);
-      break;
   }
 
   // TODO add support for non-segwit chains

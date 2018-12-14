@@ -66,7 +66,7 @@ export class UtxoHtlc<N extends Network> extends Htlc<N> {
    * Generate the funding transaction and return the raw tx hex
    * @param utxos The unspent funding tx outputs
    * @param amount The funding amount in satoshis
-   * @param privateKey The private key WIF string
+   * @param privateKey The private key WIF string used to sign
    */
   public fund(utxos: TxOutput[], amount: number, privateKey: string): string {
     const tx = new TransactionBuilder();
@@ -99,24 +99,24 @@ export class UtxoHtlc<N extends Network> extends Htlc<N> {
    * @param recipientPublicKey The recipient's public key
    * @param currentBlockHeight The current block height on the network
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
-   * @param paymentSecret The payment secret
    * @param privateKey The private key WIF string
+   * @param paymentSecret The payment secret
    */
   public claim(
     utxos: TxOutput[],
     recipientPublicKey: string,
     currentBlockHeight: number,
     feeTokensPerVirtualByte: number,
-    paymentSecret: string,
     privateKey: string,
+    paymentSecret: string,
   ): string {
     return this.buildTransaction(
       utxos,
       recipientPublicKey,
       currentBlockHeight,
       feeTokensPerVirtualByte,
-      paymentSecret,
       privateKey,
+      paymentSecret,
     );
   }
 
@@ -126,7 +126,6 @@ export class UtxoHtlc<N extends Network> extends Htlc<N> {
    * @param recipientPublicKey The recipient's public key
    * @param currentBlockHeight The current block height on the network
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
-   * @param paymentSecret The payment secret
    * @param privateKey The private key WIF string
    */
   public refund(
@@ -134,7 +133,6 @@ export class UtxoHtlc<N extends Network> extends Htlc<N> {
     recipientPublicKeyHash: string,
     currentBlockHeight: number,
     feeTokensPerVirtualByte: number,
-    paymentSecret: string,
     privateKey: string,
   ): string {
     // The refund tx recipient
@@ -148,8 +146,8 @@ export class UtxoHtlc<N extends Network> extends Htlc<N> {
       recipientOutputPubKey,
       currentBlockHeight,
       feeTokensPerVirtualByte,
-      paymentSecret,
       privateKey,
+      this.details.refund_public_key_hash, // TODO: Use public key
     );
   }
 
@@ -159,16 +157,16 @@ export class UtxoHtlc<N extends Network> extends Htlc<N> {
    * @param recipientPublicKey The recipient's public key
    * @param currentBlockHeight The current block height on the network
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
-   * @param paymentSecret The payment secret
    * @param privateKey The private key WIF string
+   * @param unlock Claim secret (preimage) or refund public key
    */
   private buildTransaction(
     utxos: TxOutput[],
     recipientPublicKey: string | Buffer,
     currentBlockHeight: number,
     feeTokensPerVirtualByte: number,
-    paymentSecret: string,
     privateKey: string,
+    unlock: string,
   ): string {
     // Create a new transaction instance
     const tx = new Transaction();
@@ -189,7 +187,7 @@ export class UtxoHtlc<N extends Network> extends Htlc<N> {
     const fee = estimateFee(
       this.redeemScript,
       utxos,
-      paymentSecret,
+      unlock,
       tx.weight(),
       feeTokensPerVirtualByte,
     );
@@ -205,7 +203,7 @@ export class UtxoHtlc<N extends Network> extends Htlc<N> {
     out.value -= fee;
 
     // Set the signed witnesses
-    this.addWitnessScripts(utxos, privateKey, paymentSecret, tx);
+    this.addWitnessScripts(utxos, privateKey, unlock, tx);
 
     return tx.toHex();
   }
@@ -245,12 +243,13 @@ export class UtxoHtlc<N extends Network> extends Htlc<N> {
    * have been added. Otherwise, you'll end up with a different sig hash.
    * @param utxos The utxos we're spending
    * @param privateKey The private key WIF string
+   * @param unlock Claim secret (preimage) or refund public key
    * @param tx The tx instance
    */
   private addWitnessScripts(
     utxos: TxOutput[],
     privateKey: string,
-    paymentSecret: string,
+    unlock: string,
     tx: Transaction,
   ) {
     // Create the signing key from the WIF string
@@ -272,7 +271,7 @@ export class UtxoHtlc<N extends Network> extends Htlc<N> {
       );
       const witness = [
         signature,
-        Buffer.from(paymentSecret, 'hex'),
+        Buffer.from(unlock, 'hex'),
         this.redeemScriptBuffer,
       ];
       tx.setWitness(i, witness);
