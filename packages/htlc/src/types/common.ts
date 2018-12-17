@@ -1,4 +1,5 @@
 import { BIP32 } from 'bip32';
+import Web3 from 'web3';
 import { Network, Subnet } from './constants';
 
 export interface UnsignedTx {
@@ -40,7 +41,7 @@ export interface PartialTxParams {
 }
 
 export interface RedeemScriptArgs {
-  recipientPublicKey: string;
+  destinationPublicKey: string;
   paymentHash: string;
   refundPublicKeyHash: string;
   timelockBlockHeight: number;
@@ -51,12 +52,19 @@ export interface RedeemScriptArgs {
  */
 export type UtxoHtlcOptions = string | RedeemScriptArgs;
 
+/**
+ * Web3 Instance
+ */
+export interface EthereumHtlcOptions {
+  web3: Web3;
+}
+
 export interface TxOutput {
   tx_id: string; // tx id for this output
-  address: string; // output address
-  script: Buffer;
-  tokens: number; // amount of tokens in this output
   index: number; // vout index of this output
+  tokens: number; // amount of tokens in this output
+  address?: string; // output address
+  script?: Buffer;
 }
 
 export interface KeyPair {
@@ -69,4 +77,10 @@ export interface KeyPair {
   p2pkh_address: string;
   index: number;
   key_pair: BIP32;
+}
+
+export interface HtlcOptions {
+  [Network.BITCOIN]: UtxoHtlcOptions;
+  [Network.LITECOIN]: UtxoHtlcOptions;
+  [Network.ETHEREUM]: EthereumHtlcOptions;
 }

@@ -8,3 +8,7 @@ export function getRpcWebSocketUrl(network: Network, subnet: Subnet): string {
   }
   return `ws://${host}:${port}`;
 }
+
+export function getTestingMnemonic() {
+  return process.env.REDSHIFT_TESTING_MNEMONIC as string;
+}

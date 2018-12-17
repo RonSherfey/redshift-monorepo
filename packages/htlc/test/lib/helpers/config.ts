@@ -1,5 +1,8 @@
 import { crypto } from '../../../src/overrides/bitcoinjs-lib';
+import { BitcoinSubnet, Network } from '../../../src/types';
 import { addHexPrefix } from '../../../src/utils';
+import { getTestingMnemonic } from './env-vars';
+import { getKeyPairFromMnemonic } from './wallet';
 
 /**
  * Generate a random hex string
@@ -21,19 +24,24 @@ function sha256Hash(str: string) {
 
 /**
  * Generate random invoice, secret, and hash values for testing
+ * @param prefixHex Whether or not the hex secret & hash should be prefixed
  */
-function generateRandomInvoiceSecretAndHashValues() {
+function generateRandomInvoiceSecretAndHashValues(prefixHex: boolean) {
   const invoice = generateRandomHexString();
-  const paymentSecret = sha256Hash(generateRandomHexString());
-  const paymentHash = sha256Hash(paymentSecret);
+  let paymentSecret = sha256Hash(generateRandomHexString());
+  let paymentHash = sha256Hash(paymentSecret);
 
+  if (prefixHex) {
+    paymentSecret = addHexPrefix(paymentSecret);
+    paymentHash = addHexPrefix(paymentHash);
+  }
   return {
     invoice,
+    paymentSecret,
+    paymentHash,
     amount: Math.random()
       .toFixed(2)
       .toString(),
-    paymentSecret: addHexPrefix(paymentSecret),
-    paymentHash: addHexPrefix(paymentHash),
   };
 }
 
@@ -42,45 +50,68 @@ function generateRandomInvoiceSecretAndHashValues() {
  */
 const networkSpecificConfigs = {
   bitcoin: {
-    valid: {
-      redeemScript:
-        '76a820e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256702e10bb17576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
-      htlc: {
-        args: {
-          recipientPublicKey:
-            '0398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25',
-          paymentHash:
-            'e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d',
-          refundPublicKeyHash: '3f1857b3db895b4d481a46e5a0129cb2b04781c8',
-          timelockBlockHeight: 3041,
-        },
-        details: {
-          network: 'bitcoin',
-          subnet: 'simnet',
-          destination_public_key:
-            '0398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25',
-          payment_hash:
-            'e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d',
-          refund_public_key_hash: '3f1857b3db895b4d481a46e5a0129cb2b04781c8',
-          timelock_block_height: 3041,
-          p2sh_output_script: 'a9145a53e89d2db880a0dcaa627693b021344d15fdcf87',
-          p2sh_address: '2N1UqKd8fmTk8DkDuKZDP9QuJnV2zv2fgTS',
-          p2sh_p2wsh_address: '2Mst61eNNcE9uN2Nq1pp6puXy9xfPhJVyt2',
-          p2sh_p2wsh_output_script:
-            'a91406f8bb6bbc7e0932d010e2242ba7f1c37208682587',
-          p2wsh_address:
-            'bcrt1qg69sz0pa3xj5sfftq0lrtt6c3pl9ry0vd547he6j3sn55x6kujls8rphxm',
-          p2wsh_output_script:
-            '0020468b013c3d89a548252b03fe35af58887e5191ec6d2bebe7528c274a1b56e4bf',
-          refund_p2wpkh_address: 'bcrt1q8uv90v7m39d56jq6gmj6qy5uk2cy0qwgwj88lv',
-          refund_p2pkh_address: 'mmGa2VVPXEKP82YkrPM4VbnsLS4VjRwDCf',
-          redeem_script:
-            '76a820e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256702e10bb17576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
+    unit: {
+      valid: {
+        redeemScript:
+          '76a820e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256702e10bb17576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
+        htlc: {
+          args: {
+            destinationPublicKey:
+              '0398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25',
+            paymentHash:
+              'e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d',
+            refundPublicKeyHash: '3f1857b3db895b4d481a46e5a0129cb2b04781c8',
+            timelockBlockHeight: 3041,
+          },
+          details: {
+            network: 'bitcoin',
+            subnet: 'simnet',
+            destination_public_key:
+              '0398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25',
+            payment_hash:
+              'e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d',
+            refund_public_key_hash: '3f1857b3db895b4d481a46e5a0129cb2b04781c8',
+            timelock_block_height: 3041,
+            p2sh_output_script:
+              'a9145a53e89d2db880a0dcaa627693b021344d15fdcf87',
+            p2sh_address: '2N1UqKd8fmTk8DkDuKZDP9QuJnV2zv2fgTS',
+            p2sh_p2wsh_address: '2Mst61eNNcE9uN2Nq1pp6puXy9xfPhJVyt2',
+            p2sh_p2wsh_output_script:
+              'a91406f8bb6bbc7e0932d010e2242ba7f1c37208682587',
+            p2wsh_address:
+              'sb1qg69sz0pa3xj5sfftq0lrtt6c3pl9ry0vd547he6j3sn55x6kujlsdtpk2y',
+            p2wsh_output_script:
+              '0020468b013c3d89a548252b03fe35af58887e5191ec6d2bebe7528c274a1b56e4bf',
+            refund_p2wpkh_address: 'sb1q8uv90v7m39d56jq6gmj6qy5uk2cy0qwgfu40g6',
+            refund_p2pkh_address: 'mmGa2VVPXEKP82YkrPM4VbnsLS4VjRwDCf',
+            redeem_script:
+              '76a820e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256702e10bb17576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
+          },
         },
       },
+      invalid: {
+        redeemScript: 'not_a_redeem_script',
+      },
     },
-    invalid: {
-      redeemScript: 'not_a_redeem_script',
+    integration: {
+      funder: getKeyPairFromMnemonic(
+        Network.BITCOIN,
+        BitcoinSubnet.SIMNET,
+        getTestingMnemonic(),
+        0,
+      ),
+      claimer: getKeyPairFromMnemonic(
+        Network.BITCOIN,
+        BitcoinSubnet.SIMNET,
+        getTestingMnemonic(),
+        1,
+      ),
+      refunder: getKeyPairFromMnemonic(
+        Network.BITCOIN,
+        BitcoinSubnet.SIMNET,
+        getTestingMnemonic(),
+        2,
+      ),
     },
   },
   ethereum: {
@@ -104,7 +135,8 @@ const networkSpecificConfigs = {
  */
 const sharedConfig = {
   random: {
-    args: () => generateRandomInvoiceSecretAndHashValues(),
+    args: (prefixHex: boolean = false) =>
+      generateRandomInvoiceSecretAndHashValues(prefixHex),
   },
   pattern: {
     hex: /^(0x)?[0-9a-fA-F]+$/,

@@ -16,14 +16,36 @@ export class UtxoRpcClient {
   }
 
   /**
-   * Get the header hash of a block at the given height.
+   * Fetch current chain block height
+   * @return <Result Object>
+   */
+  public async getBlockCount(): Promise<number> {
+    return (await postRpcCall(this._network, this._subnet, 'getblockcount', []))
+      .result;
+  }
+
+  /**
+   * Get the header hash of a block at the given height
    * @param height - A block height
    * @return <Result Object>
    */
-  public async getBlockHash(height: number): Promise<any> {
+  public async getBlockHash(height: number): Promise<string> {
     return (await postRpcCall(this._network, this._subnet, 'getblockhash', [
       height,
     ])).result;
+  }
+
+  /**
+   * Fetch current chain tip block hash
+   * @return <Result Object>
+   */
+  public async getBestBlockHash(): Promise<string> {
+    return (await postRpcCall(
+      this._network,
+      this._subnet,
+      'getbestblockhash',
+      [],
+    )).result;
   }
 
   /**
@@ -53,6 +75,24 @@ export class UtxoRpcClient {
       txId,
       vout,
     ])).result;
+  }
+
+  /**
+   * Fetch raw transaction data
+   * @param hash - The tx hash to return data for
+   * @param returnDecoded - If true return human readable output, else hex data
+   * @return <Result Object>
+   */
+  public async getTransactionByHash(
+    hash: string,
+    returnDecoded: boolean = true,
+  ): Promise<string | any> {
+    return (await postRpcCall(
+      this._network,
+      this._subnet,
+      'getrawtransaction',
+      [hash, returnDecoded ? 1 : 0],
+    )).result;
   }
 
   /**

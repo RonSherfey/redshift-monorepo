@@ -1,21 +1,25 @@
+import bip65 from 'bip65';
 import { isString } from 'util';
 import {
   address,
   crypto,
   ECPair,
   networks,
+  payments,
   script,
   Transaction,
   TransactionBuilder,
 } from '../../overrides/bitcoinjs-lib';
 import {
-  ConditionalSubnet,
   Network,
+  Subnet,
+  SubnetMap,
   SwapError,
   TxOutput,
   UtxoHtlcOptions,
   UtxoSwapDetails,
 } from '../../types';
+import { isDefined } from '../../utils';
 import { Htlc } from '../shared';
 import {
   createSwapRedeemScript,
@@ -46,11 +50,7 @@ export class UtxoHtlc<N extends Network> extends Htlc<N> {
    * @param subnet The chain subnet
    * @param scriptArgs The redeem script or htlc creation options
    */
-  constructor(
-    network: N,
-    subnet: ConditionalSubnet<N>,
-    scriptArgs: UtxoHtlcOptions,
-  ) {
+  constructor(network: N, subnet: SubnetMap[N], scriptArgs: UtxoHtlcOptions) {
     super(network, subnet);
     this._redeemScript = isString(scriptArgs)
       ? scriptArgs
@@ -67,27 +67,47 @@ export class UtxoHtlc<N extends Network> extends Htlc<N> {
    * @param utxos The unspent funding tx outputs
    * @param amount The funding amount in satoshis
    * @param privateKey The private key WIF string used to sign
+   * @param fee Fee tokens for the transaction
    */
-  public fund(utxos: TxOutput[], amount: number, privateKey: string): string {
-    const tx = new TransactionBuilder();
+  public fund(
+    utxos: TxOutput[],
+    amount: number,
+    privateKey: string,
+    fee: number = 0,
+  ): string {
+    const networkPayload = networks[this._subnet as Subnet];
+    const tx = new TransactionBuilder(networkPayload);
+
+    // The signing key
+    const signingKey = ECPair.fromWIF(privateKey, networkPayload);
+
+    // Generate prev output script
+    const { output, address } = payments.p2wpkh({
+      pubkey: signingKey.publicKey,
+      network: networkPayload,
+    });
 
     // Add the inputs being spent to the transaction
     utxos.forEach(utxo => {
-      tx.addInput(toReversedByteOrderBuffer(utxo.tx_id), utxo.index, 0);
+      if (isDefined(utxo.tx_id) && isDefined(utxo.index)) {
+        tx.addInput(
+          toReversedByteOrderBuffer(utxo.tx_id),
+          utxo.index,
+          0,
+          output,
+        );
+      }
     });
 
-    // Add output containing the p2sh address
-    tx.addOutput(this.details.p2sh_p2wsh_address, amount);
+    // Total spendable amount
+    const tokens = utxos.reduce((t, c) => t + c.tokens, 0);
 
-    // The signing key
-    const signingKey = ECPair.fromWIF(
-      privateKey,
-      networks[this._subnet as any],
-    );
+    tx.addOutput(this.details.p2sh_p2wsh_address, amount);
+    tx.addOutput(address, tokens - amount - fee);
 
     // Sign the inputs
-    utxos.forEach((_output, i) => {
-      tx.sign(i, signingKey);
+    utxos.forEach((output, i) => {
+      tx.sign(i, signingKey, undefined, undefined, output.tokens);
     });
 
     return tx.build().toHex();
@@ -96,7 +116,7 @@ export class UtxoHtlc<N extends Network> extends Htlc<N> {
   /**
    * Generate the claim transaction and return the raw tx hex
    * @param utxos The unspent funding tx outputs
-   * @param recipientPublicKey The recipient's public key
+   * @param destinationAddress The claim destination address
    * @param currentBlockHeight The current block height on the network
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
    * @param privateKey The private key WIF string
@@ -104,7 +124,7 @@ export class UtxoHtlc<N extends Network> extends Htlc<N> {
    */
   public claim(
     utxos: TxOutput[],
-    recipientPublicKey: string,
+    destinationAddress: string,
     currentBlockHeight: number,
     feeTokensPerVirtualByte: number,
     privateKey: string,
@@ -112,7 +132,7 @@ export class UtxoHtlc<N extends Network> extends Htlc<N> {
   ): string {
     return this.buildTransaction(
       utxos,
-      recipientPublicKey,
+      destinationAddress,
       currentBlockHeight,
       feeTokensPerVirtualByte,
       privateKey,
@@ -123,38 +143,34 @@ export class UtxoHtlc<N extends Network> extends Htlc<N> {
   /**
    * Generate the refund transaction and return the raw tx hex
    * @param utxos The unspent funding tx outputs
-   * @param recipientPublicKey The recipient's public key
+   * @param destinationAddress The refund destination address
    * @param currentBlockHeight The current block height on the network
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
    * @param privateKey The private key WIF string
+   * @param publicKey The public key corresponding to the provided public key hash
    */
   public refund(
     utxos: TxOutput[],
-    recipientPublicKeyHash: string,
+    destinationAddress: string,
     currentBlockHeight: number,
     feeTokensPerVirtualByte: number,
     privateKey: string,
+    publicKey: string,
   ): string {
-    // The refund tx recipient
-    const recipientOutputPubKey = address.toOutputScript(
-      recipientPublicKeyHash,
-      networks[this._subnet as any],
-    );
-
     return this.buildTransaction(
       utxos,
-      recipientOutputPubKey,
+      destinationAddress,
       currentBlockHeight,
       feeTokensPerVirtualByte,
       privateKey,
-      this.details.refund_public_key_hash, // TODO: Use public key
+      publicKey,
     );
   }
 
   /**
    * Build the transaction using the provided params and return the raw tx hex
    * @param utxos The unspent funding tx outputs
-   * @param recipientPublicKey The recipient's public key
+   * @param destinationAddress The destination address of the transaction
    * @param currentBlockHeight The current block height on the network
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
    * @param privateKey The private key WIF string
@@ -162,7 +178,7 @@ export class UtxoHtlc<N extends Network> extends Htlc<N> {
    */
   private buildTransaction(
     utxos: TxOutput[],
-    recipientPublicKey: string | Buffer,
+    destinationAddress: string,
     currentBlockHeight: number,
     feeTokensPerVirtualByte: number,
     privateKey: string,
@@ -174,11 +190,19 @@ export class UtxoHtlc<N extends Network> extends Htlc<N> {
     // Total the utxos
     const tokens = utxos.reduce((t, c) => t + c.tokens, 0);
 
-    // Add output containing the recipient public key
-    tx.addOutput(recipientPublicKey, tokens);
+    // Add output containing the destination public key
+    tx.addOutput(
+      address.toOutputScript(
+        destinationAddress,
+        networks[this._subnet as Subnet],
+      ),
+      tokens,
+    );
 
     // Set transaction locktime
-    tx.locktime = currentBlockHeight;
+    tx.locktime = bip65.encode({
+      blocks: currentBlockHeight,
+    });
 
     // Add the inputs being spent to the transaction
     this.addInputs(utxos, tx, this.generateInputScript());

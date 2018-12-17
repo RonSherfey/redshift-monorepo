@@ -5,6 +5,7 @@ import https from 'https';
 import {
   JsonRpc,
   Network,
+  NetworkError,
   RpcConnectionConfig,
   Subnet,
 } from '../../../../src/types';
@@ -71,6 +72,6 @@ export async function postRpcCall(
     });
     return resp.data;
   } catch (error) {
-    throw new Error(`RpcCallFailed:${error}`);
+    throw new Error(`${NetworkError.RPC_CALL_FAILED}:${error}`);
   }
 }

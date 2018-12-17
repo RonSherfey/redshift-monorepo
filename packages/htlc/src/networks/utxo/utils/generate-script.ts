@@ -32,7 +32,7 @@ function convertScriptElementsToHex(scriptElements: any): string {
  * if false check the lock time, pubkey hash, and push the local pubkey
  * Check remote or local pubkey signed the transaction
  *
- * @param {String} recipientPublicKey - destination address for the hashlock
+ * @param {String} destinationPublicKey - destination public key for the hashlock
  * @param {String} paymentHash - lightning invoice payment hash
  * @param {String} refundPublicKeyHash - refund key hash for the CLTV op
  * @param {Number} timelockBlockHeight - block height at which the swap expires
@@ -40,11 +40,11 @@ function convertScriptElementsToHex(scriptElements: any): string {
  */
 export function createSwapRedeemScript(scriptArgs: RedeemScriptArgs): string {
   const [
-    recipientPublicKeyBuffer,
+    destinationPublicKeyBuffer,
     paymentHashBuffer,
     refundPublicKeyHashBuffer,
   ] = [
-    scriptArgs.recipientPublicKey,
+    scriptArgs.destinationPublicKey,
     scriptArgs.paymentHash,
     scriptArgs.refundPublicKeyHash,
   ].map(i => Buffer.from(i, 'hex'));
@@ -59,7 +59,7 @@ export function createSwapRedeemScript(scriptArgs: RedeemScriptArgs): string {
     opcodes.OP_EQUAL,
     opcodes.OP_IF,
     opcodes.OP_DROP,
-    recipientPublicKeyBuffer,
+    destinationPublicKeyBuffer,
     opcodes.OP_ELSE,
     cltvBuffer,
     opcodes.OP_CHECKLOCKTIMEVERIFY,

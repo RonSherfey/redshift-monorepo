@@ -48,12 +48,10 @@ export const Subnet = {
 export type Subnet = ValueOf<Pick<typeof Subnet, KnownKeys<typeof Subnet>>>;
 
 /**
- * Returns the subnet type for the provided network
+ * Returns the subnet enum for the provided network
  */
-export type ConditionalSubnet<N> = N extends Network.BITCOIN
-  ? BitcoinSubnet
-  : N extends Network.LITECOIN
-  ? LitecoinSubnet
-  : N extends Network.ETHEREUM
-  ? EthereumSubnet
-  : unknown;
+export interface SubnetMap {
+  [Network.BITCOIN]: BitcoinSubnet;
+  [Network.LITECOIN]: LitecoinSubnet;
+  [Network.ETHEREUM]: EthereumSubnet;
+}

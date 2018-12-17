@@ -1,10 +1,10 @@
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3/types';
 import {
-  ConditionalSubnet,
   EthereumSubnet,
   Network,
   PartialTxParams,
+  SubnetMap,
   UnsignedTx,
 } from '../../types';
 import { addHexPrefix } from '../../utils';
@@ -30,7 +30,7 @@ export class EthereumHtlc<N extends Network> extends Htlc<N> {
    * @param subnet The chain subnet
    * @param web3 The web3 instance used for contract calls
    */
-  constructor(network: N, subnet: ConditionalSubnet<N>, web3: Web3) {
+  constructor(network: N, subnet: SubnetMap[N], web3: Web3) {
     super(network, subnet);
     const { etherSwap } = getContractAddressesForSubnetOrThrow(
       subnet as EthereumSubnet,

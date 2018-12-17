@@ -1,7 +1,7 @@
 {
 	"simnet": {
 		"messagePrefix": "\\x18Bitcoin Signed Message:\n",
-		"bech32": "bcrt",
+		"bech32": "sb",
 		"bip32": {
 			"public": "043587CF",
 			"private": "04358394"

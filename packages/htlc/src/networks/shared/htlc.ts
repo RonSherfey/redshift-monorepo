@@ -1,16 +1,24 @@
-import { ConditionalSubnet, Network } from '../../types';
+import { Network, NetworkError, Subnet, SubnetMap } from '../../types';
+import { getSubnetForNetwork } from '../../utils/network-utils';
 
 export abstract class Htlc<N extends Network> {
   protected _network: N;
-  protected _subnet: ConditionalSubnet<N>;
+  protected _subnet: SubnetMap[N];
 
   /**
    * Create a new HTLC instance
    * @param network The on-chain network
    * @param subnet The on-chain subnet
    */
-  constructor(network: N, subnet: ConditionalSubnet<N>) {
-    // TODO: Throw on invalid
+  constructor(network: N, subnet: SubnetMap[N]) {
+    if (!Network[network.toUpperCase()]) {
+      throw new Error(NetworkError.INVALID_NETWORK);
+    }
+
+    if (getSubnetForNetwork(network)[subnet as Subnet]) {
+      throw new Error(NetworkError.INVALID_SUBNET);
+    }
+
     this._network = network;
     this._subnet = subnet;
   }

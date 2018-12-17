@@ -23,3 +23,9 @@ export enum WeightEstimationError {
   EXPECTED_UTXOS = 'ExpectedUtxos',
   EXPECTED_UNSIGNED_TX_WEIGHT = 'ExpectedUnsignedTxWeight',
 }
+
+export enum NetworkError {
+  INVALID_NETWORK = 'InvalidNetwork',
+  INVALID_SUBNET = 'InvalidSubnet',
+  RPC_CALL_FAILED = 'RpcCallFailed',
+}

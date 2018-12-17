@@ -1,6 +1,6 @@
 import Web3 from 'web3';
-import { EthereumHtlc, UtxoHtlc } from '../../../../src';
-import { BitcoinSubnet, EthereumSubnet, Network } from '../../../../src/types';
+import { EthereumHtlc } from '../../../../src';
+import { EthereumSubnet, Network } from '../../../../src/types';
 import { config, expect, getRpcWebSocketUrl } from '../../../lib/helpers';
 import { transactionResponseSchema } from '../../../lib/schemas';
 
