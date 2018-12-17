@@ -43,6 +43,52 @@ describe('networks/ethereum/ethereum-htlc', () => {
     });
   });
 
+  describe('Claim', () => {
+    let args: {
+      invoice: string;
+      amount: string;
+      paymentSecret: string;
+      paymentHash: string;
+    };
+
+    beforeEach(async () => {
+      args = config.random.args();
+
+      // Fund the swap
+      await htlc.fund(args.amount, args.invoice, args.paymentHash, true, {
+        from: config.ethereum.accounts[0],
+        gas: 200000,
+      });
+    });
+
+    it('should build a claim transaction and return the unsigned transaction when the shouldSend flag is set to false', async () => {
+      const unsignedClaimTx = await htlc.claim(
+        args.invoice,
+        args.paymentSecret,
+        false,
+      );
+      const claimTxResult = await web3.eth.sendTransaction({
+        ...unsignedClaimTx,
+        from: config.ethereum.accounts[1],
+        gas: 200000,
+      });
+      expect(claimTxResult).to.be.jsonSchema(transactionResponseSchema);
+    });
+
+    it('should build and send a claim transaction when the shouldSend flag is set to true', async () => {
+      const claimTxResult = await htlc.claim(
+        args.invoice,
+        args.paymentSecret,
+        true,
+        {
+          from: config.ethereum.accounts[0],
+          gas: 200000,
+        },
+      );
+      expect(claimTxResult).to.be.jsonSchema(transactionResponseSchema);
+    });
+  });
+
   describe('Refund', () => {
     let args: {
       invoice: string;
