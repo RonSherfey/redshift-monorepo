@@ -5,8 +5,30 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
+    "test": "mocha -r @ts-tools/node \"test/**/*.test.ts\" --watch-extensions ts --colors"
   },
   "keywords": [],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "big.js": "^5.2.2",
+    "bip65": "^1.0.3",
+    "bitcoinjs-lib": "^4.0.2",
+    "dotenv": "^6.2.0",
+    "varuint-bitcoin": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/big.js": "^4.0.5",
+    "@types/bip32": "^1.0.0",
+    "@types/bip39": "^2.4.1",
+    "@types/bitcoinjs-lib": "^4.0.0",
+    "@types/chai-json-schema": "^1.4.3",
+    "@types/dotenv": "^6.1.0",
+    "@types/web3": "^1.0.14",
+    "axios": "^0.18.0",
+    "bip39": "^2.5.0",
+    "chai-json-schema": "^1.5.0",
+    "web3": "^1.0.0-beta.37"
+  }
 }
