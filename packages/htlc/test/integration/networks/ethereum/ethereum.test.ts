@@ -4,7 +4,7 @@ import { EthereumSubnet, Network } from '../../../../src/types';
 import { config, expect, getRpcWebSocketUrl } from '../../../lib/helpers';
 import { transactionResponseSchema } from '../../../lib/schemas';
 
-describe('networks/ethereum/ethereum-htlc', () => {
+describe('EVM HTLC - Ethereum Network', () => {
   let web3: Web3;
   let htlc: EvmHtlc<Network.ETHEREUM>;
   before(() => {

@@ -2,7 +2,7 @@ import { HTLC } from '../../../../src';
 import { BitcoinSubnet, Network } from '../../../../src/types';
 import { config, expect } from '../../../lib/helpers';
 
-describe('networks/utxo/utxo-htlc', () => {
+describe('UTXO HTLC - Bitcoin Network', () => {
   const { valid, invalid } = config.bitcoin.unit;
   describe('General', () => {
     it('should decompile the redeem script when a valid redeem script is passed in the constructor', () => {

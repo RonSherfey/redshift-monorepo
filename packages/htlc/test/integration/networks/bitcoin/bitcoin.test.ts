@@ -57,7 +57,7 @@ function setupTestSuite() {
   });
 }
 
-describe('networks/utxo/utxo-htlc', () => {
+describe('UTXO HTLC - Bitcoin Network', () => {
   before(async () => {
     // Instantiate a new rpc client
     rpcClient = new UtxoRpcClient(Network.BITCOIN, BitcoinSubnet.SIMNET);
