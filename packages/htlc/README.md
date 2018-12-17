@@ -1,6 +1,6 @@
 ## @radar-redshift/htlc
 
-A small library for constructing HTLCs across multiple networks & network models.
+A small library used to construct and interact with HTLCs across multiple networks & network models.
 
 ## Bitcoin
 
