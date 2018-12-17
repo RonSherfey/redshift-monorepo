@@ -1,7 +1,7 @@
 import { Network, NetworkError, Subnet, SubnetMap } from '../../types';
 import { getSubnetForNetwork } from '../../utils/network-utils';
 
-export abstract class Htlc<N extends Network> {
+export abstract class BaseHtlc<N extends Network> {
   protected _network: N;
   protected _subnet: SubnetMap[N];
 

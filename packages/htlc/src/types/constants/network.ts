@@ -1,3 +1,4 @@
+import { EvmHtlc, UtxoHtlc } from '../../network-models';
 import { KnownKeys, ValueOf } from '../lib';
 
 // tslint:disable:variable-name
@@ -46,12 +47,3 @@ export const Subnet = {
   ...EthereumSubnet,
 };
 export type Subnet = ValueOf<Pick<typeof Subnet, KnownKeys<typeof Subnet>>>;
-
-/**
- * Returns the subnet enum for the provided network
- */
-export interface SubnetMap {
-  [Network.BITCOIN]: BitcoinSubnet;
-  [Network.LITECOIN]: LitecoinSubnet;
-  [Network.ETHEREUM]: EthereumSubnet;
-}

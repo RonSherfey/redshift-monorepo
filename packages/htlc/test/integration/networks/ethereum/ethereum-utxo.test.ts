@@ -1,17 +1,19 @@
 import Web3 from 'web3';
-import { EthereumHtlc } from '../../../../src';
+import { EvmHtlc, HTLC } from '../../../../src';
 import { EthereumSubnet, Network } from '../../../../src/types';
 import { config, expect, getRpcWebSocketUrl } from '../../../lib/helpers';
 import { transactionResponseSchema } from '../../../lib/schemas';
 
 describe('networks/ethereum/ethereum-htlc', () => {
   let web3: Web3;
-  let htlc: EthereumHtlc<Network.ETHEREUM>;
+  let htlc: EvmHtlc<Network.ETHEREUM>;
   before(() => {
     web3 = new Web3(
       getRpcWebSocketUrl(Network.ETHEREUM, EthereumSubnet.GANACHE),
     );
-    htlc = new EthereumHtlc(Network.ETHEREUM, EthereumSubnet.GANACHE, web3);
+    htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE, {
+      web3,
+    });
   });
 
   describe('Fund', () => {

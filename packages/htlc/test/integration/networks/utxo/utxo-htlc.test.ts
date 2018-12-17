@@ -4,8 +4,8 @@ import {
   BitcoinSubnet,
   BlockResult,
   Network,
-  RedeemScriptArgs,
   TxOutput,
+  UTXO,
 } from '../../../../src/types';
 import { config, toSatoshi, UtxoRpcClient } from '../../../lib/helpers';
 import { mineBlocks } from '../../../lib/helpers/btccli';
@@ -15,7 +15,7 @@ const feeTokensPerVirtualByte = 1;
 let htlc: UtxoHtlc<Network.BITCOIN>;
 let rpcClient: UtxoRpcClient;
 let utxos: TxOutput[];
-let htlcArgs: RedeemScriptArgs;
+let htlcArgs: UTXO.RedeemScriptArgs;
 let paymentSecret: string;
 
 /**

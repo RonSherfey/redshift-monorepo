@@ -1,7 +1,7 @@
 import bip65 from 'bip65';
 import varuint from 'varuint-bitcoin';
 import { opcodes, script } from '../../../overrides/bitcoinjs-lib';
-import { RedeemScriptArgs } from '../../../types';
+import { UTXO } from '../../../types';
 
 /**
  *
@@ -38,7 +38,9 @@ function convertScriptElementsToHex(scriptElements: any): string {
  * @param {Number} timelockBlockHeight - block height at which the swap expires
  * @return {String} the hex representation of the redeem script
  */
-export function createSwapRedeemScript(scriptArgs: RedeemScriptArgs): string {
+export function createSwapRedeemScript(
+  scriptArgs: UTXO.RedeemScriptArgs,
+): string {
   const [
     destinationPublicKeyBuffer,
     paymentHashBuffer,

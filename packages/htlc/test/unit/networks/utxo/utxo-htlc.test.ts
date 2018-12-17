@@ -1,4 +1,4 @@
-import { UtxoHtlc } from '../../../../src';
+import { HTLC } from '../../../../src';
 import { BitcoinSubnet, Network } from '../../../../src/types';
 import { config, expect } from '../../../lib/helpers';
 
@@ -6,7 +6,7 @@ describe('networks/utxo/utxo-htlc', () => {
   const { valid, invalid } = config.bitcoin.unit;
   describe('General', () => {
     it('should decompile the redeem script when a valid redeem script is passed in the constructor', () => {
-      const htlc = new UtxoHtlc(
+      const htlc = HTLC.construct(
         Network.BITCOIN,
         BitcoinSubnet.SIMNET,
         config.bitcoin.unit.valid.redeemScript,
@@ -15,7 +15,7 @@ describe('networks/utxo/utxo-htlc', () => {
     });
 
     it('should compile the redeem script when valid htlc args are passed in the constructor', () => {
-      const htlc = new UtxoHtlc(
+      const htlc = HTLC.construct(
         Network.BITCOIN,
         BitcoinSubnet.SIMNET,
         valid.htlc.args,
@@ -25,13 +25,12 @@ describe('networks/utxo/utxo-htlc', () => {
     });
 
     it('should throw an InvalidRedeemScriptLength error when an arg with an invalid length is passed', () => {
-      expect(
-        () =>
-          new UtxoHtlc(
-            Network.BITCOIN,
-            BitcoinSubnet.SIMNET,
-            invalid.redeemScript,
-          ),
+      expect(() =>
+        HTLC.construct(
+          Network.BITCOIN,
+          BitcoinSubnet.SIMNET,
+          invalid.redeemScript,
+        ),
       ).to.throw(Error, /InvalidRedeemScriptLength/);
     });
   });

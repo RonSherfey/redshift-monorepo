@@ -2,18 +2,19 @@ import Web3 from 'web3';
 import { TransactionReceipt } from 'web3/types';
 import {
   EthereumSubnet,
+  EVM,
   Network,
   PartialTxParams,
   SubnetMap,
   UnsignedTx,
 } from '../../types';
 import { addHexPrefix } from '../../utils';
-import { Htlc } from '../shared';
+import { BaseHtlc } from '../shared';
 import { getContractAddressesForSubnetOrThrow } from './contract-addresses';
 import { abi } from './contract-artifacts/EtherSwap.json';
 import { EtherSwapContract } from './contract-types';
 
-export class EthereumHtlc<N extends Network> extends Htlc<N> {
+export class EvmHtlc<N extends Network> extends BaseHtlc<N> {
   private _contract: EtherSwapContract;
   private _web3Instance: Web3;
 
@@ -30,13 +31,16 @@ export class EthereumHtlc<N extends Network> extends Htlc<N> {
    * @param subnet The chain subnet
    * @param web3 The web3 instance used for contract calls
    */
-  constructor(network: N, subnet: SubnetMap[N], web3: Web3) {
+  constructor(network: N, subnet: SubnetMap[N], options: EVM.Options) {
     super(network, subnet);
     const { etherSwap } = getContractAddressesForSubnetOrThrow(
       subnet as EthereumSubnet,
     );
-    this._contract = new web3.eth.Contract(abi, etherSwap) as EtherSwapContract;
-    this._web3Instance = web3;
+    this._contract = new options.web3.eth.Contract(
+      abi,
+      etherSwap,
+    ) as EtherSwapContract;
+    this._web3Instance = options.web3;
   }
 
   /**

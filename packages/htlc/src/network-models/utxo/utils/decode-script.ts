@@ -9,7 +9,7 @@ import {
   Network,
   Subnet,
   SwapError,
-  UtxoSwapDetails,
+  UTXO,
 } from '../../../types';
 
 /**
@@ -24,7 +24,7 @@ export function getSwapRedeemScriptDetails(
   network: Network,
   subnet: Subnet,
   redeemScriptHex: string,
-): UtxoSwapDetails {
+): UTXO.Details {
   const networkPayload = networks[subnet];
   const redeemScriptBuffer = Buffer.from(redeemScriptHex, 'hex');
   const scriptAssembly = script

@@ -16,11 +16,10 @@ import {
   SubnetMap,
   SwapError,
   TxOutput,
-  UtxoHtlcOptions,
-  UtxoSwapDetails,
+  UTXO,
 } from '../../types';
 import { isDefined } from '../../utils';
-import { Htlc } from '../shared';
+import { BaseHtlc } from '../shared';
 import {
   createSwapRedeemScript,
   estimateFee,
@@ -28,9 +27,9 @@ import {
   toReversedByteOrderBuffer,
 } from './utils';
 
-export class UtxoHtlc<N extends Network> extends Htlc<N> {
+export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
   private _redeemScript: string;
-  private _details: UtxoSwapDetails;
+  private _details: UTXO.Details;
 
   get redeemScript(): string {
     return this._redeemScript;
@@ -40,7 +39,7 @@ export class UtxoHtlc<N extends Network> extends Htlc<N> {
     return Buffer.from(this.redeemScript, 'hex');
   }
 
-  get details(): UtxoSwapDetails {
+  get details(): UTXO.Details {
     return this._details;
   }
 
@@ -50,11 +49,11 @@ export class UtxoHtlc<N extends Network> extends Htlc<N> {
    * @param subnet The chain subnet
    * @param scriptArgs The redeem script or htlc creation options
    */
-  constructor(network: N, subnet: SubnetMap[N], scriptArgs: UtxoHtlcOptions) {
+  constructor(network: N, subnet: SubnetMap[N], options: UTXO.Options) {
     super(network, subnet);
-    this._redeemScript = isString(scriptArgs)
-      ? scriptArgs
-      : createSwapRedeemScript(scriptArgs);
+    this._redeemScript = isString(options)
+      ? options
+      : createSwapRedeemScript(options);
     this._details = getSwapRedeemScriptDetails(
       this._network,
       this._subnet,

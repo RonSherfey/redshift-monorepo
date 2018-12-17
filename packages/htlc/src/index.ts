@@ -1,1 +1,3 @@
-export { EthereumHtlc, UtxoHtlc } from './networks';
+export * from './htlc';
+export * from './network-models';
+export * from './types';
