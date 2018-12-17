@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { UtxoHtlc } from '../../../../src';
+import { HTLC, UtxoHtlc } from '../../../../src';
 import {
   BitcoinSubnet,
   BlockResult,
@@ -34,7 +34,7 @@ function setupTestSuite() {
     paymentSecret = random.paymentSecret;
 
     // Create a new htlc
-    htlc = new UtxoHtlc(Network.BITCOIN, BitcoinSubnet.SIMNET, htlcArgs);
+    htlc = HTLC.construct(Network.BITCOIN, BitcoinSubnet.SIMNET, htlcArgs);
 
     // Generate & broadcast the funding transaction
     const fundSatoshiAmount = toSatoshi(0.01);
