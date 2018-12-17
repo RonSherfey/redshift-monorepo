@@ -1,5 +1,5 @@
 import { BIP32 } from 'bip32';
-import { Network, Subnet } from '.';
+import { Network, Subnet } from '..';
 
 export namespace UTXO {
   export type Options = string | RedeemScriptArgs;
