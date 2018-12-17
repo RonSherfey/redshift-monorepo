@@ -4,6 +4,7 @@ import {
   Network,
   NetworkModelMap,
   Options,
+  Stellar,
   SubnetMap,
   UTXO,
 } from './types';
@@ -27,7 +28,7 @@ export namespace HTLC {
       case Network.ETHEREUM:
         return new EvmHtlc(network, subnet, options as EVM.Options);
       case Network.ETHEREUM:
-        return new StellarHtlc(network, subnet, options as EVM.Options);
+        return new StellarHtlc(network, subnet, options as Stellar.Options);
       default:
         return new UtxoHtlc(network, subnet, options as UTXO.Options);
     }

@@ -7,7 +7,7 @@ import {
   Network,
   StellarSubnet,
 } from './constants';
-import { EVM, UTXO } from './network-models';
+import { EVM, Stellar, UTXO } from './network-models';
 
 /**
  * HTLC options by network
@@ -16,6 +16,7 @@ export interface Options {
   [Network.BITCOIN]: UTXO.Options;
   [Network.LITECOIN]: UTXO.Options;
   [Network.ETHEREUM]: EVM.Options;
+  [Network.STELLAR]: Stellar.Options;
 }
 
 /**
