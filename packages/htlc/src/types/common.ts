@@ -1,9 +1,11 @@
 import { EvmHtlc, UtxoHtlc } from '..';
+import { StellarHtlc } from '../network-models/index';
 import {
   BitcoinSubnet,
   EthereumSubnet,
   LitecoinSubnet,
   Network,
+  StellarSubnet,
 } from './constants';
 import { EVM, UTXO } from './network-models';
 
@@ -23,6 +25,7 @@ export interface SubnetMap {
   [Network.BITCOIN]: BitcoinSubnet;
   [Network.LITECOIN]: LitecoinSubnet;
   [Network.ETHEREUM]: EthereumSubnet;
+  [Network.STELLAR]: StellarSubnet;
 }
 
 /**
@@ -32,4 +35,5 @@ export interface NetworkModelMap<N extends Network> {
   [Network.BITCOIN]: UtxoHtlc<N>;
   [Network.LITECOIN]: UtxoHtlc<N>;
   [Network.ETHEREUM]: EvmHtlc<N>;
+  [Network.STELLAR]: StellarHtlc<N>;
 }

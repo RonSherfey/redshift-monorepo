@@ -1,4 +1,4 @@
-import { EvmHtlc, UtxoHtlc } from './network-models';
+import { EvmHtlc, StellarHtlc, UtxoHtlc } from './network-models';
 import {
   EVM,
   Network,
@@ -26,6 +26,8 @@ export namespace HTLC {
     switch (network) {
       case Network.ETHEREUM:
         return new EvmHtlc(network, subnet, options as EVM.Options);
+      case Network.ETHEREUM:
+        return new StellarHtlc(network, subnet, options as EVM.Options);
       default:
         return new UtxoHtlc(network, subnet, options as UTXO.Options);
     }
