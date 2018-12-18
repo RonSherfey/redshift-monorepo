@@ -2,27 +2,51 @@ import stellarSdk from 'stellar-sdk';
 import { Network, Stellar, SubnetMap } from '../../types';
 import { BaseHtlc } from '../shared';
 
-// TODO move
 stellarSdk.Network.useTestNetwork();
 const server = new stellarSdk.Server('https://horizon-testnet.stellar.org');
 
 export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
   constructor(network: N, subnet: SubnetMap[N], options: Stellar.Options) {
     super(network, subnet);
+    this.network(subnet);
+  }
+
+  public network(subnet: SubnetMap[N]) {
+    if (subnet === 'xlmtestnet') {
+      // TODO setup testnet
+    }
+    if (subnet === 'stellar') {
+      // TODO set up mainnet
+    }
+    if (subnet === 'zulucrypto') {
+      // TODO setup https://github.com/zulucrypto/docker-stellar-integration-test-network
+    }
+  }
+
+  public async broadcast(envelope: string) {
+    try {
+      const txFromEnvelope = new stellarSdk.Transaction(envelope);
+      const resp = await server.submitTransaction(txFromEnvelope);
+      return resp;
+    } catch (err) {
+      console.log(require('util').inspect(err, false, null, true));
+      throw new Error(err);
+    }
   }
 
   public async sign(keyPair: stellarSdk.Keypair, envelope: string) {
     try {
-      const txFromEnvelope = new stellarSdk.Transaction(envelope);
-      txFromEnvelope.sign(keyPair);
-      const resp = await server.submitTransaction(txFromEnvelope);
-      return resp.hash;
+      const tx = new stellarSdk.Transaction(envelope);
+      tx.sign(keyPair);
+      return tx.toEnvelope().toXDR('base64');
     } catch (err) {
       throw new Error(err);
     }
   }
 
-  public async create(keyPair: stellarSdk.Keypair) {
+  public async create(
+    keyPair: stellarSdk.Keypair,
+  ): Promise<{ createEnvelope: string; escrowPubKey: string }> {
     try {
       // create a completely new and unique pair of keys
       const escrowKeyPair = stellarSdk.Keypair.random();
@@ -49,7 +73,10 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
       const tx = tb.build();
       tx.sign(escrowKeyPair);
       tx.sign(keyPair);
-      return tx.toEnvelope().toXDR('base64');
+      return {
+        createEnvelope: tx.toEnvelope().toXDR('base64'),
+        escrowPubKey: escrowKeyPair.publicKey(),
+      };
     } catch (err) {
       throw new Error(err);
     }
@@ -75,8 +102,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
       tx.sign(keyPair);
       // https://stellar.github.io/js-stellar-sdk/Transaction.html#signHashX
       tx.signHashX(preimage);
-      // broadcast transaction
-      return await server.submitTransaction(tx);
+      return tx.toEnvelope().toXDR('base64');
     } catch (err) {
       console.log('claim transaction failed');
       console.log(err.response.data.extras);
@@ -87,7 +113,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     keyPair: stellarSdk.Keypair,
     userPubKey: string,
     escrowPubKey: string,
-    amount: string,
+    amount: number,
     hashX: string,
   ) {
     try {
@@ -97,7 +123,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
       const tb = new stellarSdk.TransactionBuilder(account)
         .addOperation(
           stellarSdk.Operation.payment({
-            amount, // user pays amount
+            amount: amount.toString(), // user pays amount
             destination: escrowPubKey,
             asset: stellarSdk.Asset.native(),
           }),
@@ -147,6 +173,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     keyPair: stellarSdk.Keypair,
     userPubKey: string,
     escrowPubKey: string,
+    timelockSeconds: number,
   ) {
     try {
       // load escrow account from pub key
@@ -156,7 +183,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
       // build claim transaction with timelock
       const tb = new stellarSdk.TransactionBuilder(escrowAccount, {
         timebounds: {
-          minTime: Math.floor(Date.now() / 1000) + 2, // timelock of 2 seconds
+          minTime: Math.floor(Date.now() / 1000) + timelockSeconds, // timelock of 2 seconds
           maxTime: 0,
         },
       })
