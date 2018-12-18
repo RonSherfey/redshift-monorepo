@@ -2,31 +2,42 @@ import stellarSdk from 'stellar-sdk';
 import { Network, Stellar, SubnetMap } from '../../types';
 import { BaseHtlc } from '../shared';
 
-stellarSdk.Network.useTestNetwork();
-const server = new stellarSdk.Server('https://horizon-testnet.stellar.org');
-
 export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
+  private server: any;
+
   constructor(network: N, subnet: SubnetMap[N], options: Stellar.Options) {
     super(network, subnet);
     this.network(subnet);
   }
 
-  public network(subnet: SubnetMap[N]) {
+  private network(subnet: SubnetMap[N]) {
+    // https://www.stellar.org/developers/js-stellar-sdk/reference/examples.html
     if (subnet === 'xlmtestnet') {
-      // TODO setup testnet
-    }
-    if (subnet === 'stellar') {
-      // TODO set up mainnet
-    }
-    if (subnet === 'zulucrypto') {
-      // TODO setup https://github.com/zulucrypto/docker-stellar-integration-test-network
+      stellarSdk.Network.useTestNetwork();
+      this.server = new stellarSdk.Server(
+        'https://horizon-testnet.stellar.org',
+      );
+    } else if (subnet === 'stellar') {
+      stellarSdk.Network.usePublicNetwork();
+      this.server = new stellarSdk.Server('https://horizon.stellar.org');
+    } else if (subnet === 'zulucrypto') {
+      // https://github.com/zulucrypto/docker-stellar-integration-test-network
+      stellarSdk.Network.use(
+        new stellarSdk.Network('Integration Test Network ; zulucrypto'),
+      );
+      // https://github.com/RadarRelay/redshift-submarine-backend/pull/48
+      this.server = new stellarSdk.Server('http://localhost:8000', {
+        allowHttp: true,
+      });
+    } else {
+      throw new Error('unable to connect stellar network');
     }
   }
 
   public async broadcast(envelope: string) {
     try {
       const txFromEnvelope = new stellarSdk.Transaction(envelope);
-      const resp = await server.submitTransaction(txFromEnvelope);
+      const resp = await this.server.submitTransaction(txFromEnvelope);
       return resp;
     } catch (err) {
       throw new Error(err);
@@ -49,7 +60,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     try {
       // create a completely new and unique pair of keys
       const escrowKeyPair = stellarSdk.Keypair.random();
-      const userAccount = await server.loadAccount(keyPair.publicKey());
+      const userAccount = await this.server.loadAccount(keyPair.publicKey());
       // build transaction with operations
       const tb = new stellarSdk.TransactionBuilder(userAccount)
         .addOperation(
@@ -82,7 +93,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
   }
 
   public async accountInfo(pubKey: string) {
-    return server.loadAccount(pubKey);
+    return this.server.loadAccount(pubKey);
   }
 
   public async claim(
@@ -92,7 +103,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
   ): Promise<string> {
     try {
       // load escrow account from pub key
-      const escrowAccount = await server.loadAccount(escrowPubKey);
+      const escrowAccount = await this.server.loadAccount(escrowPubKey);
       // build claim transaction
       const tb = new stellarSdk.TransactionBuilder(escrowAccount).addOperation(
         stellarSdk.Operation.accountMerge({
@@ -120,7 +131,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
   ): Promise<string> {
     try {
       // load account to sign with
-      const account = await server.loadAccount(userPubKey);
+      const account = await this.server.loadAccount(userPubKey);
       // add a payment operation to the transaction
       const tb = new stellarSdk.TransactionBuilder(account)
         .addOperation(
@@ -179,7 +190,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
   ) {
     try {
       // load escrow account from pub key
-      const escrowAccount = await server.loadAccount(escrowPubKey);
+      const escrowAccount = await this.server.loadAccount(escrowPubKey);
       // load all payments
       const escrowPayments = await escrowAccount.payments();
       // build claim transaction with timelock
