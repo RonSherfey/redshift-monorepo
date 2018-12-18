@@ -29,7 +29,6 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
       const resp = await server.submitTransaction(txFromEnvelope);
       return resp;
     } catch (err) {
-      console.log(require('util').inspect(err, false, null, true));
       throw new Error(err);
     }
   }
