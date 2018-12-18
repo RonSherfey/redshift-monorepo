@@ -34,7 +34,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     }
   }
 
-  public async sign(keyPair: stellarSdk.Keypair, envelope: string) {
+  public sign(keyPair: stellarSdk.Keypair, envelope: string) {
     try {
       const tx = new stellarSdk.Transaction(envelope);
       tx.sign(keyPair);
@@ -82,11 +82,15 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     }
   }
 
+  public async accountInfo(pubKey: string) {
+    return server.loadAccount(pubKey);
+  }
+
   public async claim(
     keyPair: stellarSdk.Keypair,
     escrowPubKey: string,
     preimage: string,
-  ) {
+  ): Promise<string> {
     try {
       // load escrow account from pub key
       const escrowAccount = await server.loadAccount(escrowPubKey);
@@ -104,8 +108,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
       tx.signHashX(preimage);
       return tx.toEnvelope().toXDR('base64');
     } catch (err) {
-      console.log('claim transaction failed');
-      console.log(err.response.data.extras);
+      throw new Error(err);
     }
   }
 
@@ -115,7 +118,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     escrowPubKey: string,
     amount: number,
     hashX: string,
-  ) {
+  ): Promise<string> {
     try {
       // load account to sign with
       const account = await server.loadAccount(userPubKey);

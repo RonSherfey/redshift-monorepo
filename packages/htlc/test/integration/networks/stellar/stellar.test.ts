@@ -51,7 +51,7 @@ describe('Stellar HTLC - Stellar Network', () => {
       );
       // user signs fund envelope
       const userKeyPair = stellarSdk.Keypair.fromSecret(userSecret);
-      const signedFundEnvelope = await htlc.sign(userKeyPair, fundEnvelope);
+      const signedFundEnvelope = htlc.sign(userKeyPair, fundEnvelope);
       // broadcast funded envelope
       const fundedTxResp = await htlc.broadcast(signedFundEnvelope);
       // get transaction operation
@@ -62,6 +62,47 @@ describe('Stellar HTLC - Stellar Network', () => {
       expect(operations.data._embedded.records[0].to).to.equal(escrowPubKey);
       expect(operations.data._embedded.records[0].from).to.equal(userPubKey);
       expect(operations.data._embedded.records[0].amount).to.equal('3.0000000');
+    });
+  });
+
+  describe('Claim', () => {
+    it('should create escrow account, fund and claim', async () => {
+      // get initial server account balance
+      const preClaimServerBalance = await htlc
+        .accountInfo(serverPubKey)
+        .then(resp => Number(resp.balances[0].balance));
+      const serverKeyPair = stellarSdk.Keypair.fromSecret(serverSecret);
+      // server creates envelope to broadcast
+      const { createEnvelope, escrowPubKey } = await htlc.create(serverKeyPair);
+      // broadcast envelope
+      await htlc.broadcast(createEnvelope);
+      // create fund envelope, sends to user
+      const fundEnvelope = await htlc.fund(
+        serverKeyPair,
+        userPubKey,
+        escrowPubKey,
+        3,
+        hashX,
+      );
+      // user signs fund envelope
+      const userKeyPair = stellarSdk.Keypair.fromSecret(userSecret);
+      const signedFundEnvelope = htlc.sign(userKeyPair, fundEnvelope);
+      // broadcast funded envelope
+      await htlc.broadcast(signedFundEnvelope);
+      // server pays invoice and gets preimage
+      const claimEnvelope = await htlc.claim(
+        serverKeyPair,
+        escrowPubKey,
+        preimage,
+      );
+      // broadcast claim Envelope
+      await htlc.broadcast(claimEnvelope);
+      // get balance after claiming
+      const postClaimServerBalance = await htlc
+        .accountInfo(serverPubKey)
+        .then(resp => Number(resp.balances[0].balance));
+      // server should recieve XLM
+      expect(postClaimServerBalance).to.be.above(preClaimServerBalance);
     });
   });
 });
