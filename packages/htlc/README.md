@@ -6,7 +6,7 @@ A small library used to construct and interact with HTLCs across multiple networ
 
 ### Construct a new Bitcoin HTLC:
 
-```
+```typescript
 import { HTLC } from '@radar-redshift/htlc';
 
 const htlc = HTLC.construct(Network.BITCOIN, BitcoinSubnet.SIMNET, {
@@ -19,7 +19,7 @@ const htlc = HTLC.construct(Network.BITCOIN, BitcoinSubnet.SIMNET, {
 
 ### Construct a Bitcoin HTLC from an existing redeem script:
 
-```
+```typescript
 import { HTLC } from '@radar-redshift/htlc';
 
 const htlc = HTLC.construct(
@@ -32,22 +32,22 @@ const htlc = HTLC.construct(
 ### Interact with the Bitcoin HTLC
 
 Get the HTLC details:
-```
+```typescript
 const { details } = htlc;
 ```
 
 Get the redeem script
-```
+```typescript
 const { redeemScript } = htlc;
 ```
 
 Generate the fund transaction. You can now broadcast it using `sendrawtransaction`:
-```
+```typescript
 const fundTxHex = htlc.fund(utxos, fundingAmount, privateKey);
 ```
 
 Generate the claim transaction. You can now broadcast it using `sendrawtransaction`:
-```
+```typescript
 const claimTxHex = htlc.claim(
   utxos,
   destinationAddress,
@@ -59,7 +59,7 @@ const claimTxHex = htlc.claim(
 ```
 
 Generate the refund transaction. You can now broadcast it using `sendrawtransaction`:
-```
+```typescript
 const refundTxHex = htlc.refund(
   utxos,
   destinationAddress,
@@ -74,7 +74,7 @@ const refundTxHex = htlc.refund(
 
 ### Construct an Ethereum HTLC:
 
-```
+```typescript
 import { HTLC } from '@radar-redshift/htlc';
 
 const htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE, {
@@ -85,34 +85,34 @@ const htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE, {
 ### Interact with the Ethereum HTLC
 
 Get the deployed HTLC contract instance:
-```
+```typescript
 const { contract } = htlc;
 ```
 
 Generate, sign, and broadcast the fund transaction using the provided `web3` instance:
-```
+```typescript
 const txReceipt = await htlc.fund(amount, invoice, paymentHash);
 ```
 
 Generate and broadcast the claim transaction using the provided `web3` instance:
-```
+```typescript
 const txReceipt = await htlc.claim(invoice, paymentSecret);
 ```
 
 Generate and broadcast the refund transaction using the provided `web3` instance:
-```
+```typescript
 const txReceipt = await htlc.refund(invoice);
 ```
 
 Want to pass in additional tx params? Pass all desired tx params as the last argument:
-```
+```typescript
 const txReceipt = await htlc.refund(invoice, true, {
   gas: 200000,
 });
 ```
 
 Don't want to sign and broadcast the transaction? Set `shouldSend` to false to return the unsigned transaction. You can now broadcast it using `eth_sendTransaction`:
-```
+```typescript
 const unsignedTx = await htlc.refund(invoice, false);
 ```
 
