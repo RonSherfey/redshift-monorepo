@@ -27,7 +27,7 @@ export namespace HTLC {
     switch (network) {
       case Network.ETHEREUM:
         return new EvmHtlc(network, subnet, options as EVM.Options);
-      case Network.ETHEREUM:
+      case Network.STELLAR:
         return new StellarHtlc(network, subnet, options as Stellar.Options);
       default:
         return new UtxoHtlc(network, subnet, options as UTXO.Options);
