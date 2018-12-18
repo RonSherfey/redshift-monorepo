@@ -5,11 +5,21 @@ import { BaseHtlc } from '../shared';
 export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
   private server: any;
 
+  /**
+   * Create a new Stellar HTLC instance
+   * @param network
+   * @param subnet
+   * @param options
+   */
   constructor(network: N, subnet: SubnetMap[N], options: Stellar.Options) {
     super(network, subnet);
     this.network(subnet);
   }
 
+  /**
+   * Connect to mainnet, testnet or local
+   * @param subnet
+   */
   private network(subnet: SubnetMap[N]) {
     // https://www.stellar.org/developers/js-stellar-sdk/reference/examples.html
     if (subnet === 'xlmtestnet') {
@@ -34,6 +44,18 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     }
   }
 
+  /**
+   * Get stellar account info
+   * @param pubKey
+   */
+  public async accountInfo(pubKey: string) {
+    return this.server.loadAccount(pubKey);
+  }
+
+  /**
+   * Broadcast signed envelope to network
+   * @param envelope
+   */
   public async broadcast(envelope: string) {
     try {
       const txFromEnvelope = new stellarSdk.Transaction(envelope);
@@ -44,16 +66,10 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     }
   }
 
-  public sign(keyPair: stellarSdk.Keypair, envelope: string) {
-    try {
-      const tx = new stellarSdk.Transaction(envelope);
-      tx.sign(keyPair);
-      return tx.toEnvelope().toXDR('base64');
-    } catch (err) {
-      throw new Error(err);
-    }
-  }
-
+  /**
+   * Create a generic escrow account
+   * @param keyPair stellarSdk.Keypair.fromSecret('secret-here')
+   */
   public async create(
     keyPair: stellarSdk.Keypair,
   ): Promise<{ createEnvelope: string; escrowPubKey: string }> {
@@ -92,10 +108,12 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     }
   }
 
-  public async accountInfo(pubKey: string) {
-    return this.server.loadAccount(pubKey);
-  }
-
+  /**
+   * Create claim envelope once the preimage is revealed. Broadcast to complete swap
+   * @param keyPair stellarSdk.Keypair.fromSecret('secret-here')
+   * @param escrowPubKey
+   * @param preimage
+   */
   public async claim(
     keyPair: stellarSdk.Keypair,
     escrowPubKey: string,
@@ -122,6 +140,14 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     }
   }
 
+  /**
+   * Create fund envelope. User must sign to make valid. Once signed the escrow account becomes a multisig
+   * @param keyPair stellarSdk.Keypair.fromSecret('secret-here')
+   * @param userPubKey
+   * @param escrowPubKey
+   * @param amount
+   * @param hashX
+   */
   public async fund(
     keyPair: stellarSdk.Keypair,
     userPubKey: string,
@@ -182,6 +208,13 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     }
   }
 
+  /**
+   * Create refund envelope in case something goes wrong. user must sign to be valid. can only broadcast after timelock
+   * @param keyPair stellarSdk.Keypair.fromSecret('secret-here')
+   * @param userPubKey
+   * @param escrowPubKey
+   * @param timelockSeconds
+   */
   public async refund(
     keyPair: stellarSdk.Keypair,
     userPubKey: string,
@@ -216,6 +249,21 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
       const tx = tb.build();
       tx.sign(keyPair);
       // https://www.stellar.org/developers/horizon/reference/xdr.html
+      return tx.toEnvelope().toXDR('base64');
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
+
+  /**
+   * Sign fund envelope or refund envelope
+   * @param keyPair stellarSdk.Keypair.fromSecret('secret-here')
+   * @param envelope
+   */
+  public sign(keyPair: stellarSdk.Keypair, envelope: string) {
+    try {
+      const tx = new stellarSdk.Transaction(envelope);
+      tx.sign(keyPair);
       return tx.toEnvelope().toXDR('base64');
     } catch (err) {
       throw new Error(err);
