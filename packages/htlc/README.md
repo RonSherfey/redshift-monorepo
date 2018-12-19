@@ -122,6 +122,7 @@ const unsignedTx = await htlc.refund(invoice, false);
 
 ```typescript
 import { HTLC } from '@radar-redshift/htlc';
+import stellarSdk from 'stellar-sdk';
 
 const htlc = HTLC.construct(Network.STELLAR, StellarSubnet.XLMTESTNET);
 
@@ -142,7 +143,7 @@ const fundEnvelope = await htlc.fund(
   serverKeyPair,
   userPubKey,
   escrowPubKey,
-  3, // 3 XLM
+  3, // tell user to fund 3 XLM
   hashX, // hash from ln invoice
 );
 
