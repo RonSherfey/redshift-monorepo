@@ -35,7 +35,6 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
       stellarSdk.Network.use(
         new stellarSdk.Network('Integration Test Network ; zulucrypto'),
       );
-      // https://github.com/RadarRelay/redshift-submarine-backend/pull/48
       this.server = new stellarSdk.Server('http://localhost:8000', {
         allowHttp: true,
       });
@@ -76,9 +75,9 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     try {
       // create a completely new and unique pair of keys
       const escrowKeyPair = stellarSdk.Keypair.random();
-      const userAccount = await this.server.loadAccount(keyPair.publicKey());
+      const serverAccount = await this.server.loadAccount(keyPair.publicKey());
       // build transaction with operations
-      const tb = new stellarSdk.TransactionBuilder(userAccount)
+      const tb = new stellarSdk.TransactionBuilder(serverAccount)
         .addOperation(
           stellarSdk.Operation.createAccount({
             destination: escrowKeyPair.publicKey(), // create escrow account
@@ -224,12 +223,10 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     try {
       // load escrow account from pub key
       const escrowAccount = await this.server.loadAccount(escrowPubKey);
-      // load all payments
-      const escrowPayments = await escrowAccount.payments();
       // build claim transaction with timelock
       const tb = new stellarSdk.TransactionBuilder(escrowAccount, {
         timebounds: {
-          minTime: Math.floor(Date.now() / 1000) + timelockSeconds, // timelock of 2 seconds
+          minTime: Math.floor(Date.now() / 1000) + timelockSeconds,
           maxTime: 0,
         },
       })
