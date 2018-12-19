@@ -48,7 +48,11 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
    * @param pubKey
    */
   public async accountInfo(pubKey: string) {
-    return this.server.loadAccount(pubKey);
+    try {
+      return this.server.loadAccount(pubKey);
+    } catch (err) {
+      throw new Error(err);
+    }
   }
 
   /**

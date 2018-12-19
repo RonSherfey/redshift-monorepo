@@ -298,4 +298,14 @@ describe('Stellar HTLC - Stellar Network', () => {
       expect(postClaimEscrowBalance).to.be.greaterThan(0);
     });
   });
+
+  describe('AccountInfo Invalid', () => {
+    it('should throw error if pub key is not vaid', async () => {
+      try {
+        await htlc.accountInfo('invalid-pub-key');
+      } catch (err) {
+        expect(err).to.not.be.undefined;
+      }
+    });
+  });
 });
