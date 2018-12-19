@@ -160,4 +160,45 @@ describe('Stellar HTLC - Stellar Network', () => {
       );
     });
   });
+
+  describe('Claim with wrong hash', () => {
+    it('should create escrow account, fund and claim with wrong preimage', async () => {
+      // get initial server account balance
+      const serverKeyPair = stellarSdk.Keypair.fromSecret(serverSecret);
+      // server creates envelope to broadcast
+      const { createEnvelope, escrowPubKey } = await htlc.create(serverKeyPair);
+      // broadcast envelope
+      await htlc.broadcast(createEnvelope);
+      // create fund envelope, sends to user
+      const fundEnvelope = await htlc.fund(
+        serverKeyPair,
+        userPubKey,
+        escrowPubKey,
+        3,
+        hashX,
+      );
+      // user signs fund envelope
+      const userKeyPair = stellarSdk.Keypair.fromSecret(userSecret);
+      const signedFundEnvelope = htlc.sign(userKeyPair, fundEnvelope);
+      // broadcast funded envelope
+      await htlc.broadcast(signedFundEnvelope);
+      // server pays does not pay and tries a different preimage
+      const claimEnvelope = await htlc.claim(
+        serverKeyPair,
+        escrowPubKey,
+        'this-is-an-incorrect-preimage',
+      );
+      // broadcast claim Envelope
+      try {
+        await htlc.broadcast(claimEnvelope);
+      } catch (err) {
+        expect(err).to.not.be.undefined;
+      }
+      // escrow account should still exist with a balance
+      const postClaimEscrowBalance = await htlc
+        .accountInfo(escrowPubKey)
+        .then(resp => Number(resp.balances[0].balance));
+      expect(postClaimEscrowBalance).to.be.greaterThan(0);
+    });
+  });
 });
