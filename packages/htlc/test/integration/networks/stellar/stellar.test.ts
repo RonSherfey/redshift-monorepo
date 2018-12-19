@@ -161,7 +161,7 @@ describe('Stellar HTLC - Stellar Network', () => {
     });
   });
 
-  describe('Claim with wrong hash', () => {
+  describe('Claim with wrong preimage', () => {
     it('should create escrow account, fund and claim with wrong preimage', async () => {
       // get initial server account balance
       const serverKeyPair = stellarSdk.Keypair.fromSecret(serverSecret);
