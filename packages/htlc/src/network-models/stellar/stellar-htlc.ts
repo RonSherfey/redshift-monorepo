@@ -223,7 +223,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     userPubKey: string,
     escrowPubKey: string,
     timelockSeconds: number,
-  ) {
+  ): Promise<string> {
     try {
       // load escrow account from pub key
       const escrowAccount = await this.server.loadAccount(escrowPubKey);
@@ -261,7 +261,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
    * @param keyPair stellarSdk.Keypair.fromSecret('secret-here')
    * @param envelope
    */
-  public sign(keyPair: stellarSdk.Keypair, envelope: string) {
+  public sign(keyPair: stellarSdk.Keypair, envelope: string): string {
     try {
       const tx = new stellarSdk.Transaction(envelope);
       tx.sign(keyPair);
