@@ -116,6 +116,77 @@ Don't want to sign and broadcast the transaction? Set `shouldSend` to false to r
 const unsignedTx = await htlc.refund(invoice, false);
 ```
 
+## Stellar
+
+### Construct an Stellar HTLC:
+
+```typescript
+import { HTLC } from '@radar-redshift/htlc';
+
+const htlc = HTLC.construct(Network.STELLAR, StellarSubnet.XLMTESTNET);
+
+const serverKeyPair = stellarSdk.Keypair.fromSecret('SCHMRGINH4CDPUPKBEQZTFZHNRSZKC3NYEFMSUYNDKA4OQK3ZA7JT7C6);
+
+```
+
+Sever builds & signs a transaction (envelope) to create an escrow account (escrowPubKey):
+```typescript
+const { createEnvelope, escrowPubKey } = await htlc.create(serverKeyPair);
+
+await htlc.broadcast(createEnvelope)
+```
+
+When escrow account is created, server builds fund and refund envelope for user:
+```typescript
+const fundEnvelope = await htlc.fund(
+  serverKeyPair,
+  userPubKey,
+  escrowPubKey,
+  3, // 3 XLM
+  hashX, // hash from ln invoice
+);
+
+const refundEnvelope = await htlc.refund(
+  serverKeyPair,
+  userPubKey,
+  escrowPubKey,
+  3600, // timelock in seconds (1hr)
+);
+```
+
+User recieves the `escrowPubKey`, `fundEnvelope`, and `refundEnvelope`. If user agrees to the fund amount (3 XLM), then user will sign the fund envelope and broadcast:
+```typescript
+const userKeyPair = stellarSdk.Keypair.fromSecret('GDGFK52PNXSKD7BKE5GQJQJ7THDACI5ECDWWEIC6GR5KKBDY7SGPRV6X');
+
+const signedFundEnvelope = htlc.sign(userKeyPair, fundEnvelope);
+
+await htlc.broadcast(signedFundEnvelope);
+
+// once broadcasted, the escrow account becomes a 2/3 multisig
+```
+
+When escrow account is funded, server pays ln invoice to get preimage. Server uses preimage to claim XLM funds.
+``` typescript
+const claimEnvelope = await htlc.claim(
+  serverKeyPair,
+  escrowPubKey,
+  preimage, // get preimage from paying ln invoice
+);
+
+await htlc.broadcast(claimEnvelope);
+
+// once broadcasted, escrow account gets merged into server account aka swap complete
+```
+
+If server is does not pay invoice, user can broadcast refundEnvelope after timelock (1 hr)
+``` typescript
+const signedRefundEnvelope = htlc.sign(userKeyPair, refundEnvelope);
+
+await htlc.broadcast(signedRefundEnvelope);
+
+// once broadcasted, XLM is returned back to user
+```
+
 ## Testing
 
 Run tests:
