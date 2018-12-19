@@ -182,7 +182,7 @@ describe('Stellar HTLC - Stellar Network', () => {
       const signedFundEnvelope = htlc.sign(userKeyPair, fundEnvelope);
       // broadcast funded envelope
       await htlc.broadcast(signedFundEnvelope);
-      // server pays does not pay and tries a different preimage
+      // server uses a incorrect preimage
       const claimEnvelope = await htlc.claim(
         serverKeyPair,
         escrowPubKey,
@@ -204,13 +204,6 @@ describe('Stellar HTLC - Stellar Network', () => {
 
   describe('Refund before timelock', () => {
     it('should create escrow account, fund and refund before timelock', async () => {
-      // get initial server account balance
-      const preClaimServerBalance = await htlc
-        .accountInfo(serverPubKey)
-        .then(resp => Number(resp.balances[0].balance));
-      const preClaimUserBalance = await htlc
-        .accountInfo(userPubKey)
-        .then(resp => Number(resp.balances[0].balance));
       const serverKeyPair = stellarSdk.Keypair.fromSecret(serverSecret);
       // server creates envelope to broadcast
       const { createEnvelope, escrowPubKey } = await htlc.create(serverKeyPair);
@@ -242,6 +235,7 @@ describe('Stellar HTLC - Stellar Network', () => {
       try {
         await htlc.broadcast(signedRefundEnvelope);
       } catch (err) {
+        // unable to broadcast because of timelock is set to 1 hr
         expect(err).to.not.be.undefined;
       }
       // escrow account should still exist with a balance
@@ -254,10 +248,6 @@ describe('Stellar HTLC - Stellar Network', () => {
 
   describe('Claim with different keypair', () => {
     it('should create escrow account, fund and claim with different keypair', async () => {
-      // get initial server account balance
-      const preClaimServerBalance = await htlc
-        .accountInfo(serverPubKey)
-        .then(resp => Number(resp.balances[0].balance));
       const serverKeyPair = stellarSdk.Keypair.fromSecret(serverSecret);
       // server creates envelope to broadcast
       const { createEnvelope, escrowPubKey } = await htlc.create(serverKeyPair);
@@ -289,6 +279,7 @@ describe('Stellar HTLC - Stellar Network', () => {
       try {
         await htlc.broadcast(claimEnvelope);
       } catch (err) {
+        // unable to broadcast because server signed with wrong keypair
         expect(err).to.not.be.undefined;
       }
       // escrow account should still exist with a balance

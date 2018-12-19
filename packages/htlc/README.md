@@ -137,7 +137,7 @@ const { createEnvelope, escrowPubKey } = await htlc.create(serverKeyPair);
 await htlc.broadcast(createEnvelope)
 ```
 
-When escrow account is created, server builds fund and refund envelope for user:
+When escrow account is created, server builds `fundEnvelope` and `refundEnvelope` for user:
 ```typescript
 const fundEnvelope = await htlc.fund(
   serverKeyPair,
