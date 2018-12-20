@@ -124,15 +124,14 @@ const unsignedTx = await htlc.refund(invoice, false);
 import { HTLC } from '@radar-redshift/htlc';
 import stellarSdk from 'stellar-sdk';
 
-const htlc = HTLC.construct(Network.STELLAR, StellarSubnet.XLMTESTNET);
-
-const serverKeyPair = stellarSdk.Keypair.fromSecret('SCHMRGINH4CDPUPKBEQZTFZHNRSZKC3NYEFMSUYNDKA4OQK3ZA7JT7C6);
+const secret = 'SCHMRGINH4CDPUPKBEQZTFZHNRSZKC3NYEFMSUYNDKA4OQK3ZA7JT7C6'
+const htlc = new StellarHtlc(secret, Network.STELLAR, StellarSubnet.XLMTESTNET);
 
 ```
 
 Sever builds & signs a transaction (envelope) to create an escrow account (escrowPubKey):
 ```typescript
-const { createEnvelope, escrowPubKey } = await htlc.create(serverKeyPair);
+const createEnvelope = await htlc.create();
 
 await htlc.broadcast(createEnvelope)
 ```
@@ -140,39 +139,33 @@ await htlc.broadcast(createEnvelope)
 When escrow account is created, server builds `fundEnvelope` and `refundEnvelope` for user:
 ```typescript
 const fundEnvelope = await htlc.fund(
-  serverKeyPair,
   userPubKey,
-  escrowPubKey,
   3, // tell user to fund 3 XLM
   hashX, // hash from ln invoice
 );
 
 const refundEnvelope = await htlc.refund(
-  serverKeyPair,
   userPubKey,
-  escrowPubKey,
   3600, // timelock in seconds (1hr)
 );
 ```
 
 User recieves the `escrowPubKey`, `fundEnvelope`, and `refundEnvelope`. If user agrees to the fund amount (3 XLM), then user will sign the fund envelope and broadcast:
 ```typescript
-const userKeyPair = stellarSdk.Keypair.fromSecret('GDGFK52PNXSKD7BKE5GQJQJ7THDACI5ECDWWEIC6GR5KKBDY7SGPRV6X');
+const secret = 'GDGFK52PNXSKD7BKE5GQJQJ7THDACI5ECDWWEIC6GR5KKBDY7SGPRV6'
+const userWallet = new StellarHtlc(secret, Network.STELLAR, StellarSubnet.XLMTESTNET);
 
-const signedFundEnvelope = htlc.sign(userKeyPair, fundEnvelope);
+const signedFundEnvelope = userWallet.sign(fundEnvelope);
 
-await htlc.broadcast(signedFundEnvelope);
+await userWallet.broadcast(signedFundEnvelope);
 
 // once broadcasted, the escrow account becomes a 2/3 multisig
 ```
 
 When escrow account is funded, server pays ln invoice to get preimage. Server uses preimage to claim XLM funds.
 ``` typescript
-const claimEnvelope = await htlc.claim(
-  serverKeyPair,
-  escrowPubKey,
-  preimage, // get preimage from paying ln invoice
-);
+// get preimage from paying ln invoice
+const claimEnvelope = await htlc.claim(preimage);
 
 await htlc.broadcast(claimEnvelope);
 
@@ -181,9 +174,9 @@ await htlc.broadcast(claimEnvelope);
 
 If server is does not pay invoice, user can broadcast refundEnvelope after timelock (1 hr)
 ``` typescript
-const signedRefundEnvelope = htlc.sign(userKeyPair, refundEnvelope);
+const signedRefundEnvelope = userWallet.sign(refundEnvelope);
 
-await htlc.broadcast(signedRefundEnvelope);
+await userWallet.broadcast(signedRefundEnvelope);
 
 // once broadcasted, XLM is returned back to user
 ```
