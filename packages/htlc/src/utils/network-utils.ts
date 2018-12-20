@@ -4,6 +4,7 @@ import {
   LitecoinSubnet,
   Network,
   NetworkError,
+  StellarSubnet,
 } from '../types';
 
 /**
@@ -18,6 +19,8 @@ export function getSubnetForNetwork(network: Network) {
       return EthereumSubnet;
     case Network.LITECOIN:
       return LitecoinSubnet;
+    case Network.STELLAR:
+      return StellarSubnet;
     default:
       throw new Error(NetworkError.INVALID_NETWORK);
   }
