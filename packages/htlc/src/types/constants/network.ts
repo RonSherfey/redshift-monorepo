@@ -33,6 +33,7 @@ export enum StellarSubnet {
   ZULUCRYPTO = 'zulucrypto',
   XLMTESTNET = 'xlmtestnet',
   STELLAR = 'stellar',
+  CUSTOM = 'custom',
 }
 
 /**

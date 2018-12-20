@@ -1,9 +1,15 @@
 import stellarSdk from 'stellar-sdk';
-import { Network, Stellar, SubnetMap } from '../../types';
+import {
+  Network,
+  NetworkError,
+  Stellar,
+  StellarSubnet,
+  SubnetMap,
+} from '../../types';
 import { BaseHtlc } from '../shared';
 
 export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
-  private server: any;
+  private _server: stellarSdk.Server;
 
   /**
    * Create a new Stellar HTLC instance
@@ -13,33 +19,50 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
    */
   constructor(network: N, subnet: SubnetMap[N], options: Stellar.Options) {
     super(network, subnet);
-    this.network(subnet);
+    const {
+      url,
+      passphrase,
+      allowHttp = false,
+    } = this.getServerDetailsForSubnet(subnet, options.server);
+    stellarSdk.Network.use(new stellarSdk.Network(passphrase));
+    this._server = new stellarSdk.Server(url, {
+      allowHttp,
+    });
   }
 
   /**
    * Connect to mainnet, testnet or local
    * @param subnet
    */
-  private network(subnet: SubnetMap[N]) {
-    // https://www.stellar.org/developers/js-stellar-sdk/reference/examples.html
-    if (subnet === 'xlmtestnet') {
-      stellarSdk.Network.useTestNetwork();
-      this.server = new stellarSdk.Server(
-        'https://horizon-testnet.stellar.org',
-      );
-    } else if (subnet === 'stellar') {
-      stellarSdk.Network.usePublicNetwork();
-      this.server = new stellarSdk.Server('https://horizon.stellar.org');
-    } else if (subnet === 'zulucrypto') {
-      // https://github.com/zulucrypto/docker-stellar-integration-test-network
-      stellarSdk.Network.use(
-        new stellarSdk.Network('Integration Test Network ; zulucrypto'),
-      );
-      this.server = new stellarSdk.Server('http://localhost:8000', {
-        allowHttp: true,
-      });
-    } else {
-      throw new Error('unable to connect stellar network');
+  private getServerDetailsForSubnet(
+    subnet: SubnetMap[N],
+    serverOptions?: Stellar.ServerOptions,
+  ) {
+    switch (subnet) {
+      case StellarSubnet.STELLAR:
+        return {
+          url: 'https://horizon.stellar.org',
+          passphrase: stellarSdk.Networks.PUBLIC,
+          allowHttp: false,
+        };
+      case StellarSubnet.XLMTESTNET:
+        return {
+          url: 'https://horizon-testnet.stellar.org',
+          passphrase: stellarSdk.Networks.TESTNET,
+          allowHttp: false,
+        };
+      case StellarSubnet.ZULUCRYPTO:
+        return {
+          url: 'http://localhost:8000',
+          passphrase: 'Integration Test Network ; zulucrypto',
+          allowHttp: true,
+        };
+      case StellarSubnet.CUSTOM:
+        return {
+          ...(serverOptions as Stellar.ServerOptions),
+        };
+      default:
+        throw new Error(NetworkError.INVALID_SUBNET);
     }
   }
 
@@ -49,7 +72,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
    */
   public async accountInfo(pubKey: string) {
     try {
-      return this.server.loadAccount(pubKey);
+      return this._server.loadAccount(pubKey);
     } catch (err) {
       throw new Error(err);
     }
@@ -62,7 +85,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
   public async broadcast(envelope: string) {
     try {
       const txFromEnvelope = new stellarSdk.Transaction(envelope);
-      const resp = await this.server.submitTransaction(txFromEnvelope);
+      const resp = await this._server.submitTransaction(txFromEnvelope);
       return resp;
     } catch (err) {
       throw new Error(err);
@@ -79,7 +102,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     try {
       // create a completely new and unique pair of keys
       const escrowKeyPair = stellarSdk.Keypair.random();
-      const serverAccount = await this.server.loadAccount(keyPair.publicKey());
+      const serverAccount = await this._server.loadAccount(keyPair.publicKey());
       // build transaction with operations
       const tb = new stellarSdk.TransactionBuilder(serverAccount)
         .addOperation(
@@ -124,7 +147,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
   ): Promise<string> {
     try {
       // load escrow account from pub key
-      const escrowAccount = await this.server.loadAccount(escrowPubKey);
+      const escrowAccount = await this._server.loadAccount(escrowPubKey);
       // build claim transaction
       const tb = new stellarSdk.TransactionBuilder(escrowAccount).addOperation(
         stellarSdk.Operation.accountMerge({
@@ -160,7 +183,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
   ): Promise<string> {
     try {
       // load account to sign with
-      const account = await this.server.loadAccount(userPubKey);
+      const account = await this._server.loadAccount(userPubKey);
       // add a payment operation to the transaction
       const tb = new stellarSdk.TransactionBuilder(account)
         .addOperation(
@@ -226,7 +249,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
   ): Promise<string> {
     try {
       // load escrow account from pub key
-      const escrowAccount = await this.server.loadAccount(escrowPubKey);
+      const escrowAccount = await this._server.loadAccount(escrowPubKey);
       // build claim transaction with timelock
       const tb = new stellarSdk.TransactionBuilder(escrowAccount, {
         timebounds: {
