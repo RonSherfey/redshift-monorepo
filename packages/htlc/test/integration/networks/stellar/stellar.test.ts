@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { StellarHtlc } from '../../../../src';
-
+import stellarSdk from 'stellar-sdk';
+import { HTLC, StellarHtlc } from '../../../../src';
 import { Network, StellarSubnet } from '../../../../src/types';
 import { expect } from '../../../lib/helpers';
 
@@ -17,13 +17,17 @@ describe('Stellar HTLC - Stellar Network', () => {
   const hashX =
     '087d80f7f182dd44f184aa86ca34488853ebcc04f0c60d5294919a466b463831';
 
+  // setup for client wallet
+  stellarSdk.Network.useTestNetwork();
+  const server = new stellarSdk.Server('https://horizon-testnet.stellar.org');
+  const userKeyPair = stellarSdk.Keypair.fromSecret(userSecret);
+
   describe('Create', () => {
     it('should create and broadcast a transaction envelope', async () => {
-      const htlc: StellarHtlc<Network.STELLAR> = new StellarHtlc(
-        serverSecret,
+      const htlc: StellarHtlc<Network.STELLAR> = HTLC.construct(
         Network.STELLAR,
         StellarSubnet.XLMTESTNET,
-        {},
+        { secret: serverSecret },
       );
       // create envelope to broadcast
       const createEnvelope = await htlc.create();
@@ -35,17 +39,10 @@ describe('Stellar HTLC - Stellar Network', () => {
 
   describe('Fund', () => {
     it('should create escrow account, create fund envelope then broadcast', async () => {
-      const htlc: StellarHtlc<Network.STELLAR> = new StellarHtlc(
-        serverSecret,
+      const htlc: StellarHtlc<Network.STELLAR> = HTLC.construct(
         Network.STELLAR,
         StellarSubnet.XLMTESTNET,
-        {},
-      );
-      const userWallet: StellarHtlc<Network.STELLAR> = new StellarHtlc(
-        userSecret,
-        Network.STELLAR,
-        StellarSubnet.XLMTESTNET,
-        {},
+        { secret: serverSecret },
       );
       // server creates envelope to broadcast
       const createEnvelope = await htlc.create();
@@ -53,10 +50,12 @@ describe('Stellar HTLC - Stellar Network', () => {
       await htlc.broadcast(createEnvelope);
       // create fund envelope, sends to user
       const fundEnvelope = await htlc.fund(userPubKey, 3, hashX);
+
       // user signs fund envelope
-      const signedFundEnvelope = userWallet.sign(fundEnvelope);
-      // broadcast funded envelope
-      const fundedTxResp = await userWallet.broadcast(signedFundEnvelope);
+      const txFromEnvelope = new stellarSdk.Transaction(fundEnvelope);
+      txFromEnvelope.sign(userKeyPair);
+      const fundedTxResp = await server.submitTransaction(txFromEnvelope);
+
       // get transaction operation
       const operations = await axios.get(
         `${fundedTxResp._links.transaction.href}/operations`,
@@ -72,17 +71,10 @@ describe('Stellar HTLC - Stellar Network', () => {
 
   describe('Claim', () => {
     it('should create escrow account, fund and claim', async () => {
-      const htlc: StellarHtlc<Network.STELLAR> = new StellarHtlc(
-        serverSecret,
+      const htlc: StellarHtlc<Network.STELLAR> = HTLC.construct(
         Network.STELLAR,
         StellarSubnet.XLMTESTNET,
-        {},
-      );
-      const userWallet: StellarHtlc<Network.STELLAR> = new StellarHtlc(
-        userSecret,
-        Network.STELLAR,
-        StellarSubnet.XLMTESTNET,
-        {},
+        { secret: serverSecret },
       );
       // get initial server account balance
       const preClaimServerBalance = await htlc
@@ -94,10 +86,12 @@ describe('Stellar HTLC - Stellar Network', () => {
       await htlc.broadcast(createEnvelope);
       // create fund envelope, sends to user
       const fundEnvelope = await htlc.fund(userPubKey, 3, hashX);
+
       // user signs fund envelope
-      const signedFundEnvelope = userWallet.sign(fundEnvelope);
-      // broadcast funded envelope
-      await userWallet.broadcast(signedFundEnvelope);
+      const txFromEnvelope = new stellarSdk.Transaction(fundEnvelope);
+      txFromEnvelope.sign(userKeyPair);
+      await server.submitTransaction(txFromEnvelope);
+
       // server pays invoice and gets preimage
       const claimEnvelope = await htlc.claim(preimage);
       // broadcast claim Envelope
@@ -113,17 +107,10 @@ describe('Stellar HTLC - Stellar Network', () => {
 
   describe('Refund', () => {
     it('should create escrow account, fund and refund', async () => {
-      const htlc: StellarHtlc<Network.STELLAR> = new StellarHtlc(
-        serverSecret,
+      const htlc: StellarHtlc<Network.STELLAR> = HTLC.construct(
         Network.STELLAR,
         StellarSubnet.XLMTESTNET,
-        {},
-      );
-      const userWallet: StellarHtlc<Network.STELLAR> = new StellarHtlc(
-        userSecret,
-        Network.STELLAR,
-        StellarSubnet.XLMTESTNET,
-        {},
+        { secret: serverSecret },
       );
       // get initial server account balance
       const preClaimServerBalance = await htlc
@@ -144,14 +131,19 @@ describe('Stellar HTLC - Stellar Network', () => {
       );
       // create refund envelope in case shit goes wrong
       const refundEnvelope = await htlc.refund(userPubKey, 1);
+
       // user signs fund envelope
-      const signedFundEnvelope = userWallet.sign(fundEnvelope);
-      // broadcast funded envelope
-      await userWallet.broadcast(signedFundEnvelope);
-      // shit went wrong... signing refund
-      const signedRefundEnvelope = userWallet.sign(refundEnvelope);
-      // broadcast refund
-      await userWallet.broadcast(signedRefundEnvelope);
+      const txFromFundEnvelope = new stellarSdk.Transaction(fundEnvelope);
+      txFromFundEnvelope.sign(userKeyPair);
+      await server.submitTransaction(txFromFundEnvelope);
+
+      // ... shit went wrong
+
+      // user signs refund envelope
+      const txFromRefundEnvelope = new stellarSdk.Transaction(refundEnvelope);
+      txFromRefundEnvelope.sign(userKeyPair);
+      await server.submitTransaction(txFromRefundEnvelope);
+
       // get balance after refund
       const postClaimServerBalance = await htlc
         .accountInfo(serverPubKey)
@@ -171,17 +163,10 @@ describe('Stellar HTLC - Stellar Network', () => {
 
   describe('Claim with wrong preimage', () => {
     it('should create escrow account, fund and claim with wrong preimage', async () => {
-      const htlc: StellarHtlc<Network.STELLAR> = new StellarHtlc(
-        serverSecret,
+      const htlc: StellarHtlc<Network.STELLAR> = HTLC.construct(
         Network.STELLAR,
         StellarSubnet.XLMTESTNET,
-        {},
-      );
-      const userWallet: StellarHtlc<Network.STELLAR> = new StellarHtlc(
-        userSecret,
-        Network.STELLAR,
-        StellarSubnet.XLMTESTNET,
-        {},
+        { secret: serverSecret },
       );
       // server creates envelope to broadcast
       const createEnvelope = await htlc.create();
@@ -189,10 +174,12 @@ describe('Stellar HTLC - Stellar Network', () => {
       await htlc.broadcast(createEnvelope);
       // create fund envelope, sends to user
       const fundEnvelope = await htlc.fund(userPubKey, 3, hashX);
+
       // user signs fund envelope
-      const signedFundEnvelope = userWallet.sign(fundEnvelope);
-      // broadcast funded envelope
-      await userWallet.broadcast(signedFundEnvelope);
+      const txFromEnvelope = new stellarSdk.Transaction(fundEnvelope);
+      txFromEnvelope.sign(userKeyPair);
+      await server.submitTransaction(txFromEnvelope);
+
       // server uses a incorrect preimage
       const claimEnvelope = await htlc.claim('this-is-an-incorrect-preimage');
       // broadcast claim Envelope
@@ -211,17 +198,10 @@ describe('Stellar HTLC - Stellar Network', () => {
 
   describe('Claim with different keypair', () => {
     it('should create escrow account, fund and claim with different keypair', async () => {
-      const htlc: StellarHtlc<Network.STELLAR> = new StellarHtlc(
-        serverSecret,
+      const htlc: StellarHtlc<Network.STELLAR> = HTLC.construct(
         Network.STELLAR,
         StellarSubnet.XLMTESTNET,
-        {},
-      );
-      const userWallet: StellarHtlc<Network.STELLAR> = new StellarHtlc(
-        userSecret,
-        Network.STELLAR,
-        StellarSubnet.XLMTESTNET,
-        {},
+        { secret: serverSecret },
       );
       // server creates envelope to broadcast
       const createEnvelope = await htlc.create();
@@ -229,16 +209,17 @@ describe('Stellar HTLC - Stellar Network', () => {
       await htlc.broadcast(createEnvelope);
       // create fund envelope, sends to user
       const fundEnvelope = await htlc.fund(userPubKey, 3, hashX);
+
       // user signs fund envelope
-      const signedFundEnvelope = userWallet.sign(fundEnvelope);
-      // broadcast funded envelope
-      await userWallet.broadcast(signedFundEnvelope);
+      const txFromEnvelope = new stellarSdk.Transaction(fundEnvelope);
+      txFromEnvelope.sign(userKeyPair);
+      await server.submitTransaction(txFromEnvelope);
+
       // server pays invoice and gets preimage but signs with wrong keypair
-      const wrongServerWallet: StellarHtlc<Network.STELLAR> = new StellarHtlc(
-        'SBRNVXKBUC6H7MGJLZTWKWDOFYLBGGHSLG3XKOVY6UIZJQMJFHRFRQLE',
+      const wrongServerWallet: StellarHtlc<Network.STELLAR> = HTLC.construct(
         Network.STELLAR,
         StellarSubnet.XLMTESTNET,
-        {},
+        { secret: 'SBRNVXKBUC6H7MGJLZTWKWDOFYLBGGHSLG3XKOVY6UIZJQMJFHRFRQLE' },
       );
       wrongServerWallet.escrowKeyPair = htlc.escrowKeyPair;
       const claimEnvelope = await wrongServerWallet.claim(preimage);
@@ -259,17 +240,10 @@ describe('Stellar HTLC - Stellar Network', () => {
 
   describe('Refund before timelock', () => {
     it('should create escrow account, fund and refund before timelock', async () => {
-      const htlc: StellarHtlc<Network.STELLAR> = new StellarHtlc(
-        serverSecret,
+      const htlc: StellarHtlc<Network.STELLAR> = HTLC.construct(
         Network.STELLAR,
         StellarSubnet.XLMTESTNET,
-        {},
-      );
-      const userWallet: StellarHtlc<Network.STELLAR> = new StellarHtlc(
-        userSecret,
-        Network.STELLAR,
-        StellarSubnet.XLMTESTNET,
-        {},
+        { secret: serverSecret },
       );
       // server creates envelope to broadcast
       const createEnvelope = await htlc.create();
@@ -279,15 +253,18 @@ describe('Stellar HTLC - Stellar Network', () => {
       const fundEnvelope = await htlc.fund(userPubKey, 3, hashX);
       // create refund envelope in case shit goes wrong
       const refundEnvelope = await htlc.refund(userPubKey, 3600); // 1hr timelock
+
       // user signs fund envelope
-      const signedFundEnvelope = userWallet.sign(fundEnvelope);
-      // broadcast funded envelope
-      await userWallet.broadcast(signedFundEnvelope);
+      const txFromFundEnvelope = new stellarSdk.Transaction(fundEnvelope);
+      txFromFundEnvelope.sign(userKeyPair);
+      await server.submitTransaction(txFromFundEnvelope);
       // shit went wrong... signing refund
-      const signedRefundEnvelope = userWallet.sign(refundEnvelope);
+      const txFromRefundEnvelope = new stellarSdk.Transaction(refundEnvelope);
+      txFromRefundEnvelope.sign(userKeyPair);
+
       // broadcast refund
       try {
-        await userWallet.broadcast(signedRefundEnvelope);
+        await server.submitTransaction(txFromRefundEnvelope);
       } catch (err) {
         // unable to broadcast because of timelock is set to 1 hr
         expect(err).to.not.be.undefined;
@@ -303,11 +280,10 @@ describe('Stellar HTLC - Stellar Network', () => {
   describe('AccountInfo Invalid', () => {
     it('should throw error if pub key is not vaid', async () => {
       try {
-        const htlc: StellarHtlc<Network.STELLAR> = new StellarHtlc(
-          serverSecret,
+        const htlc: StellarHtlc<Network.STELLAR> = HTLC.construct(
           Network.STELLAR,
           StellarSubnet.XLMTESTNET,
-          {},
+          { secret: serverSecret },
         );
         await htlc.accountInfo('invalid-pub-key');
       } catch (err) {

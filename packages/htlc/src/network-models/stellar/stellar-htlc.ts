@@ -10,7 +10,7 @@ import { BaseHtlc } from '../shared';
 
 export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
   private _server: stellarSdk.Server;
-  private serverKeyPair: stellarSdk.Keypair;
+  private _serverKeyPair: stellarSdk.Keypair;
   public escrowKeyPair: stellarSdk.Keypair;
 
   /**
@@ -19,12 +19,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
    * @param subnet
    * @param options
    */
-  constructor(
-    secret: string,
-    network: N,
-    subnet: SubnetMap[N],
-    options: Stellar.Options,
-  ) {
+  constructor(network: N, subnet: SubnetMap[N], options: Stellar.Options) {
     super(network, subnet);
     const {
       url,
@@ -35,7 +30,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     this._server = new stellarSdk.Server(url, {
       allowHttp,
     });
-    this.serverKeyPair = stellarSdk.Keypair.fromSecret(secret);
+    this._serverKeyPair = stellarSdk.Keypair.fromSecret(options.secret);
     // create a completely new and unique pair of keys
     this.escrowKeyPair = stellarSdk.Keypair.random();
   }
@@ -81,11 +76,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
    * @param pubKey
    */
   public async accountInfo(pubKey: string) {
-    try {
-      return this._server.loadAccount(pubKey);
-    } catch (err) {
-      throw new Error(err);
-    }
+    return this._server.loadAccount(pubKey);
   }
 
   /**
@@ -104,7 +95,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
    */
   public async create(): Promise<string> {
     const serverAccount = await this._server.loadAccount(
-      this.serverKeyPair.publicKey(),
+      this._serverKeyPair.publicKey(),
     );
     // build transaction with operations
     const tb = new stellarSdk.TransactionBuilder(serverAccount)
@@ -118,7 +109,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
         stellarSdk.Operation.setOptions({
           source: this.escrowKeyPair.publicKey(),
           signer: {
-            ed25519PublicKey: this.serverKeyPair.publicKey(), // add radar as signer on escrow account
+            ed25519PublicKey: this._serverKeyPair.publicKey(), // add radar as signer on escrow account
             weight: 1,
           },
         }),
@@ -126,7 +117,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
 
     // build and sign transaction
     const tx = tb.build();
-    tx.sign(this.escrowKeyPair, this.serverKeyPair);
+    tx.sign(this.escrowKeyPair, this._serverKeyPair);
     return tx.toEnvelope().toXDR('base64');
   }
 
@@ -144,13 +135,13 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     // build claim transaction
     const tb = new stellarSdk.TransactionBuilder(escrowAccount).addOperation(
       stellarSdk.Operation.accountMerge({
-        destination: this.serverKeyPair.publicKey(),
+        destination: this._serverKeyPair.publicKey(),
       }),
     );
 
     // build and sign transaction
     const tx = tb.build();
-    tx.sign(this.serverKeyPair);
+    tx.sign(this._serverKeyPair);
     // https://stellar.github.io/js-stellar-sdk/Transaction.html#signHashX
     tx.signHashX(preimage);
     return tx.toEnvelope().toXDR('base64');
@@ -184,7 +175,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
         stellarSdk.Operation.setOptions({
           source: this.escrowKeyPair.publicKey(),
           signer: {
-            ed25519PublicKey: this.serverKeyPair.publicKey(), // add radar as signer on escrow account
+            ed25519PublicKey: this._serverKeyPair.publicKey(), // add radar as signer on escrow account
             weight: 1,
           },
         }),
@@ -214,7 +205,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
 
     // build and sign transaction
     const tx = tb.build();
-    tx.sign(this.serverKeyPair);
+    tx.sign(this._serverKeyPair);
     return tx.toEnvelope().toXDR('base64');
   }
 
@@ -242,7 +233,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     })
       .addOperation(
         stellarSdk.Operation.payment({
-          destination: this.serverKeyPair.publicKey(),
+          destination: this._serverKeyPair.publicKey(),
           asset: stellarSdk.Asset.native(),
           amount: '2.00001', // send upfront cost back to radar
         }),
@@ -254,7 +245,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
       );
     // build and sign transaction
     const tx = tb.build();
-    tx.sign(this.serverKeyPair);
+    tx.sign(this._serverKeyPair);
     // https://www.stellar.org/developers/horizon/reference/xdr.html
     return tx.toEnvelope().toXDR('base64');
   }
@@ -266,7 +257,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
    */
   public sign(envelope: string): string {
     const tx = new stellarSdk.Transaction(envelope);
-    tx.sign(this.serverKeyPair);
+    tx.sign(this._serverKeyPair);
     return tx.toEnvelope().toXDR('base64');
   }
 }
