@@ -74,11 +74,28 @@ const refundTxHex = htlc.refund(
 
 ### Construct an Ethereum HTLC:
 
+### Asset: **Ether**
+
 ```typescript
 import { HTLC } from '@radar-redshift/htlc';
 
 const htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE, {
+  invoice,
   web3,
+  assetType: EVM.AssetType.ETHER,
+});
+```
+
+### Asset: **ERC20**
+
+```typescript
+import { HTLC } from '@radar-redshift/htlc';
+
+const htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE, {
+  invoice,
+  web3,
+  tokenContractAddress,
+  assetType: EVM.AssetType.ERC20,
 });
 ```
 
@@ -91,29 +108,29 @@ const { contract } = htlc;
 
 Generate, sign, and broadcast the fund transaction using the provided `web3` instance:
 ```typescript
-const txReceipt = await htlc.fund(amount, invoice, paymentHash);
+const txReceipt = await htlc.fund(amount, paymentHash);
 ```
 
 Generate and broadcast the claim transaction using the provided `web3` instance:
 ```typescript
-const txReceipt = await htlc.claim(invoice, paymentSecret);
+const txReceipt = await htlc.claim(paymentSecret);
 ```
 
 Generate and broadcast the refund transaction using the provided `web3` instance:
 ```typescript
-const txReceipt = await htlc.refund(invoice);
+const txReceipt = await htlc.refund();
 ```
 
 Want to pass in additional tx params? Pass all desired tx params as the last argument:
 ```typescript
-const txReceipt = await htlc.refund(invoice, true, {
+const txReceipt = await htlc.refund(true, {
   gas: 200000,
 });
 ```
 
 Don't want to sign and broadcast the transaction? Set `shouldSend` to false to return the unsigned transaction. You can now broadcast it using `eth_sendTransaction`:
 ```typescript
-const unsignedTx = await htlc.refund(invoice, false);
+const unsignedTx = await htlc.refund(false);
 ```
 
 ## Testing
