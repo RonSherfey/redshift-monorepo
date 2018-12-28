@@ -29,6 +29,13 @@ export enum EthereumSubnet {
   MAINNET = 'mainnet',
 }
 
+export enum StellarSubnet {
+  ZULUCRYPTO = 'zulucrypto',
+  XLMTESTNET = 'xlmtestnet',
+  STELLAR = 'stellar',
+  CUSTOM = 'custom',
+}
+
 /**
  * Supported networks
  */
@@ -36,6 +43,7 @@ export enum Network {
   BITCOIN = 'bitcoin',
   LITECOIN = 'litecoin',
   ETHEREUM = 'ethereum',
+  STELLAR = 'stellar',
 }
 
 /**
@@ -45,5 +53,6 @@ export const Subnet = {
   ...BitcoinSubnet,
   ...LitecoinSubnet,
   ...EthereumSubnet,
+  ...StellarSubnet,
 };
 export type Subnet = ValueOf<Pick<typeof Subnet, KnownKeys<typeof Subnet>>>;
