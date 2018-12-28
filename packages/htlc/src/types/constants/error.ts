@@ -27,5 +27,6 @@ export enum WeightEstimationError {
 export enum NetworkError {
   INVALID_NETWORK = 'InvalidNetwork',
   INVALID_SUBNET = 'InvalidSubnet',
+  INVALID_ASSET = 'InvalidAsset',
   RPC_CALL_FAILED = 'RpcCallFailed',
 }
