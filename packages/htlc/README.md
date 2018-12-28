@@ -74,7 +74,7 @@ const refundTxHex = htlc.refund(
 
 ### Construct an Ethereum HTLC:
 
-### Asset: **Ether**
+#### Asset: Ether
 
 ```typescript
 import { HTLC } from '@radar-redshift/htlc';
@@ -86,7 +86,7 @@ const htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE, {
 });
 ```
 
-### Asset: **ERC20**
+#### Asset: ERC20
 
 ```typescript
 import { HTLC } from '@radar-redshift/htlc';
