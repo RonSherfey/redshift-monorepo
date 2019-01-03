@@ -118,7 +118,10 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     // build and sign transaction
     const tx = tb.build();
     tx.sign(this.escrowKeyPair, this._serverKeyPair);
-    return tx.toEnvelope().toXDR('base64');
+    return tx
+      .toEnvelope()
+      .toXDR('base64')
+      .toString();
   }
 
   /**
@@ -144,7 +147,10 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     tx.sign(this._serverKeyPair);
     // https://stellar.github.io/js-stellar-sdk/Transaction.html#signHashX
     tx.signHashX(preimage);
-    return tx.toEnvelope().toXDR('base64');
+    return tx
+      .toEnvelope()
+      .toXDR('base64')
+      .toString();
   }
 
   /**
@@ -206,7 +212,10 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     // build and sign transaction
     const tx = tb.build();
     tx.sign(this._serverKeyPair);
-    return tx.toEnvelope().toXDR('base64');
+    return tx
+      .toEnvelope()
+      .toXDR('base64')
+      .toString();
   }
 
   /**
@@ -247,7 +256,10 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     const tx = tb.build();
     tx.sign(this._serverKeyPair);
     // https://www.stellar.org/developers/horizon/reference/xdr.html
-    return tx.toEnvelope().toXDR('base64');
+    return tx
+      .toEnvelope()
+      .toXDR('base64')
+      .toString();
   }
 
   /**
@@ -258,6 +270,9 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
   public sign(envelope: string): string {
     const tx = new stellarSdk.Transaction(envelope);
     tx.sign(this._serverKeyPair);
-    return tx.toEnvelope().toXDR('base64');
+    return tx
+      .toEnvelope()
+      .toXDR('base64')
+      .toString();
   }
 }

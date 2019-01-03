@@ -1,13 +1,14 @@
 import { EvmHtlc, UtxoHtlc } from '..';
-import { StellarHtlc } from '../network-models/index';
+import { DecredHtlc, StellarHtlc } from '../network-models/index';
 import {
   BitcoinSubnet,
+  DecredSubnet,
   EthereumSubnet,
   LitecoinSubnet,
   Network,
   StellarSubnet,
 } from './constants';
-import { EVM, Stellar, UTXO } from './network-models';
+import { Decred, EVM, Stellar, UTXO } from './network-models';
 
 /**
  * HTLC options by network
@@ -17,6 +18,7 @@ export interface Options {
   [Network.LITECOIN]: UTXO.Options;
   [Network.ETHEREUM]: EVM.Options;
   [Network.STELLAR]: Stellar.Options;
+  [Network.DECRED]: Decred.Options;
 }
 
 /**
@@ -27,6 +29,7 @@ export interface SubnetMap {
   [Network.LITECOIN]: LitecoinSubnet;
   [Network.ETHEREUM]: EthereumSubnet;
   [Network.STELLAR]: StellarSubnet;
+  [Network.DECRED]: DecredSubnet;
 }
 
 /**
@@ -37,4 +40,5 @@ export interface NetworkModelMap<N extends Network> {
   [Network.LITECOIN]: UtxoHtlc<N>;
   [Network.ETHEREUM]: EvmHtlc<N>;
   [Network.STELLAR]: StellarHtlc<N>;
+  [Network.DECRED]: DecredHtlc<N>;
 }

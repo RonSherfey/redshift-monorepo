@@ -140,6 +140,13 @@
   dependencies:
     "@types/node" "*"
 
+"@types/bitcore-lib@^0.15.1":
+  version "0.15.1"
+  resolved "https://registry.yarnpkg.com/@types/bitcore-lib/-/bitcore-lib-0.15.1.tgz#42c0e33b716cc008c533071d037da7e38bf16757"
+  integrity sha512-rxBI1QO9AjbZsj8nXZvQGzRm33XBrLCdAf9ok35a4ihH5wUNnM5hmY1eaortWVhouetk1aGGnSW7Uos3VBXlTw==
+  dependencies:
+    "@types/node" "*"
+
 "@types/bn.js@*":
   version "4.11.3"
   resolved "https://registry.yarnpkg.com/@types/bn.js/-/bn.js-4.11.3.tgz#0f09e53e98659b007d7019261ddab9178135df38"
@@ -1514,6 +1521,38 @@ bitcoinjs-lib@^4.0.2:
     varuint-bitcoin "^1.0.4"
     wif "^2.0.1"
 
+bitcore-explorers@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/bitcore-explorers/-/bitcore-explorers-1.0.1.tgz#d0bc34bbd7129664a1fb9ba4970911b5d10e94d5"
+  integrity sha1-0Lw0u9cSlmSh+5uklwkRtdEOlNU=
+  dependencies:
+    bitcore-lib "^0.13.7"
+    browser-request "^0.3.3"
+    request "^2.51.0"
+
+bitcore-lib@^0.13.7:
+  version "0.13.19"
+  resolved "https://registry.yarnpkg.com/bitcore-lib/-/bitcore-lib-0.13.19.tgz#48af1e9bda10067c1ab16263472b5add2000f3dc"
+  integrity sha1-SK8em9oQBnwasWJjRyta3SAA89w=
+  dependencies:
+    bn.js "=2.0.4"
+    bs58 "=2.0.0"
+    buffer-compare "=1.0.0"
+    elliptic "=3.0.3"
+    inherits "=2.0.1"
+    lodash "=3.10.1"
+
+bitcore-lib@leon-do/bitcore#master-new:
+  version "0.13.16"
+  resolved "https://codeload.github.com/leon-do/bitcore/tar.gz/c39bbbf8d860a830272535bc574e28263b9fb30a"
+  dependencies:
+    bn.js "=2.0.4"
+    bs58 "=2.0.0"
+    buffer-compare "=1.0.0"
+    elliptic "=3.0.3"
+    inherits "=2.0.1"
+    lodash "=3.10.1"
+
 bl@^1.0.0:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/bl/-/bl-1.2.2.tgz#a160911717103c07410cef63ef51b397c025af9c"
@@ -1543,6 +1582,16 @@ bn.js@4.11.6:
   version "4.11.6"
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-4.11.6.tgz#53344adb14617a13f6e8dd2ce28905d1c0ba3215"
   integrity sha1-UzRK2xRhehP26N0s4okF0cC6MhU=
+
+bn.js@=2.0.4:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-2.0.4.tgz#220a7cd677f7f1bfa93627ff4193776fe7819480"
+  integrity sha1-Igp81nf38b+pNif/QZN3b+eBlIA=
+
+bn.js@^2.0.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-2.2.0.tgz#12162bc2ae71fc40a5626c33438f3a875cd37625"
+  integrity sha1-EhYrwq5x/EClYmwzQ486h1zTdiU=
 
 bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.1.1, bn.js@^4.10.0, bn.js@^4.11.0, bn.js@^4.11.3, bn.js@^4.11.6, bn.js@^4.11.8, bn.js@^4.4.0, bn.js@^4.8.0:
   version "4.11.8"
@@ -1607,6 +1656,11 @@ brorand@^1.0.1:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/brorand/-/brorand-1.1.0.tgz#12c25efe40a45e3c323eb8675a0a0ce57b22371f"
   integrity sha1-EsJe/kCkXjwyPrhnWgoM5XsiNx8=
+
+browser-request@^0.3.3:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/browser-request/-/browser-request-0.3.3.tgz#9ece5b5aca89a29932242e18bf933def9876cc17"
+  integrity sha1-ns5bWsqJopkyJC4Yv5M975h2zBc=
 
 browser-stdout@1.3.0:
   version "1.3.0"
@@ -1685,6 +1739,11 @@ browserslist@^3.2.6:
     caniuse-lite "^1.0.30000844"
     electron-to-chromium "^1.3.47"
 
+bs58@=2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/bs58/-/bs58-2.0.0.tgz#72b713bed223a0ac518bbda0e3ce3f4817f39eb5"
+  integrity sha1-crcTvtIjoKxRi72g484/SBfznrU=
+
 bs58@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/bs58/-/bs58-2.0.1.tgz#55908d58f1982aba2008fa1bed8f91998a29bf8d"
@@ -1733,6 +1792,11 @@ buffer-alloc@^1.2.0:
   dependencies:
     buffer-alloc-unsafe "^1.1.0"
     buffer-fill "^1.0.0"
+
+buffer-compare@=1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/buffer-compare/-/buffer-compare-1.0.0.tgz#acaa7a966e98eee9fae14b31c39a5f158fb3c4a2"
+  integrity sha1-rKp6lm6Y7un64Usxw5pfFY+zxKI=
 
 buffer-crc32@~0.2.3:
   version "0.2.13"
@@ -2674,6 +2738,10 @@ crypto-browserify@3.12.0:
     randombytes "^2.0.0"
     randomfill "^1.0.3"
 
+crypto-browserify@leon-do/crypto-browserify#master-legacy:
+  version "1.0.9"
+  resolved "https://codeload.github.com/leon-do/crypto-browserify/tar.gz/61c7c2c4ff96bf12a0dd75aa36eef10f1bb59d4b"
+
 crypto-js@^3.1.4:
   version "3.1.8"
   resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-3.1.8.tgz#715f070bf6014f2ae992a98b3929258b713f08d5"
@@ -3204,6 +3272,16 @@ elliptic@6.3.3:
   integrity sha1-VILZZG1UvLif19mU/J4ulWiHbj8=
   dependencies:
     bn.js "^4.4.0"
+    brorand "^1.0.1"
+    hash.js "^1.0.0"
+    inherits "^2.0.1"
+
+elliptic@=3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/elliptic/-/elliptic-3.0.3.tgz#865c9b420bfbe55006b9f969f97a0d2c44966595"
+  integrity sha1-hlybQgv75VAGuflp+XoNLESWZZU=
+  dependencies:
+    bn.js "^2.0.0"
     brorand "^1.0.1"
     hash.js "^1.0.0"
     inherits "^2.0.1"
@@ -5111,6 +5189,11 @@ inherits@2, inherits@2.0.3, inherits@^2.0.1, inherits@^2.0.3, inherits@~2.0.0, i
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.3.tgz#633c2c83e3da42a502f52466022480f4208261de"
   integrity sha1-Yzwsg+PaQqUC9SRmAiSA9CCCYd4=
 
+inherits@=2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.1.tgz#b17d08d326b4423e568eff719f91b0b1cbdf69f1"
+  integrity sha1-sX0I0ya0Qj5Wjv9xn5GwscvfafE=
+
 ini@^1.3.2, ini@^1.3.4, ini@~1.3.0:
   version "1.3.5"
   resolved "https://registry.yarnpkg.com/ini/-/ini-1.3.5.tgz#eee25f56db1c9ec6085e0c22778083f596abf927"
@@ -6255,6 +6338,11 @@ lodash@4.17.10:
   version "4.17.10"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.10.tgz#1b7793cf7259ea38fb3661d4d38b3260af8ae4e7"
   integrity sha512-UejweD1pDoXu+AD825lWwp4ZGtSwgnpZxb3JDViD7StjQz+Nb/6l093lx4OQ0foGWNRoc19mWy7BzL+UAK2iVg==
+
+lodash@=3.10.1:
+  version "3.10.1"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
+  integrity sha1-W/Rejkm6QYnhfUgnid/RW9FAt7Y=
 
 lodash@^4.0.0, lodash@^4.1.0, lodash@^4.11.2, lodash@^4.13.1, lodash@^4.15.0, lodash@^4.17.1, lodash@^4.17.10, lodash@^4.17.2, lodash@^4.17.5, lodash@^4.2.0:
   version "4.17.11"
@@ -8093,7 +8181,7 @@ replace-ext@^1.0.0:
   resolved "https://registry.yarnpkg.com/replace-ext/-/replace-ext-1.0.0.tgz#de63128373fcbf7c3ccfa4de5a480c45a67958eb"
   integrity sha1-3mMSg3P8v3w8z6TeWkgMRaZ5WOs=
 
-request@^2.12.0, request@^2.55.0, request@^2.67.0, request@^2.79.0, request@^2.83.0, request@^2.85.0:
+request@^2.12.0, request@^2.51.0, request@^2.55.0, request@^2.67.0, request@^2.79.0, request@^2.83.0, request@^2.85.0:
   version "2.88.0"
   resolved "https://registry.yarnpkg.com/request/-/request-2.88.0.tgz#9c2fca4f7d35b592efe57c7f0a55e81052124fef"
   integrity sha512-NAqBSrijGLZdM0WZNsInLJpkJokL72XYjUpnB0iwsRgxh7dB6COrHnTBNwN0E+lHDAJzu7kLAkDeY08z2/A0hg==

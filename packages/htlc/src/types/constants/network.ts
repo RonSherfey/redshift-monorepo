@@ -36,6 +36,11 @@ export enum StellarSubnet {
   CUSTOM = 'custom',
 }
 
+export enum DecredSubnet {
+  DCRTESTNET = 'dcrtestnet',
+  DECRED = 'decred',
+}
+
 /**
  * Supported networks
  */
@@ -44,6 +49,7 @@ export enum Network {
   LITECOIN = 'litecoin',
   ETHEREUM = 'ethereum',
   STELLAR = 'stellar',
+  DECRED = 'decred',
 }
 
 /**
@@ -54,5 +60,6 @@ export const Subnet = {
   ...LitecoinSubnet,
   ...EthereumSubnet,
   ...StellarSubnet,
+  ...DecredSubnet,
 };
 export type Subnet = ValueOf<Pick<typeof Subnet, KnownKeys<typeof Subnet>>>;

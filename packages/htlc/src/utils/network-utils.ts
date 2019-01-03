@@ -1,5 +1,6 @@
 import {
   BitcoinSubnet,
+  DecredSubnet,
   EthereumSubnet,
   LitecoinSubnet,
   Network,
@@ -21,6 +22,8 @@ export function getSubnetForNetwork(network: Network) {
       return LitecoinSubnet;
     case Network.STELLAR:
       return StellarSubnet;
+    case Network.DECRED:
+      return DecredSubnet;
     default:
       throw new Error(NetworkError.INVALID_NETWORK);
   }

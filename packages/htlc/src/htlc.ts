@@ -1,5 +1,6 @@
-import { EvmHtlc, StellarHtlc, UtxoHtlc } from './network-models';
+import { DecredHtlc, EvmHtlc, StellarHtlc, UtxoHtlc } from './network-models';
 import {
+  Decred,
   EVM,
   Network,
   NetworkModelMap,
@@ -29,6 +30,8 @@ export namespace HTLC {
         return new EvmHtlc(network, subnet, options as EVM.Options);
       case Network.STELLAR:
         return new StellarHtlc(network, subnet, options as Stellar.Options);
+      case Network.DECRED:
+        return new DecredHtlc(network, subnet, options as Decred.Options);
       default:
         return new UtxoHtlc(network, subnet, options as UTXO.Options);
     }
