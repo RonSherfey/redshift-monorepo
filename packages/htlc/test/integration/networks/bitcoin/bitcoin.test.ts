@@ -14,7 +14,8 @@ const { funder, claimer, refunder } = config.bitcoin.integration;
 const feeTokensPerVirtualByte = 1;
 let htlc: UtxoHtlc<Network.BITCOIN>;
 let rpcClient: UtxoRpcClient;
-let utxos: TxOutput[];
+let coinbaseUtxos: TxOutput[];
+let fundingUtxos: TxOutput[];
 let htlcArgs: UTXO.RedeemScriptArgs;
 let paymentSecret: string;
 
@@ -23,6 +24,8 @@ let paymentSecret: string;
  */
 function setupTestSuite() {
   before(async () => {
+    await setCoinbaseUtxos();
+
     // Set the HTLC arguments being used
     const random = config.random.args(false);
     htlcArgs = {
@@ -38,13 +41,17 @@ function setupTestSuite() {
 
     // Generate & broadcast the funding transaction
     const fundSatoshiAmount = toSatoshi(0.01);
-    const fundTxHex = htlc.fund(utxos, fundSatoshiAmount, funder.private_key);
+    const fundTxHex = htlc.fund(
+      coinbaseUtxos,
+      fundSatoshiAmount,
+      funder.private_key,
+    );
     const fundingTxId = await rpcClient.sendRawTransaction(fundTxHex);
 
     // Set claimable/refundable outputs
     const p2shOutput = (await rpcClient.getTransactionByHash(fundingTxId))
       .vout[0];
-    utxos = [
+    fundingUtxos = [
       {
         tx_id: fundingTxId,
         index: 0,
@@ -57,34 +64,41 @@ function setupTestSuite() {
   });
 }
 
+/**
+ * Set the utxos that we will spend in the funding transaction
+ */
+async function setCoinbaseUtxos() {
+  // Get spendable outputs for initial fund (generated coins can't be spent for 100 blocks)
+  const coinbaseBlockNumber = (await rpcClient.getBlockCount()) - 100;
+  const coinbaseBlockHash = await rpcClient.getBlockHash(coinbaseBlockNumber);
+  const coinbaseBlock = (await rpcClient.getBlockByHash(
+    coinbaseBlockHash,
+  )) as BlockResult;
+  const coinbaseTxId = coinbaseBlock.tx[0];
+  const coinbaseUtxo = await rpcClient.getTxOutput(coinbaseTxId, 0);
+  coinbaseUtxos = [
+    {
+      tx_id: coinbaseTxId,
+      index: 0,
+      tokens: toSatoshi(coinbaseUtxo.value),
+    },
+  ];
+}
+
 describe('UTXO HTLC - Bitcoin Network', () => {
   before(async () => {
+    // Mine 100 blocks ahead of the coinbase transaction
+    await mineBlocks(100);
+
     // Instantiate a new rpc client
     rpcClient = new UtxoRpcClient(Network.BITCOIN, BitcoinSubnet.SIMNET);
-    // Ensure at least 100 blocks have been mined
-    await mineBlocks(100);
-    // Get spendable outputs for initial fund (generated coins can't be spent for 100 blocks)
-    const coinbaseBlockNumber = (await rpcClient.getBlockCount()) - 100;
-    const coinbaseBlockHash = await rpcClient.getBlockHash(coinbaseBlockNumber);
-    const coinbaseBlock = (await rpcClient.getBlockByHash(
-      coinbaseBlockHash,
-    )) as BlockResult;
-    const coinbaseTxId = coinbaseBlock.tx[coinbaseBlock.tx.length - 1];
-    const coinbaseUtxo = await rpcClient.getTxOutput(coinbaseTxId, 0);
-    utxos = [
-      {
-        tx_id: coinbaseTxId,
-        index: 0,
-        tokens: toSatoshi(coinbaseUtxo.value),
-      },
-    ];
   });
 
   describe('Fund', () => {
     setupTestSuite();
 
     it('should build a valid fund transaction and return a tx id when broadcast', async () => {
-      expect(utxos[0].tx_id).to.be.a('string');
+      expect(fundingUtxos[0].tx_id).to.be.a('string');
     });
 
     it('should have the correct funding values when mined', async () => {
@@ -92,10 +106,14 @@ describe('UTXO HTLC - Bitcoin Network', () => {
       const block = (await rpcClient.getBlockByHash(
         bestBlockHash,
       )) as BlockResult;
-      const fundingTx = await rpcClient.getTransactionByHash(utxos[0].tx_id);
+      const fundingTx = await rpcClient.getTransactionByHash(
+        fundingUtxos[0].tx_id,
+      );
       expect(block.tx.length).to.equal(2); // Coinbase & Funding Txs
       expect(fundingTx.vout[0].value).to.equal(0.01); // Funding Ouput
-      expect(fundingTx.vout[1].value).to.equal(49.99); // Change Output
+      expect(fundingTx.vout[1].value)
+        .to.be.above(49.98)
+        .and.below(50); // Change Output
     });
   });
 
@@ -106,7 +124,7 @@ describe('UTXO HTLC - Bitcoin Network', () => {
     it('should build a valid claim transaction given valid parameters', async () => {
       const currentBlockHeight = await rpcClient.getBlockCount();
       const claimTxHex = htlc.claim(
-        utxos,
+        fundingUtxos,
         claimer.p2pkh_address,
         currentBlockHeight,
         feeTokensPerVirtualByte,
@@ -137,7 +155,7 @@ describe('UTXO HTLC - Bitcoin Network', () => {
     it('should build a valid refund transaction given valid parameters', async () => {
       const currentBlockHeight = await rpcClient.getBlockCount();
       const refundTxHex = htlc.refund(
-        utxos,
+        fundingUtxos,
         refunder.p2pkh_address,
         currentBlockHeight,
         feeTokensPerVirtualByte,
@@ -149,12 +167,7 @@ describe('UTXO HTLC - Bitcoin Network', () => {
     });
 
     it('should have the correct refund values when mined', async () => {
-      const bestBlockHash = await rpcClient.getBestBlockHash();
-      const block = (await rpcClient.getBlockByHash(
-        bestBlockHash,
-      )) as BlockResult;
       const refundTx = await rpcClient.getTransactionByHash(refundTxId);
-      expect(block.tx.length).to.equal(2); // Coinbase & Refund Txs
       expect(refundTx.vout[0].value)
         .to.be.above(0.009)
         .and.below(0.01); // Refund Output less tx fee
