@@ -28,7 +28,7 @@ jobs:
         name: Setup Integration Environment
         command: docker-compose up -d
     - run:
-        name: Setup Local Environment
+        name: Setup Environment
         command: |
           curl -o- -L https://yarnpkg.com/install.sh | bash
           source ~/.bashrc
@@ -37,7 +37,7 @@ jobs:
           cp .env.integration .env
           yarn install
     - run:
-        name: Run Integration Tests
+        name: Run Tests
         command: |
           source ~/.bashrc
           yarn test
@@ -45,5 +45,5 @@ workflows:
   version: 2
   default:
     jobs:
-      - lint
-      - test
+    - lint
+    - test
