@@ -34,7 +34,6 @@ jobs:
           source ~/.bashrc
           nvm install 8.12
           nvm alias default 8.12
-          cp .env.integration .env
           yarn install
     - run:
         name: Run Tests
