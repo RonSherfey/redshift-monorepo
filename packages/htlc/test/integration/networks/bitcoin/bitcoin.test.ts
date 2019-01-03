@@ -61,7 +61,8 @@ describe('UTXO HTLC - Bitcoin Network', () => {
   before(async () => {
     // Instantiate a new rpc client
     rpcClient = new UtxoRpcClient(Network.BITCOIN, BitcoinSubnet.SIMNET);
-
+    // Ensure at least 100 blocks have been mined
+    await mineBlocks(100);
     // Get spendable outputs for initial fund (generated coins can't be spent for 100 blocks)
     const coinbaseBlockNumber = (await rpcClient.getBlockCount()) - 100;
     const coinbaseBlockHash = await rpcClient.getBlockHash(coinbaseBlockNumber);
