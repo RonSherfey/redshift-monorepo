@@ -20,3 +20,9 @@ services:
     ports:
     - "8545:8545"
     command: ["-a 10", "-s testing"]
+
+  test-stellar:
+    image: zulucrypto/stellar-integration-test-network
+    ports:
+    - "8000:8000"
+    - "8004:8004"
