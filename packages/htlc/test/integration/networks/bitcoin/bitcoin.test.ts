@@ -87,8 +87,8 @@ async function setCoinbaseUtxos() {
 
 describe('UTXO HTLC - Bitcoin Network', () => {
   before(async () => {
-    // Mine 100 blocks ahead of the coinbase transaction
-    await mineBlocks(100);
+    // Mine 400 blocks ahead of the coinbase transaction
+    await mineBlocks(400);
 
     // Instantiate a new rpc client
     rpcClient = new UtxoRpcClient(Network.BITCOIN, BitcoinSubnet.SIMNET);
