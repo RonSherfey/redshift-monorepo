@@ -1,5 +1,5 @@
 import explorers from 'bitcore-explorers';
-import bitcore from 'bitcore-lib';
+import bitcore, { PublicKey } from 'bitcore-lib';
 import {
   Decred,
   DecredSubnet,
@@ -12,8 +12,10 @@ import { BaseHtlc } from '../shared/index';
 export class DecredHtlc<N extends Network> extends BaseHtlc<N> {
   private _insight: explorers.Insight;
   private _serverPrivateKey: bitcore.PrivateKey;
+  public network: bitcore.Networks.Network;
   public timelock: number;
-  public serverAddress: bitcore.PublicKey;
+  public serverAddress: bitcore.Address;
+  public script: bitcore.Script;
 
   /**
    * Create a new Stellar HTLC instance
@@ -28,12 +30,13 @@ export class DecredHtlc<N extends Network> extends BaseHtlc<N> {
       passphrase,
       allowHttp = false,
     } = this.getServerDetailsForSubnet(subnet, options.server);
-    // https://github.com/bitpay/bitcore-explorers
-    this._insight = new explorers.Insight(url, passphrase);
+    this.network = passphrase;
+    this._insight = new explorers.Insight(url, this.network);
+    this.timelock = Math.floor(Date.now() / 1000) + 1; // @TODO change to block number
+    this.script = new bitcore.Script();
     this._serverPrivateKey = new bitcore.PrivateKey(options.secret);
     const serverPublicKey = new bitcore.PublicKey(this._serverPrivateKey);
     this.serverAddress = serverPublicKey.toAddress(passphrase);
-    this.timelock = Math.floor(Date.now() / 1000) + 1; // @TODO change to block number
   }
 
   /**
@@ -62,17 +65,17 @@ export class DecredHtlc<N extends Network> extends BaseHtlc<N> {
     }
   }
 
-  public async fund(hash: string, clientAddress: string) {
-    const script = new bitcore.Script()
+  public fund(hash: string, clientAddress: string): bitcore.Address {
+    this.script = new bitcore.Script()
       .add('OP_IF')
-      .add('OP_SHA2')
+      .add(192) // dered op code number for SHA256
       .add(new Buffer(hash, 'hex')) // hash of preimage
       .add('OP_EQUALVERIFY')
       .add(
         bitcore.Script.buildPublicKeyHashOut(
-          bitcore.Address.fromString(this.serverAddress.toString()),
+          bitcore.Address.fromString(this.serverAddress.toString()), // send DCR here
         ),
-      ) // send DCR here
+      )
       .add('OP_ELSE')
       .add(bitcore.crypto.BN.fromNumber(this.timelock).toScriptNumBuffer())
       .add('OP_CHECKLOCKTIMEVERIFY')
@@ -84,8 +87,29 @@ export class DecredHtlc<N extends Network> extends BaseHtlc<N> {
       )
       .add('OP_ENDIF');
 
-    console.log('\n\nfund', bitcore.Address.payingTo(script));
+    return bitcore.Address.payingTo(this.script);
   }
   public async claim() {}
   public async refund() {}
+
+  public broadcast(transaction: string) {
+    return new Promise((resolve, reject) => {
+      this._insight.broadcast(
+        transaction,
+        (err: any, transactionHash: string) => {
+          if (err) reject(err);
+          resolve(transactionHash);
+        },
+      );
+    });
+  }
+
+  public getUnspentUtxos(address: string) {
+    return new Promise((resolve, reject) => {
+      this._insight.getUnspentUtxos(address, (err: any, utxos: any) => {
+        if (err) reject(err);
+        resolve(utxos);
+      });
+    });
+  }
 }

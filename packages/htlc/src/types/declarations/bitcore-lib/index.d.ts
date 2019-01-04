@@ -144,7 +144,7 @@ declare module 'bitcore-lib' {
   export class PublicKey {
     constructor(privateKey: PrivateKey);
     static fromPrivateKey(privateKey: PrivateKey): PublicKey;
-    toAddress(network: Networks.Network): PublicKey;
+    toAddress(network: Networks.Network): Address;
     toBuffer(): Buffer;
     toDER(): Buffer;
     toString(): string;
@@ -303,9 +303,9 @@ declare module 'bitcore-lib' {
     readonly hashBuffer: Buffer;
     readonly network: Networks.Network;
     readonly type: string;
-    static payingTo(script: Script): String;
+    static payingTo(script: Script): Address;
     static fromString(publicKey: String): Address;
-    static isValid(publicKey: PublicKey): Boolean;
+    static isValid(address: Address): Boolean;
     constructor(
       data: Buffer | Uint8Array | string | object,
       network?: Networks.Network,
