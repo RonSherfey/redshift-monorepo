@@ -6,27 +6,31 @@ import { expect } from '../../../lib/helpers';
 
 describe('Stellar HTLC - Stellar Network', () => {
   const serverPubKey =
-    'GDDUGE5U7HOA75I33BYGQDU6FIRCRMVM6HD7WIMV2ROZ4AJZBEHYPGLT';
+    'GAJCCCRIRXAYEU2ATNQAFYH4E2HKLN2LCKM2VPXCTJKIBVTRSOLEGCJZ';
   const serverSecret =
-    'SDQDRU35373DU24DH736GUQ4TVWHVIPDEZM5Q2VHF6NE6JTJGXRWM5TZ';
+    'SDJCZISO5M5XAUV6Y7MZJNN3JZ5BWPXDHV4GXP3MYNACVDNQRQSERXBC';
 
-  const userPubKey = 'GBPWIW4WNBGSR2N3QFGKKELSOVGJY265IAV34TP64VCQPVYJTKH7TEFS';
-  const userSecret = 'SDGQ5H6JY4A5ZI7NSENSPIXDZIBEOKCEOB4XW4HUNMC6A26QVOWOULYA';
+  const userPubKey = 'GCP6IHMHWRCF5TQ4ZP6TVIRNDZD56W42F42VHYWMVDGDAND75YGAHHBQ';
+  const userSecret = 'SCEDMZ7DUEOUGRQWEXHXEXISQ2NAWI5IDXRHYWT2FHTYLIQOSUK5FX2E';
 
   const preimage = 'abc';
   const hashX =
     '087d80f7f182dd44f184aa86ca34488853ebcc04f0c60d5294919a466b463831';
 
-  // setup for client wallet
-  stellarSdk.Network.useTestNetwork();
-  const server = new stellarSdk.Server('https://horizon-testnet.stellar.org');
+  // https://github.com/zulucrypto/docker-stellar-integration-test-network
+  stellarSdk.Network.use(
+    new stellarSdk.Network('Integration Test Network ; zulucrypto'),
+  );
+  const server = new stellarSdk.Server('http://localhost:8000', {
+    allowHttp: true,
+  });
   const userKeyPair = stellarSdk.Keypair.fromSecret(userSecret);
 
   describe('Create', () => {
     it('should create and broadcast a transaction envelope', async () => {
       const htlc: StellarHtlc<Network.STELLAR> = HTLC.construct(
         Network.STELLAR,
-        StellarSubnet.XLMTESTNET,
+        StellarSubnet.ZULUCRYPTO,
         { secret: serverSecret },
       );
       // create envelope to broadcast
@@ -41,7 +45,7 @@ describe('Stellar HTLC - Stellar Network', () => {
     it('should create escrow account, create fund envelope then broadcast', async () => {
       const htlc: StellarHtlc<Network.STELLAR> = HTLC.construct(
         Network.STELLAR,
-        StellarSubnet.XLMTESTNET,
+        StellarSubnet.ZULUCRYPTO,
         { secret: serverSecret },
       );
       // server creates envelope to broadcast
@@ -56,6 +60,7 @@ describe('Stellar HTLC - Stellar Network', () => {
       txFromEnvelope.sign(userKeyPair);
       const fundedTxResp = await server.submitTransaction(txFromEnvelope);
 
+      await delay(500);
       // get transaction operation
       const operations = await axios.get(
         `${fundedTxResp._links.transaction.href}/operations`,
@@ -73,7 +78,7 @@ describe('Stellar HTLC - Stellar Network', () => {
     it('should create escrow account, fund and claim', async () => {
       const htlc: StellarHtlc<Network.STELLAR> = HTLC.construct(
         Network.STELLAR,
-        StellarSubnet.XLMTESTNET,
+        StellarSubnet.ZULUCRYPTO,
         { secret: serverSecret },
       );
       // get initial server account balance
@@ -109,7 +114,7 @@ describe('Stellar HTLC - Stellar Network', () => {
     it('should create escrow account, fund and refund', async () => {
       const htlc: StellarHtlc<Network.STELLAR> = HTLC.construct(
         Network.STELLAR,
-        StellarSubnet.XLMTESTNET,
+        StellarSubnet.ZULUCRYPTO,
         { secret: serverSecret },
       );
       // get initial server account balance
@@ -165,7 +170,7 @@ describe('Stellar HTLC - Stellar Network', () => {
     it('should create escrow account, fund and claim with wrong preimage', async () => {
       const htlc: StellarHtlc<Network.STELLAR> = HTLC.construct(
         Network.STELLAR,
-        StellarSubnet.XLMTESTNET,
+        StellarSubnet.ZULUCRYPTO,
         { secret: serverSecret },
       );
       // server creates envelope to broadcast
@@ -200,7 +205,7 @@ describe('Stellar HTLC - Stellar Network', () => {
     it('should create escrow account, fund and claim with different keypair', async () => {
       const htlc: StellarHtlc<Network.STELLAR> = HTLC.construct(
         Network.STELLAR,
-        StellarSubnet.XLMTESTNET,
+        StellarSubnet.ZULUCRYPTO,
         { secret: serverSecret },
       );
       // server creates envelope to broadcast
@@ -218,7 +223,7 @@ describe('Stellar HTLC - Stellar Network', () => {
       // server pays invoice and gets preimage but signs with wrong keypair
       const wrongServerWallet: StellarHtlc<Network.STELLAR> = HTLC.construct(
         Network.STELLAR,
-        StellarSubnet.XLMTESTNET,
+        StellarSubnet.ZULUCRYPTO,
         { secret: 'SBRNVXKBUC6H7MGJLZTWKWDOFYLBGGHSLG3XKOVY6UIZJQMJFHRFRQLE' },
       );
       wrongServerWallet.escrowKeyPair = htlc.escrowKeyPair;
@@ -242,7 +247,7 @@ describe('Stellar HTLC - Stellar Network', () => {
     it('should create escrow account, fund and refund before timelock', async () => {
       const htlc: StellarHtlc<Network.STELLAR> = HTLC.construct(
         Network.STELLAR,
-        StellarSubnet.XLMTESTNET,
+        StellarSubnet.ZULUCRYPTO,
         { secret: serverSecret },
       );
       // server creates envelope to broadcast
@@ -282,7 +287,7 @@ describe('Stellar HTLC - Stellar Network', () => {
       try {
         const htlc: StellarHtlc<Network.STELLAR> = HTLC.construct(
           Network.STELLAR,
-          StellarSubnet.XLMTESTNET,
+          StellarSubnet.ZULUCRYPTO,
           { secret: serverSecret },
         );
         await htlc.accountInfo('invalid-pub-key');
@@ -292,3 +297,11 @@ describe('Stellar HTLC - Stellar Network', () => {
     });
   });
 });
+
+function delay(milliseconds: number) {
+  return new Promise(res => {
+    setTimeout(() => {
+      res(true);
+    }, milliseconds);
+  });
+}
