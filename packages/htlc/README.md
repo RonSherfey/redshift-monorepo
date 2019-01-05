@@ -183,7 +183,12 @@ await userWallet.broadcast(signedRefundEnvelope);
 
 ## Testing
 
-Run tests:
+### Build container services for tests
+```sh
+docker-compose up
+```
+
+### Run tests:
 ```
 yarn test
 ```
