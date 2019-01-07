@@ -15,9 +15,9 @@
     "big.js": "^5.2.2",
     "bip65": "^1.0.3",
     "bitcoinjs-lib": "^4.0.2",
-    "bitcore-explorers": "^1.0.1",
-    "bitcore-lib": "leon-do/bitcore-lib#master-new",
-    "crypto-browserify": "leon-do/crypto-browserify#master-legacy",
+    "bitcore-explorers": "Decred-Bitcore/bitcore-explorers#master",
+    "bitcore-lib": "Decred-Bitcore/bitcore#master-new",
+    "crypto-browserify": "Decred-Bitcore/crypto-browserify#master-legacy",
     "dotenv": "^6.2.0",
     "stellar-sdk": "^0.11.0",
     "varuint-bitcoin": "^1.1.0"
@@ -36,5 +36,8 @@
     "bip39": "^2.5.0",
     "chai-json-schema": "^1.5.0",
     "web3": "^1.0.0-beta.37"
+  },
+  "resolutions": {
+    "bitcore-lib/**/bn.js": "=2.0.4"
   }
 }
