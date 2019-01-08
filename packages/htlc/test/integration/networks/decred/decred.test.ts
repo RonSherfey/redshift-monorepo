@@ -48,8 +48,6 @@ describe('Decred HTLC - Decred Network', () => {
     );
     const clientAddress = 'TsRDtJmAbavWHUEaDcCjG7YwDRJThhAnafp';
 
-    console.log({ clientPrivateKey });
-
     // client creates transaction
     const transaction = new bitcore.Transaction(network)
       .from(await getUnspentUtxos(clientAddess))

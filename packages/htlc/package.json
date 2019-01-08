@@ -36,8 +36,5 @@
     "bip39": "^2.5.0",
     "chai-json-schema": "^1.5.0",
     "web3": "^1.0.0-beta.37"
-  },
-  "resolutions": {
-    "bitcore-lib/**/bn.js": "=2.0.4"
   }
 }
