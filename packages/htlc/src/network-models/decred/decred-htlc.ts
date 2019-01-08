@@ -1,5 +1,5 @@
 import explorers from 'bitcore-explorers';
-import bitcore, { PublicKey } from 'bitcore-lib';
+import bitcore from 'bitcore-lib';
 import {
   Decred,
   DecredSubnet,
@@ -16,6 +16,7 @@ export class DecredHtlc<N extends Network> extends BaseHtlc<N> {
   public timelock: number;
   public serverAddress: bitcore.Address;
   public script: bitcore.Script;
+  public serverPublicKey: bitcore.PublicKey;
 
   /**
    * Create a new Stellar HTLC instance
@@ -35,8 +36,8 @@ export class DecredHtlc<N extends Network> extends BaseHtlc<N> {
     this.timelock = Math.floor(Date.now() / 1000) + 1; // @TODO change to block number
     this.script = new bitcore.Script();
     this._serverPrivateKey = new bitcore.PrivateKey(options.secret);
-    const serverPublicKey = new bitcore.PublicKey(this._serverPrivateKey);
-    this.serverAddress = serverPublicKey.toAddress(passphrase);
+    this.serverPublicKey = new bitcore.PublicKey(this._serverPrivateKey);
+    this.serverAddress = this.serverPublicKey.toAddress(passphrase);
   }
 
   /**
@@ -89,10 +90,56 @@ export class DecredHtlc<N extends Network> extends BaseHtlc<N> {
 
     return bitcore.Address.payingTo(this.script);
   }
-  public async claim() {}
+
+  public async claim(preimage: string) {
+    // get info from fund address
+    const fundUtxos = await this.getUnspentUtxos(
+      'TcdqHYDvn2H7BinUTH4hfh9QLZ5VnNbrbNE' ||
+        bitcore.Address.payingTo(this.script).toString(),
+    );
+    const fundBalance = fundUtxos.reduce((prev: number, curr: any) => {
+      return curr.atoms + prev;
+    }, 0);
+
+    // https://bitcore.io/api/lib/transaction
+    const transaction = new bitcore.Transaction(this.network)
+      .from(
+        await this.getUnspentUtxos(
+          bitcore.Address.payingTo(this.script).toString(),
+        ),
+      )
+      .to(this.serverAddress, fundBalance - 10000) // @TODO dynamic fees
+      .lockUntilDate(Math.floor(Date.now() / 1000)); // CLTV
+
+    // the CLTV opcode requires that the input's sequence number not be finalized
+    transaction.inputs[0].sequenceNumber = 0;
+
+    // https://bitcore.io/api/lib/transaction#Signing.sighash
+    const signature = bitcore.Transaction.Sighash.sign(
+      transaction,
+      this._serverPrivateKey,
+      1, // bitcore.crypto.Signature.SIGHASH_ALL,
+      0, // the input index for the signature
+      this.script,
+    );
+
+    const unlockScript = bitcore.Script.empty()
+      .add(signature.toTxFormat())
+      .add(new Buffer(this.serverPublicKey.toString(), 'hex'))
+      .add(new Buffer(preimage, 'hex'))
+      .add('OP_TRUE') // choose the time-delayed refund code path
+      .add(this.script.toBuffer());
+
+    // setup the scriptSig of the spending transaction to spend the p2sh-cltv-p2pkh
+    transaction.inputs[0].setScript(unlockScript);
+
+    return transaction;
+    console.log({ transaction });
+  }
+
   public async refund() {}
 
-  public broadcast(transaction: string) {
+  public broadcast(transaction: string): Promise<string> {
     return new Promise((resolve, reject) => {
       this._insight.broadcast(
         transaction,
@@ -104,7 +151,9 @@ export class DecredHtlc<N extends Network> extends BaseHtlc<N> {
     });
   }
 
-  public getUnspentUtxos(address: string) {
+  public getUnspentUtxos(
+    address: string,
+  ): Promise<bitcore.Transaction.UnspentOutput[]> {
     return new Promise((resolve, reject) => {
       this._insight.getUnspentUtxos(address, (err: any, utxos: any) => {
         if (err) reject(err);

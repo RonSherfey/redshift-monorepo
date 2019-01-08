@@ -13,5 +13,7 @@ declare module 'bitcore-explorers' {
     requestGet(path: any, callback: any): void;
 
     requestPost(path: any, data: any, callback: any): void;
+
+    reduce(addresses: any, callback: any): any;
   }
 }

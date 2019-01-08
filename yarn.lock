@@ -140,6 +140,13 @@
   dependencies:
     "@types/node" "*"
 
+"@types/bitcore-lib@^0.15.1":
+  version "0.15.1"
+  resolved "https://registry.yarnpkg.com/@types/bitcore-lib/-/bitcore-lib-0.15.1.tgz#42c0e33b716cc008c533071d037da7e38bf16757"
+  integrity sha512-rxBI1QO9AjbZsj8nXZvQGzRm33XBrLCdAf9ok35a4ihH5wUNnM5hmY1eaortWVhouetk1aGGnSW7Uos3VBXlTw==
+  dependencies:
+    "@types/node" "*"
+
 "@types/bn.js@*":
   version "4.11.3"
   resolved "https://registry.yarnpkg.com/@types/bn.js/-/bn.js-4.11.3.tgz#0f09e53e98659b007d7019261ddab9178135df38"
@@ -1514,30 +1521,16 @@ bitcoinjs-lib@^4.0.2:
     varuint-bitcoin "^1.0.4"
     wif "^2.0.1"
 
-bitcore-explorers@^1.0.1:
+bitcore-explorers@Decred-Bitcore/bitcore-explorers#master:
   version "1.0.1"
-  resolved "https://registry.yarnpkg.com/bitcore-explorers/-/bitcore-explorers-1.0.1.tgz#d0bc34bbd7129664a1fb9ba4970911b5d10e94d5"
-  integrity sha1-0Lw0u9cSlmSh+5uklwkRtdEOlNU=
+  resolved "https://codeload.github.com/Decred-Bitcore/bitcore-explorers/tar.gz/c5cded48362bb7e9be1da0551dd659d670171401"
   dependencies:
-    bitcore-lib "^0.13.7"
     browser-request "^0.3.3"
     request "^2.51.0"
 
-bitcore-lib@^0.13.7:
-  version "0.13.19"
-  resolved "https://registry.yarnpkg.com/bitcore-lib/-/bitcore-lib-0.13.19.tgz#48af1e9bda10067c1ab16263472b5add2000f3dc"
-  integrity sha1-SK8em9oQBnwasWJjRyta3SAA89w=
-  dependencies:
-    bn.js "=2.0.4"
-    bs58 "=2.0.0"
-    buffer-compare "=1.0.0"
-    elliptic "=3.0.3"
-    inherits "=2.0.1"
-    lodash "=3.10.1"
-
-bitcore-lib@leon-do/bitcore-lib#master-new:
+bitcore-lib@Decred-Bitcore/bitcore#master-new:
   version "0.13.16"
-  resolved "https://codeload.github.com/leon-do/bitcore-lib/tar.gz/7ce6645540619d21d019555986c9eba8dc1a9884"
+  resolved "https://codeload.github.com/Decred-Bitcore/bitcore/tar.gz/cefc8ef7a303b8a2124babe12455301d9ddc1f51"
   dependencies:
     bn.js "=2.0.4"
     bs58 "=2.0.0"
@@ -2731,9 +2724,9 @@ crypto-browserify@3.12.0:
     randombytes "^2.0.0"
     randomfill "^1.0.3"
 
-crypto-browserify@leon-do/crypto-browserify#master-legacy:
+crypto-browserify@Decred-Bitcore/crypto-browserify#master-legacy:
   version "1.0.9"
-  resolved "https://codeload.github.com/leon-do/crypto-browserify/tar.gz/61c7c2c4ff96bf12a0dd75aa36eef10f1bb59d4b"
+  resolved "https://codeload.github.com/Decred-Bitcore/crypto-browserify/tar.gz/7c5e57153d308eaed85f9eef98bb3a472f1e929c"
 
 crypto-js@^3.1.4:
   version "3.1.8"

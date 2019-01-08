@@ -50,6 +50,7 @@ declare module 'bitcore-lib' {
       readonly outputIndex: number;
       readonly script: Script;
       readonly satoshis: number;
+      readonly atoms: number;
 
       constructor(data: object);
 
@@ -72,9 +73,20 @@ declare module 'bitcore-lib' {
     class Input {
       readonly prevTxId: Buffer;
       readonly outputIndex: number;
-      readonly sequenceNumber: number;
+      sequenceNumber: number;
       readonly script: Script;
       readonly output?: Output;
+      readonly setScript: any;
+    }
+
+    class Sighash {
+      static sign(
+        transaction: Transaction,
+        privateKey: PrivateKey,
+        sighhash: number,
+        inputNumber: number,
+        script: Script,
+      ): any;
     }
   }
 
