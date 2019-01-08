@@ -134,7 +134,6 @@ export class DecredHtlc<N extends Network> extends BaseHtlc<N> {
     transaction.inputs[0].setScript(unlockScript);
 
     return transaction;
-    console.log({ transaction });
   }
 
   public async refund() {}

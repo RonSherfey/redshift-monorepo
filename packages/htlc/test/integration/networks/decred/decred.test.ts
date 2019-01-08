@@ -21,57 +21,57 @@ describe('Decred HTLC - Decred Network', () => {
   );
   const clientAddress = 'TsRDtJmAbavWHUEaDcCjG7YwDRJThhAnafp';
 
-  // it('should fund htlc address and timelock', async () => {
-  //   const htlc: DecredHtlc<Network.DECRED> = HTLC.construct(
-  //     Network.DECRED,
-  //     DecredSubnet.DCRTESTNET,
-  //     {
-  //       secret:
-  //         '9cf492dcd4a1724470181fcfeff833710eec58fd6a4e926a8b760266dfde9659',
-  //     },
-  //   );
-  //   // use a hard coded timelock to get expected fundAddress
-  //   htlc.timelock = 1545950303;
-  //   const fundAddress = htlc.fund(hash, clientAddress);
-  //   expect(bitcore.Address.isValid(htlc.serverAddress)).to.equal(true);
-  //   expect(fundAddress.toString()).to.equal(
-  //     'TcsX4QyWV9GsWSHAWkJSJ6aUm1BxBB2tHxg',
-  //   );
-  //   expect(bitcore.Address.isValid(fundAddress)).to.equal(true);
-  // });
+  it('should fund htlc address and timelock', async () => {
+    const htlc: DecredHtlc<Network.DECRED> = HTLC.construct(
+      Network.DECRED,
+      DecredSubnet.DCRTESTNET,
+      {
+        secret:
+          '9cf492dcd4a1724470181fcfeff833710eec58fd6a4e926a8b760266dfde9659',
+      },
+    );
+    // use a hard coded timelock to get expected fundAddress
+    htlc.timelock = 1545950303;
+    const fundAddress = htlc.fund(hash, clientAddress);
+    expect(bitcore.Address.isValid(htlc.serverAddress)).to.equal(true);
+    expect(fundAddress.toString()).to.equal(
+      'TcsX4QyWV9GsWSHAWkJSJ6aUm1BxBB2tHxg',
+    );
+    expect(bitcore.Address.isValid(fundAddress)).to.equal(true);
+  });
 
-  // it('should should create fund address then client funds', async () => {
-  //   const htlc: DecredHtlc<Network.DECRED> = HTLC.construct(
-  //     Network.DECRED,
-  //     DecredSubnet.DCRTESTNET,
-  //     {
-  //       secret:
-  //         '9cf492dcd4a1724470181fcfeff833710eec58fd6a4e926a8b760266dfde9659',
-  //     },
-  //   );
+  it('should should create fund address then client funds', async () => {
+    const htlc: DecredHtlc<Network.DECRED> = HTLC.construct(
+      Network.DECRED,
+      DecredSubnet.DCRTESTNET,
+      {
+        secret:
+          '9cf492dcd4a1724470181fcfeff833710eec58fd6a4e926a8b760266dfde9659',
+      },
+    );
 
-  //   // create fundAddress for client
-  //   const fundAddress = htlc.fund(hash, clientAddress);
+    // create fundAddress for client
+    const fundAddress = htlc.fund(hash, clientAddress);
 
-  //   // client creates transaction
-  //   const spendTx = new bitcore.Transaction(network)
-  //     .from(await getUnspentUtxos(clientAddress))
-  //     .to(fundAddress, 1 * 100000000) // 100000000 atoms == 1 DCR
-  //     .change(clientAddress)
-  //     .sign(clientPrivateKey);
+    // client creates transaction
+    const spendTx = new bitcore.Transaction(network)
+      .from(await getUnspentUtxos(clientAddress))
+      .to(fundAddress, 1 * 100000000) // 100000000 atoms == 1 DCR
+      .change(clientAddress)
+      .sign(clientPrivateKey);
 
-  //   // client broadcasts transaction
-  //   await broadcastTransaction(spendTx.toString());
+    // client broadcasts transaction
+    await broadcastTransaction(spendTx.toString());
 
-  //   await delay(1000);
+    await delay(1000);
 
-  //   // check balance of fundAddress
-  //   const fundAddressUtxos = await getUnspentUtxos(fundAddress.toString());
-  //   const fundAddressBalance = fundAddressUtxos.reduce((prev, curr) => {
-  //     return curr.atoms + prev;
-  //   }, 0);
-  //   expect(fundAddressBalance).to.equal(1 * 100000000);
-  // });
+    // check balance of fundAddress
+    const fundAddressUtxos = await getUnspentUtxos(fundAddress.toString());
+    const fundAddressBalance = fundAddressUtxos.reduce((prev, curr) => {
+      return curr.atoms + prev;
+    }, 0);
+    expect(fundAddressBalance).to.equal(1 * 100000000);
+  });
 
   it('should claim', async () => {
     const htlc: DecredHtlc<Network.DECRED> = HTLC.construct(
@@ -82,7 +82,13 @@ describe('Decred HTLC - Decred Network', () => {
           '9cf492dcd4a1724470181fcfeff833710eec58fd6a4e926a8b760266dfde9659',
       },
     );
-    htlc.timelock = 1545950303;
+
+    // get balance before claim
+    const preServerUtxos = await getUnspentUtxos(htlc.serverAddress.toString());
+    const preClaimServerBalance = preServerUtxos.reduce((prev, curr) => {
+      return curr.atoms + prev;
+    }, 0);
+
     // create fundAddress for client
     const fundAddress = htlc.fund(hash, clientAddress);
 
@@ -98,10 +104,21 @@ describe('Decred HTLC - Decred Network', () => {
 
     // wait for confirmation
 
-    // server gets preimage from paying lnd invoice
+    // server gets preimage from paying lnd invoice to create transaction
     const claimTransaction = await htlc.claim(preimage);
-    const claimTxHash = await htlc.broadcast(claimTransaction.toString());
-    console.log({ claimTxHash });
+
+    // broadcast claim transaction
+    await htlc.broadcast(claimTransaction.toString());
+
+    // get server balance after claim
+    const postServerUtxos = await getUnspentUtxos(
+      htlc.serverAddress.toString(),
+    );
+    const postClaimServerBalance = postServerUtxos.reduce((prev, curr) => {
+      return curr.atoms + prev;
+    }, 0);
+
+    expect(postClaimServerBalance).to.be.greaterThan(preClaimServerBalance);
   });
 });
 
