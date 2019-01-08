@@ -16,3 +16,31 @@ export interface EtherSwapContract extends Contract {
     setRefundDelay(delay: number | string): TransactionObject<any>;
   };
 }
+
+/**
+ * The ERC20 swap contract
+ */
+export interface ERC20SwapContract extends Contract {
+  methods: {
+    [fnName: string]: (...args: any[]) => TransactionObject<any>;
+    fund(
+      lninvoiceHash: string,
+      paymentHash: string,
+      tokenContractAddress: string,
+      tokenAmount: string,
+    ): TransactionObject<any>;
+
+    claim(
+      tokenContractAddress: string,
+      lninvoiceHash: string,
+      preimage: string,
+    ): TransactionObject<any>;
+
+    refund(
+      tokenContractAddress: string,
+      lninvoiceHash: string,
+    ): TransactionObject<any>;
+
+    setRefundDelay(delay: number | string): TransactionObject<any>;
+  };
+}

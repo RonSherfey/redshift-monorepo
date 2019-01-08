@@ -4,24 +4,33 @@ import {
   EthereumSubnet,
   EVM,
   Network,
+  NetworkError,
   PartialTxParams,
   SubnetMap,
+  SwapContract,
   UnsignedTx,
 } from '../../types';
 import { addHexPrefix } from '../../utils';
 import { BaseHtlc } from '../shared';
 import { getContractAddressesForSubnetOrThrow } from './contract-addresses';
-import { abi } from './contract-artifacts/EtherSwap.json';
-import { EtherSwapContract } from './contract-types';
+import { abi as erc20Abi } from './contract-artifacts/ERC20Swap.json';
+import { abi as etherAbi } from './contract-artifacts/EtherSwap.json';
+import { ERC20SwapContract, EtherSwapContract } from './contract-types';
 
-export class EvmHtlc<N extends Network> extends BaseHtlc<N> {
-  private _contract: EtherSwapContract;
+export class EvmHtlc<
+  N extends Network,
+  O extends EVM.Options = EVM.Options
+> extends BaseHtlc<N> {
+  private _contract: SwapContract<O>;
+  private _assetType: EVM.AssetType;
   private _web3Instance: Web3;
+  private _tokenContractAddress: string;
+  private _invoiceHash: string;
 
   /**
-   * Get the Ether Swap Contract Instance
+   * Get the Swap Contract Instance
    */
-  get contract(): EtherSwapContract {
+  get contract(): SwapContract<O> {
     return this._contract;
   }
 
@@ -31,42 +40,33 @@ export class EvmHtlc<N extends Network> extends BaseHtlc<N> {
    * @param subnet The chain subnet
    * @param web3 The web3 instance used for contract calls
    */
-  constructor(network: N, subnet: SubnetMap[N], options: EVM.Options) {
+  constructor(network: N, subnet: SubnetMap[N], options: O) {
     super(network, subnet);
-    const { etherSwap } = getContractAddressesForSubnetOrThrow(
-      subnet as EthereumSubnet,
-    );
-    this._contract = new options.web3.eth.Contract(
-      abi,
-      etherSwap,
-    ) as EtherSwapContract;
+    this._assetType = options.assetType;
     this._web3Instance = options.web3;
+    this._invoiceHash = Web3.utils.sha3(options.invoice);
+    this._tokenContractAddress = (options as EVM.ERC20Options).tokenContractAddress;
+    this._contract = this.createAssetSwapContractInstance(subnet, options);
   }
 
   /**
    * Generate, and optionally send, the swap funding transaction
    * @param amount The fund amount in ether
-   * @param bolt11Invoice The bolt11 encoded payment invoice
    * @param paymentHash The hash of the payment secret
    * @param shouldSend Whether or not the transaction should be broadcast
    * @param txParams The optional transaction params
    */
   public async fund(
     amount: string,
-    bolt11Invoice: string,
     paymentHash: string,
     shouldSend: boolean = true,
     txParams?: PartialTxParams,
   ): Promise<UnsignedTx | TransactionReceipt> {
-    const methodArgs = this.contract.methods
-      .fund(Web3.utils.sha3(bolt11Invoice), addHexPrefix(paymentHash))
-      .encodeABI();
-    const unsignedTx = {
-      to: this.contract.options.address,
-      data: methodArgs,
-      value: Web3.utils.toWei(amount, 'ether'),
-      ...txParams,
-    };
+    const unsignedTx = this.createFundTxForAssetType(
+      amount,
+      paymentHash,
+      txParams,
+    );
 
     if (!shouldSend) {
       return unsignedTx;
@@ -75,26 +75,17 @@ export class EvmHtlc<N extends Network> extends BaseHtlc<N> {
   }
 
   /**
-   * Generate, and optionally send, the transaction to claim the on-chain ETH
-   * @param bolt11Invoice The bolt11 encoded payment invoice
+   * Generate, and optionally send, the transaction to claim the on-chain asset
    * @param paymentSecret The payment secret
    * @param shouldSend Whether or not the transaction should be broadcast
    * @param txParams The optional transaction params
    */
   public async claim(
-    bolt11Invoice: string,
     paymentSecret: string,
     shouldSend: boolean = true,
     txParams?: PartialTxParams,
   ): Promise<UnsignedTx | TransactionReceipt> {
-    const methodArgs = this.contract.methods
-      .claim(Web3.utils.sha3(bolt11Invoice), addHexPrefix(paymentSecret))
-      .encodeABI();
-    const unsignedTx = {
-      to: this.contract.options.address,
-      data: methodArgs,
-      ...txParams,
-    };
+    const unsignedTx = this.createClaimTxForAssetType(paymentSecret, txParams);
 
     if (!shouldSend) {
       return unsignedTx;
@@ -103,27 +94,154 @@ export class EvmHtlc<N extends Network> extends BaseHtlc<N> {
   }
 
   /**
-   * Generate, and optionally send, the transaction to refund the on-chain ETH to the funder
-   * @param bolt11Invoice The bolt11 encoded payment invoice
+   * Generate, and optionally send, the transaction to refund the on-chain asset to the funder
    * @param shouldSend Whether or not the transaction should be broadcast
    * @param txParams The optional transaction params
    */
   public async refund(
-    bolt11Invoice: string,
     shouldSend: boolean = true,
     txParams?: PartialTxParams,
   ): Promise<UnsignedTx | TransactionReceipt> {
-    const unsignedTx = {
-      to: this.contract.options.address,
-      data: this.contract.methods
-        .refund(Web3.utils.sha3(bolt11Invoice))
-        .encodeABI(),
-      ...txParams,
-    };
+    const unsignedTx = this.createRefundTxForAssetType(txParams);
 
     if (!shouldSend) {
       return unsignedTx;
     }
     return this._web3Instance.eth.sendTransaction(unsignedTx);
+  }
+
+  /**
+   * Instantiate the correct contract for the provided subnet and asset
+   * @param subnet The Ethereum subnet
+   * @param options The Ethereum htlc options
+   */
+  private createAssetSwapContractInstance(
+    subnet: SubnetMap[N],
+    options: EVM.Options,
+  ) {
+    const { erc20Swap, etherSwap } = getContractAddressesForSubnetOrThrow(
+      subnet as EthereumSubnet,
+    );
+    switch (options.assetType) {
+      case EVM.AssetType.ERC20:
+        return new options.web3.eth.Contract(
+          erc20Abi,
+          erc20Swap,
+        ) as SwapContract<O>;
+      case EVM.AssetType.ETHER:
+        return new options.web3.eth.Contract(
+          etherAbi,
+          etherSwap,
+        ) as SwapContract<O>;
+      default:
+        throw new Error(NetworkError.INVALID_ASSET);
+    }
+  }
+
+  /**
+   * Create a fund transaction for the provided asset type
+   * @param amount The fund amount in ether or token base units
+   * @param paymentHash The hash of the payment secret
+   * @param txParams The optional transaction params
+   */
+  private createFundTxForAssetType(
+    amount: string,
+    paymentHash: string,
+    txParams?: PartialTxParams,
+  ) {
+    switch (this._assetType) {
+      case EVM.AssetType.ERC20:
+        const erc20Contract = this.contract as ERC20SwapContract;
+        const erc20MethodArgs = erc20Contract.methods
+          .fund(
+            this._invoiceHash,
+            addHexPrefix(paymentHash),
+            this._tokenContractAddress,
+            amount,
+          )
+          .encodeABI();
+        return {
+          to: this.contract.options.address,
+          data: erc20MethodArgs,
+          ...txParams,
+        };
+      case EVM.AssetType.ETHER:
+        const etherContract = this.contract as EtherSwapContract;
+        const etherMethodArgs = etherContract.methods
+          .fund(this._invoiceHash, addHexPrefix(paymentHash))
+          .encodeABI();
+        return {
+          to: this.contract.options.address,
+          data: etherMethodArgs,
+          value: Web3.utils.toWei(amount, 'ether'),
+          ...txParams,
+        };
+    }
+  }
+
+  /**
+   * Create a claim transaction for the provided asset type
+   * @param paymentSecret The payment secret
+   * @param txParams The optional transaction params
+   */
+  private createClaimTxForAssetType(
+    paymentSecret: string,
+    txParams?: PartialTxParams,
+  ) {
+    switch (this._assetType) {
+      case EVM.AssetType.ERC20:
+        const erc20Contract = this.contract as ERC20SwapContract;
+        const erc20MethodArgs = erc20Contract.methods
+          .claim(
+            this._tokenContractAddress,
+            this._invoiceHash,
+            addHexPrefix(paymentSecret),
+          )
+          .encodeABI();
+        return {
+          to: this.contract.options.address,
+          data: erc20MethodArgs,
+          ...txParams,
+        };
+      case EVM.AssetType.ETHER:
+        const etherContract = this.contract as EtherSwapContract;
+        const etherMethodArgs = etherContract.methods
+          .claim(this._invoiceHash, addHexPrefix(paymentSecret))
+          .encodeABI();
+        return {
+          to: this.contract.options.address,
+          data: etherMethodArgs,
+          ...txParams,
+        };
+    }
+  }
+
+  /**
+   * Create a refund transaction for the provided asset type
+   * @param txParams The optional transaction params
+   */
+  private createRefundTxForAssetType(txParams?: PartialTxParams) {
+    switch (this._assetType) {
+      case EVM.AssetType.ERC20:
+        const erc20Contract = this.contract as ERC20SwapContract;
+        const erc20MethodArgs = erc20Contract.methods
+          .refund(this._tokenContractAddress, this._invoiceHash)
+          .encodeABI();
+        return {
+          to: this.contract.options.address,
+          data: erc20MethodArgs,
+          ...txParams,
+        };
+      case EVM.AssetType.ETHER:
+        const etherContract = this.contract as EtherSwapContract;
+        const etherMethodArgs = etherContract.methods
+          .refund(this._invoiceHash)
+          .encodeABI();
+        return {
+          to: this.contract.options.address,
+          data: etherMethodArgs,
+          ...txParams,
+        };
+    }
   }
 }

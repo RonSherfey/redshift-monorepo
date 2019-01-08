@@ -1,0 +1,48 @@
+version: 2
+
+jobs:
+  lint:
+    docker:
+    - image: circleci/node:8.12
+      environment:
+    working_directory: ~/project
+    steps:
+    - checkout
+    - run: yarn install
+    - run: yarn lint
+  test:
+    machine: true
+    working_directory: ~/project
+    steps:
+    - checkout
+    - run:
+        name: Login to GCR
+        command: echo $GCR_CREDS | docker login -u _json_key --password-stdin https://gcr.io
+    - run:
+        name: Install Docker Compose
+        command: |
+          curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+          chmod +x ~/docker-compose
+          sudo mv ~/docker-compose /usr/local/bin/docker-compose
+    - run: 
+        name: Setup Integration Environment
+        command: docker-compose up -d
+    - run:
+        name: Setup Environment
+        command: |
+          curl -o- -L https://yarnpkg.com/install.sh | bash
+          source ~/.bashrc
+          nvm install 8.12
+          nvm alias default 8.12
+          yarn install
+    - run:
+        name: Run Tests
+        command: |
+          source ~/.bashrc
+          yarn test
+workflows:
+  version: 2
+  default:
+    jobs:
+    - lint
+    - test
