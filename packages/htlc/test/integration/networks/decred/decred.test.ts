@@ -19,7 +19,8 @@ describe('Decred HTLC - Decred Network', () => {
     'f91b705c29978d7f5472201129f3edac61da67e4e2ec9dde1f6b989582321dbf',
     network,
   );
-  const clientAddress = 'TsRDtJmAbavWHUEaDcCjG7YwDRJThhAnafp';
+  const clientPublicKey = new bitcore.PublicKey(clientPrivateKey);
+  const clientAddress = clientPublicKey.toAddress(network).toString();
 
   it('should fund htlc address and timelock', async () => {
     const htlc: DecredHtlc<Network.DECRED> = HTLC.construct(
@@ -119,6 +120,83 @@ describe('Decred HTLC - Decred Network', () => {
     }, 0);
 
     expect(postClaimServerBalance).to.be.greaterThan(preClaimServerBalance);
+  });
+
+  it('should refund', async () => {
+    const htlc: DecredHtlc<Network.DECRED> = HTLC.construct(
+      Network.DECRED,
+      DecredSubnet.DCRTESTNET,
+      {
+        secret:
+          '9cf492dcd4a1724470181fcfeff833710eec58fd6a4e926a8b760266dfde9659',
+      },
+    );
+
+    htlc.timelock = 1545950305;
+    // create fundAddress for client
+    const fundAddress = htlc.fund(hash, clientAddress);
+
+    // client creates transaction
+    const spendTx = new bitcore.Transaction(network)
+      .from(await getUnspentUtxos(clientAddress))
+      .to(fundAddress, 1 * 100000000) // 100000000 atoms == 1 DCR
+      .change(clientAddress)
+      .sign(clientPrivateKey);
+
+    // client broadcasts transaction
+    await broadcastTransaction(spendTx.toString());
+
+    // get client balance before refund
+    const preClientRefundUtxo = await getUnspentUtxos(clientAddress);
+    const preClientRefundBalance = preClientRefundUtxo.reduce((prev, curr) => {
+      return curr.atoms + prev;
+    }, 0);
+
+    // get info from fund address
+    const fundUtxos = await getUnspentUtxos(fundAddress.toString());
+    const fundBalance = fundUtxos.reduce((prev, curr) => {
+      return curr.atoms + prev;
+    }, 0);
+
+    // client gets script to refund
+    const script = htlc.script;
+
+    // client builds refund transaction
+    const transaction = new bitcore.Transaction(network)
+      .from(await getUnspentUtxos(fundAddress.toString()))
+      .to(clientAddress, fundBalance - 10000)
+      .lockUntilDate(Math.floor(Date.now() / 1000)); // CLTV
+
+    // client signs refund transaction
+    const signature = bitcore.Transaction.Sighash.sign(
+      transaction,
+      clientPrivateKey,
+      1,
+      0,
+      script,
+    );
+
+    // setup the scriptSig of the spending transaction to spend the p2sh-cltv-p2pkh
+    transaction.inputs[0].setScript(
+      bitcore.Script.empty()
+        .add(signature.toTxFormat())
+        .add(new Buffer(clientPublicKey.toString(), 'hex'))
+        .add('OP_FALSE') // choose the time-delayed refund code path
+        .add(script.toBuffer()),
+    );
+
+    // broadcast transaction
+    await broadcastTransaction(transaction.toString());
+
+    // client should be refunded
+    const postClientRefundUtxo = await getUnspentUtxos(clientAddress);
+    const postClientRefundBalance = postClientRefundUtxo.reduce(
+      (prev, curr) => {
+        return curr.atoms + prev;
+      },
+      0,
+    );
+    expect(postClientRefundBalance).to.be.greaterThan(preClientRefundBalance);
   });
 });
 
