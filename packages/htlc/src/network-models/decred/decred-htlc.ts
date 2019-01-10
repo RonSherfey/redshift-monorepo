@@ -33,7 +33,7 @@ export class DecredHtlc<N extends Network> extends BaseHtlc<N> {
     } = this.getServerDetailsForSubnet(subnet, options.server);
     this.network = passphrase;
     this._insight = new explorers.Insight(url, this.network);
-    this.timelock = Math.floor(Date.now() / 1000) + 1; // @TODO change to block number
+    this.timelock = Math.floor(Date.now() / 1000) + 3600; // 1 hour timelock
     this.script = new bitcore.Script();
     this._serverPrivateKey = new bitcore.PrivateKey(options.secret);
     this.serverPublicKey = new bitcore.PublicKey(this._serverPrivateKey);

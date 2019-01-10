@@ -31,7 +31,7 @@ describe('Decred HTLC - Decred Network', () => {
   const clientPublicKey = new bitcore.PublicKey(clientPrivateKey);
   const clientAddress = clientPublicKey.toAddress(network).toString();
 
-  it('should fund htlc address and timelock', async () => {
+  it('should create htlc address', async () => {
     const htlc: DecredHtlc<Network.DECRED> = HTLC.construct(
       Network.DECRED,
       DecredSubnet.DCRTESTNET,
@@ -126,6 +126,7 @@ describe('Decred HTLC - Decred Network', () => {
       return curr.atoms + prev;
     }, 0);
 
+    // server recieves DCR
     expect(postClaimServerBalance).to.be.greaterThan(preClaimServerBalance);
   });
 
@@ -175,7 +176,7 @@ describe('Decred HTLC - Decred Network', () => {
     // client builds refund transaction
     const transaction = new bitcore.Transaction(network)
       .from(await getUnspentUtxos(fundAddress.toString()))
-      .to(clientAddress, fundBalance - 10000)
+      .to(clientAddress, fundBalance - 10000) // 10000 is the fee
       .lockUntilDate(Math.floor(Date.now() / 1000)); // CLTV
 
     // client signs refund transaction
@@ -311,7 +312,7 @@ describe('Decred HTLC - Decred Network', () => {
     // client builds refund transaction
     const transaction = new bitcore.Transaction(network)
       .from(await getUnspentUtxos(fundAddress.toString()))
-      .to(clientAddress, fundBalance - 10000)
+      .to(clientAddress, fundBalance - 10000) // 10000 fee
       .lockUntilDate(Math.floor(Date.now() / 1000)); // CLTV
 
     // client signs refund transaction
