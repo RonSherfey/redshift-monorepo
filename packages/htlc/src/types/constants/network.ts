@@ -37,6 +37,7 @@ export enum StellarSubnet {
 }
 
 export enum DecredSubnet {
+  DCRSIMNET = 'simnet',
   DCRTESTNET = 'dcrtestnet',
   DECRED = 'decred',
 }

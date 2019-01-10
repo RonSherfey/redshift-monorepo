@@ -1,11 +1,20 @@
 import explorers from 'bitcore-explorers';
 import bitcore from 'bitcore-lib';
 import { DecredHtlc, HTLC } from '../../../../src';
-import { DecredSubnet, Network } from '../../../../src/types';
-import { expect } from '../../../lib/helpers';
+import {
+  BlockResult,
+  DecredSubnet,
+  Network,
+  TxOutput,
+} from '../../../../src/types';
+import { expect, UtxoRpcClient } from '../../../lib/helpers';
+import { mineBlocks } from '../../../lib/helpers/btccli';
 
+let coinbaseUtxos: any;
 const network = bitcore.Networks.dcrdtestnet;
 const insight = new explorers.Insight('https://testnet.decred.org', network);
+
+const rpcClient = new UtxoRpcClient(Network.DECRED, DecredSubnet.DCRSIMNET);
 
 describe('Decred HTLC - Decred Network', () => {
   // parsed from ln invoice
@@ -63,8 +72,6 @@ describe('Decred HTLC - Decred Network', () => {
 
     // client broadcasts transaction
     await broadcastTransaction(spendTx.toString());
-
-    await delay(1000);
 
     // check balance of fundAddress
     const fundAddressUtxos = await getUnspentUtxos(fundAddress.toString());
@@ -132,7 +139,9 @@ describe('Decred HTLC - Decred Network', () => {
       },
     );
 
-    htlc.timelock = 1545950305;
+    // set timelock to the past
+    htlc.timelock = 1547143831;
+
     // create fundAddress for client
     const fundAddress = htlc.fund(hash, clientAddress);
 
@@ -145,6 +154,8 @@ describe('Decred HTLC - Decred Network', () => {
 
     // client broadcasts transaction
     await broadcastTransaction(spendTx.toString());
+
+    // wait for confirmation
 
     // get client balance before refund
     const preClientRefundUtxo = await getUnspentUtxos(clientAddress);
@@ -198,8 +209,151 @@ describe('Decred HTLC - Decred Network', () => {
     );
     expect(postClientRefundBalance).to.be.greaterThan(preClientRefundBalance);
   });
+
+  it('should not claim with wrong preimage', async () => {
+    const htlc: DecredHtlc<Network.DECRED> = HTLC.construct(
+      Network.DECRED,
+      DecredSubnet.DCRTESTNET,
+      {
+        secret:
+          '9cf492dcd4a1724470181fcfeff833710eec58fd6a4e926a8b760266dfde9659',
+      },
+    );
+
+    // get balance before claim
+    const preServerUtxos = await getUnspentUtxos(htlc.serverAddress.toString());
+    const preClaimServerBalance = preServerUtxos.reduce((prev, curr) => {
+      return curr.atoms + prev;
+    }, 0);
+
+    // create fundAddress for client
+    const fundAddress = htlc.fund(hash, clientAddress);
+
+    // client creates transaction
+    const spendTx = new bitcore.Transaction(network)
+      .from(await getUnspentUtxos(clientAddress))
+      .to(fundAddress, 1 * 100000000) // 100000000 atoms == 1 DCR
+      .change(clientAddress)
+      .sign(clientPrivateKey);
+
+    // client broadcasts transaction
+    await broadcastTransaction(spendTx.toString());
+
+    // claim with wrong preimage
+    const wrongPreimage = 'wrong-preimage';
+
+    // server gets preimage from paying lnd invoice to create transaction
+    const claimTransaction = await htlc.claim(wrongPreimage);
+
+    try {
+      // broadcast claim transaction
+      await htlc.broadcast(claimTransaction.toString());
+    } catch (e) {
+      expect(e.indexOf('failed to validate input')).to.be.greaterThan(0);
+    }
+
+    // get server balance after claim
+    const postServerUtxos = await getUnspentUtxos(
+      htlc.serverAddress.toString(),
+    );
+    const postClaimServerBalance = postServerUtxos.reduce((prev, curr) => {
+      return curr.atoms + prev;
+    }, 0);
+
+    // server balance should be the same
+    expect(postClaimServerBalance).to.be.equal(preClaimServerBalance);
+    // fund address should still have a balance
+    const postClaimUtxos = await getUnspentUtxos(fundAddress.toString());
+    const postClaimBalance = postClaimUtxos.reduce((prev, curr) => {
+      return curr.atoms + prev;
+    }, 0);
+    expect(postClaimBalance).to.be.greaterThan(0);
+  });
+
+  it('should not refund before timelock', async () => {
+    const htlc: DecredHtlc<Network.DECRED> = HTLC.construct(
+      Network.DECRED,
+      DecredSubnet.DCRTESTNET,
+      {
+        secret:
+          '9cf492dcd4a1724470181fcfeff833710eec58fd6a4e926a8b760266dfde9659',
+      },
+    );
+
+    // create fundAddress for client
+    const fundAddress = htlc.fund(hash, clientAddress);
+
+    // client creates transaction
+    const spendTx = new bitcore.Transaction(network)
+      .from(await getUnspentUtxos(clientAddress))
+      .to(fundAddress, 1 * 100000000) // 100000000 atoms == 1 DCR
+      .change(clientAddress)
+      .sign(clientPrivateKey);
+
+    // client broadcasts transaction
+    await broadcastTransaction(spendTx.toString());
+
+    // get client balance before refund
+    const preClientRefundUtxo = await getUnspentUtxos(clientAddress);
+    const preClientRefundBalance = preClientRefundUtxo.reduce((prev, curr) => {
+      return curr.atoms + prev;
+    }, 0);
+
+    // get info from fund address
+    const fundUtxos = await getUnspentUtxos(fundAddress.toString());
+    const fundBalance = fundUtxos.reduce((prev, curr) => {
+      return curr.atoms + prev;
+    }, 0);
+
+    // client gets script to refund
+    const script = htlc.script;
+
+    // client builds refund transaction
+    const transaction = new bitcore.Transaction(network)
+      .from(await getUnspentUtxos(fundAddress.toString()))
+      .to(clientAddress, fundBalance - 10000)
+      .lockUntilDate(Math.floor(Date.now() / 1000)); // CLTV
+
+    // client signs refund transaction
+    const signature = bitcore.Transaction.Sighash.sign(
+      transaction,
+      clientPrivateKey,
+      1,
+      0,
+      script,
+    );
+
+    // setup the scriptSig of the spending transaction to spend the p2sh-cltv-p2pkh
+    transaction.inputs[0].setScript(
+      bitcore.Script.empty()
+        .add(signature.toTxFormat())
+        .add(new Buffer(clientPublicKey.toString(), 'hex'))
+        .add('OP_FALSE') // choose the time-delayed refund code path
+        .add(script.toBuffer()),
+    );
+
+    // broadcast transaction
+    try {
+      await broadcastTransaction(transaction.toString());
+    } catch (e) {
+      expect(e.indexOf('locktime requirement not satisfied')).to.be.greaterThan(
+        0,
+      );
+    }
+
+    // client should be refunded
+    const postClientRefundUtxo = await getUnspentUtxos(clientAddress);
+    const postClientRefundBalance = postClientRefundUtxo.reduce(
+      (prev, curr) => {
+        return curr.atoms + prev;
+      },
+      0,
+    );
+    expect(postClientRefundBalance).to.be.greaterThan(preClientRefundBalance);
+  });
 });
 
+// https://testnet.decred.org/api/tx/02bffb107bda73628882775d0e42f86039ede7c5a322e84128f2b9b2a4354788?indent=true
 function getUnspentUtxos(
   address: string,
 ): Promise<bitcore.Transaction.UnspentOutput[]> {
@@ -223,10 +377,24 @@ function broadcastTransaction(transaction: string) {
   });
 }
 
-function delay(ms: number) {
-  return new Promise(res => {
-    setTimeout(() => {
-      res(true);
-    }, ms);
-  });
+/**
+ * Set the utxos that we will spend in the funding transaction
+ */
+async function setCoinbaseUtxos() {
+  // Get spendable outputs for initial fund (generated coins can't be spent for 100 blocks)
+  const coinbaseBlockNumber = (await rpcClient.getBlockCount()) - 100;
+  const coinbaseBlockHash = await rpcClient.getBlockHash(coinbaseBlockNumber);
+
+  const coinbaseBlock = (await rpcClient.getBlockByHash(
+    coinbaseBlockHash,
+  )) as BlockResult;
+  const coinbaseTxId = coinbaseBlock.tx[0];
+  const coinbaseUtxo = await rpcClient.getTxOutput(coinbaseTxId, 0);
+  coinbaseUtxos = [
+    {
+      tx_id: coinbaseTxId,
+      index: 0,
+      tokens: coinbaseUtxo.value,
+    },
+  ];
 }

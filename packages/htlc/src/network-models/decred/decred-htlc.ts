@@ -61,6 +61,12 @@ export class DecredHtlc<N extends Network> extends BaseHtlc<N> {
           passphrase: bitcore.Networks.dcrdtestnet,
           allowHttp: false,
         };
+      case DecredSubnet.DCRSIMNET:
+        return {
+          url: '127.0.0.1:19556',
+          passphrase: bitcore.Networks.dcrdsimnet,
+          allowHttp: false,
+        };
       default:
         throw new Error(NetworkError.INVALID_SUBNET);
     }
@@ -69,7 +75,7 @@ export class DecredHtlc<N extends Network> extends BaseHtlc<N> {
   public fund(hash: string, clientAddress: string): bitcore.Address {
     this.script = new bitcore.Script()
       .add('OP_IF')
-      .add(192) // dered op code number for SHA256
+      .add(192) // decred op code number for SHA256
       .add(new Buffer(hash, 'hex')) // hash of preimage
       .add('OP_EQUALVERIFY')
       .add(

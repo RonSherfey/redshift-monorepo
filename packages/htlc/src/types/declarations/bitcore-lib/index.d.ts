@@ -302,6 +302,7 @@ declare module 'bitcore-lib' {
     const testnet: Network;
     const dcrdlivenet: Network;
     const dcrdtestnet: Network;
+    const dcrdsimnet: Network;
 
     function add(data: any): Network;
     function remove(network: Network): void;
