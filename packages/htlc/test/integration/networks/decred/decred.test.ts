@@ -25,7 +25,7 @@ describe('Decred HTLC - Decred Network', () => {
     '685db6a78d5af37aae9cb7531ffc034444a562c774e54a73201cc17d7388fcbd';
   // client private key
   const clientPrivateKey = new bitcore.PrivateKey(
-    'f91b705c29978d7f5472201129f3edac61da67e4e2ec9dde1f6b989582321dbf',
+    '5d62b859efcb310cd0950d5a2dc7149eb28685ac1a24650e9d72df7633ca7566',
     network,
   );
   const clientPublicKey = new bitcore.PublicKey(clientPrivateKey);
@@ -45,12 +45,12 @@ describe('Decred HTLC - Decred Network', () => {
     const fundAddress = htlc.fund(hash, clientAddress);
     expect(bitcore.Address.isValid(htlc.serverAddress)).to.equal(true);
     expect(fundAddress.toString()).to.equal(
-      'TcsX4QyWV9GsWSHAWkJSJ6aUm1BxBB2tHxg',
+      'TcmwobouKAVNv8sRrKR6GhK4Xxxxp2RUmMV',
     );
     expect(bitcore.Address.isValid(fundAddress)).to.equal(true);
   });
 
-  it('should should create fund address then client funds', async () => {
+  it('should let client fund htlc address', async () => {
     const htlc: DecredHtlc<Network.DECRED> = HTLC.construct(
       Network.DECRED,
       DecredSubnet.DCRTESTNET,
@@ -108,7 +108,7 @@ describe('Decred HTLC - Decred Network', () => {
       .sign(clientPrivateKey);
 
     // client broadcasts transaction
-    await broadcastTransaction(spendTx.toString());
+    const txHash = await broadcastTransaction(spendTx.toString());
 
     // wait for confirmation
 
@@ -140,8 +140,14 @@ describe('Decred HTLC - Decred Network', () => {
       },
     );
 
-    // set timelock to the past
-    htlc.timelock = 1547143831;
+    // get client balance before refund
+    const preClientRefundUtxo = await getUnspentUtxos(clientAddress);
+    const preClientRefundBalance = preClientRefundUtxo.reduce((prev, curr) => {
+      return curr.atoms + prev;
+    }, 0);
+
+    // set timelock to the now
+    htlc.timelock = Math.floor(Date.now() / 1000);
 
     // create fundAddress for client
     const fundAddress = htlc.fund(hash, clientAddress);
@@ -154,15 +160,7 @@ describe('Decred HTLC - Decred Network', () => {
       .sign(clientPrivateKey);
 
     // client broadcasts transaction
-    await broadcastTransaction(spendTx.toString());
-
-    // wait for confirmation
-
-    // get client balance before refund
-    const preClientRefundUtxo = await getUnspentUtxos(clientAddress);
-    const preClientRefundBalance = preClientRefundUtxo.reduce((prev, curr) => {
-      return curr.atoms + prev;
-    }, 0);
+    const spendTxHash = await broadcastTransaction(spendTx.toString());
 
     // get info from fund address
     const fundUtxos = await getUnspentUtxos(fundAddress.toString());
@@ -176,7 +174,7 @@ describe('Decred HTLC - Decred Network', () => {
     // client builds refund transaction
     const transaction = new bitcore.Transaction(network)
       .from(await getUnspentUtxos(fundAddress.toString()))
-      .to(clientAddress, fundBalance - 10000) // 10000 is the fee
+      .to(clientAddress, fundBalance - 30000) // fee: 0.00030000 DCR
       .lockUntilDate(Math.floor(Date.now() / 1000)); // CLTV
 
     // client signs refund transaction
@@ -198,7 +196,7 @@ describe('Decred HTLC - Decred Network', () => {
     );
 
     // broadcast transaction
-    await broadcastTransaction(transaction.toString());
+    const refundTxHash = await broadcastTransaction(transaction.toString());
 
     // client should be refunded
     const postClientRefundUtxo = await getUnspentUtxos(clientAddress);
@@ -208,7 +206,10 @@ describe('Decred HTLC - Decred Network', () => {
       },
       0,
     );
-    expect(postClientRefundBalance).to.be.greaterThan(preClientRefundBalance);
+    // client gets DCR back, minus a fee
+    expect(preClientRefundBalance - postClientRefundBalance).to.be.lessThan(
+      100000000,
+    );
   });
 
   it('should not claim with wrong preimage', async () => {
@@ -238,7 +239,9 @@ describe('Decred HTLC - Decred Network', () => {
       .sign(clientPrivateKey);
 
     // client broadcasts transaction
-    await broadcastTransaction(spendTx.toString());
+    const spendTxHash = await broadcastTransaction(spendTx.toString());
+
+    // wait for confirmation
 
     // claim with wrong preimage
     const wrongPreimage = 'wrong-preimage';
@@ -281,6 +284,12 @@ describe('Decred HTLC - Decred Network', () => {
       },
     );
 
+    // get client balance before refund
+    const preClientRefundUtxo = await getUnspentUtxos(clientAddress);
+    const preClientRefundBalance = preClientRefundUtxo.reduce((prev, curr) => {
+      return curr.atoms + prev;
+    }, 0);
+
     // create fundAddress for client
     const fundAddress = htlc.fund(hash, clientAddress);
 
@@ -292,13 +301,9 @@ describe('Decred HTLC - Decred Network', () => {
       .sign(clientPrivateKey);
 
     // client broadcasts transaction
-    await broadcastTransaction(spendTx.toString());
+    const spendTxHash = await broadcastTransaction(spendTx.toString());
 
-    // get client balance before refund
-    const preClientRefundUtxo = await getUnspentUtxos(clientAddress);
-    const preClientRefundBalance = preClientRefundUtxo.reduce((prev, curr) => {
-      return curr.atoms + prev;
-    }, 0);
+    // wait for confirmation
 
     // get info from fund address
     const fundUtxos = await getUnspentUtxos(fundAddress.toString());
@@ -350,11 +355,10 @@ describe('Decred HTLC - Decred Network', () => {
       },
       0,
     );
-    expect(postClientRefundBalance).to.be.greaterThan(preClientRefundBalance);
+    expect(postClientRefundBalance).to.be.lessThan(preClientRefundBalance);
   });
 });
 
-// https://testnet.decred.org/api/tx/02bffb107bda73628882775d0e42f86039ede7c5a322e84128f2b9b2a4354788?indent=true
 function getUnspentUtxos(
   address: string,
 ): Promise<bitcore.Transaction.UnspentOutput[]> {

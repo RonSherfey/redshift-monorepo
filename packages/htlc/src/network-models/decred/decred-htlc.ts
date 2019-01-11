@@ -100,8 +100,7 @@ export class DecredHtlc<N extends Network> extends BaseHtlc<N> {
   public async claim(preimage: string) {
     // get info from fund address
     const fundUtxos = await this.getUnspentUtxos(
-      'TcdqHYDvn2H7BinUTH4hfh9QLZ5VnNbrbNE' ||
-        bitcore.Address.payingTo(this.script).toString(),
+      bitcore.Address.payingTo(this.script).toString(),
     );
     const fundBalance = fundUtxos.reduce((prev: number, curr: any) => {
       return curr.atoms + prev;
