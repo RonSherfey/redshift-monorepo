@@ -357,6 +357,81 @@ describe('Decred HTLC - Decred Network', () => {
     );
     expect(postClientRefundBalance).to.be.lessThan(preClientRefundBalance);
   });
+
+  it('should not refund with different signer', async () => {
+    const htlc: DecredHtlc<Network.DECRED> = HTLC.construct(
+      Network.DECRED,
+      DecredSubnet.DCRTESTNET,
+      {
+        secret:
+          '9cf492dcd4a1724470181fcfeff833710eec58fd6a4e926a8b760266dfde9659',
+      },
+    );
+
+    // set timelock to the now
+    htlc.timelock = Math.floor(Date.now() / 1000);
+
+    // create fundAddress for client
+    const fundAddress = htlc.fund(hash, clientAddress);
+
+    // client creates transaction
+    const spendTx = new bitcore.Transaction(network)
+      .from(await getUnspentUtxos(clientAddress))
+      .to(fundAddress, 1 * 100000000) // 100000000 atoms == 1 DCR
+      .change(clientAddress)
+      .sign(clientPrivateKey);
+
+    // client broadcasts transaction
+    const spendTxHash = await broadcastTransaction(spendTx.toString());
+
+    // get info from fund address
+    const fundUtxos = await getUnspentUtxos(fundAddress.toString());
+    const fundBalance = fundUtxos.reduce((prev, curr) => {
+      return curr.atoms + prev;
+    }, 0);
+
+    // some rando incercepts script and tries to refund
+    const script = htlc.script;
+
+    // rando tries to sign refund tx
+    const randoPrivateKey = new bitcore.PrivateKey(
+      'f797207b5e2b61777627a44747c61290794af8172e001d9f98b2b120595f322d',
+      network,
+    );
+    const randoPublicKey = new bitcore.PublicKey(randoPrivateKey);
+    const randoAddress = randoPublicKey.toAddress(network);
+
+    // rando builds refund transaction
+    const transaction = new bitcore.Transaction(network)
+      .from(await getUnspentUtxos(fundAddress.toString()))
+      .to(randoAddress, fundBalance - 30000) // fee: 0.00030000 DCR
+      .lockUntilDate(Math.floor(Date.now() / 1000)); // CLTV
+
+    // rando signs refund transaction
+    const signature = bitcore.Transaction.Sighash.sign(
+      transaction,
+      randoPrivateKey,
+      1,
+      0,
+      script,
+    );
+
+    // setup the scriptSig of the spending transaction to spend the p2sh-cltv-p2pkh
+    transaction.inputs[0].setScript(
+      bitcore.Script.empty()
+        .add(signature.toTxFormat())
+        .add(new Buffer(randoPublicKey.toString(), 'hex'))
+        .add('OP_FALSE') // choose the time-delayed refund code path
+        .add(script.toBuffer()),
+    );
+
+    // broadcast transaction
+    try {
+      await broadcastTransaction(transaction.toString());
+    } catch (e) {
+      expect(e.indexOf('OP_EQUALVERIFY failed')).to.be.greaterThan(0);
+    }
+  });
 });
 
 function getUnspentUtxos(
