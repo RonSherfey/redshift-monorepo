@@ -1,20 +1,11 @@
 import explorers from 'bitcore-explorers';
 import bitcore from 'bitcore-lib';
 import { DecredHtlc, HTLC } from '../../../../src';
-import {
-  BlockResult,
-  DecredSubnet,
-  Network,
-  TxOutput,
-} from '../../../../src/types';
-import { expect, UtxoRpcClient } from '../../../lib/helpers';
-import { mineBlocks } from '../../../lib/helpers/btccli';
+import { DecredSubnet, Network } from '../../../../src/types';
+import { expect } from '../../../lib/helpers';
 
-let coinbaseUtxos: any;
 const network = bitcore.Networks.dcrdtestnet;
 const insight = new explorers.Insight('https://testnet.decred.org', network);
-
-const rpcClient = new UtxoRpcClient(Network.DECRED, DecredSubnet.DCRSIMNET);
 
 describe('Decred HTLC - Decred Network', () => {
   // parsed from ln invoice
@@ -25,7 +16,7 @@ describe('Decred HTLC - Decred Network', () => {
     '685db6a78d5af37aae9cb7531ffc034444a562c774e54a73201cc17d7388fcbd';
   // client private key
   const clientPrivateKey = new bitcore.PrivateKey(
-    '5d62b859efcb310cd0950d5a2dc7149eb28685ac1a24650e9d72df7633ca7566',
+    'f91b705c29978d7f5472201129f3edac61da67e4e2ec9dde1f6b989582321dbf',
     network,
   );
   const clientPublicKey = new bitcore.PublicKey(clientPrivateKey);
@@ -45,7 +36,7 @@ describe('Decred HTLC - Decred Network', () => {
     const fundAddress = htlc.fund(hash, clientAddress);
     expect(bitcore.Address.isValid(htlc.serverAddress)).to.equal(true);
     expect(fundAddress.toString()).to.equal(
-      'TcmwobouKAVNv8sRrKR6GhK4Xxxxp2RUmMV',
+      'TcsX4QyWV9GsWSHAWkJSJ6aUm1BxBB2tHxg',
     );
     expect(bitcore.Address.isValid(fundAddress)).to.equal(true);
   });
@@ -71,7 +62,10 @@ describe('Decred HTLC - Decred Network', () => {
       .sign(clientPrivateKey);
 
     // client broadcasts transaction
-    await broadcastTransaction(spendTx.toString());
+    const txHash = await broadcastTransaction(spendTx.toString());
+
+    // wait for block
+    await delay(500);
 
     // check balance of fundAddress
     const fundAddressUtxos = await getUnspentUtxos(fundAddress.toString());
@@ -105,18 +99,23 @@ describe('Decred HTLC - Decred Network', () => {
       .from(await getUnspentUtxos(clientAddress))
       .to(fundAddress, 1 * 100000000) // 100000000 atoms == 1 DCR
       .change(clientAddress)
+      .fee(0.005 * 100000000) // use geneous fee to speed up process
       .sign(clientPrivateKey);
 
     // client broadcasts transaction
     const txHash = await broadcastTransaction(spendTx.toString());
 
     // wait for confirmation
+    await delay(500);
 
     // server gets preimage from paying lnd invoice to create transaction
     const claimTransaction = await htlc.claim(preimage);
 
     // broadcast claim transaction
     await htlc.broadcast(claimTransaction.toString());
+
+    // wait for block
+    await delay(500);
 
     // get server balance after claim
     const postServerUtxos = await getUnspentUtxos(
@@ -157,10 +156,14 @@ describe('Decred HTLC - Decred Network', () => {
       .from(await getUnspentUtxos(clientAddress))
       .to(fundAddress, 1 * 100000000) // 100000000 atoms == 1 DCR
       .change(clientAddress)
+      .fee(0.005 * 100000000) // use geneous fee to speed up process
       .sign(clientPrivateKey);
 
     // client broadcasts transaction
     const spendTxHash = await broadcastTransaction(spendTx.toString());
+
+    // wait for confirmation
+    await delay(500);
 
     // get info from fund address
     const fundUtxos = await getUnspentUtxos(fundAddress.toString());
@@ -198,6 +201,9 @@ describe('Decred HTLC - Decred Network', () => {
     // broadcast transaction
     const refundTxHash = await broadcastTransaction(transaction.toString());
 
+    // wait for block
+    await delay(500);
+
     // client should be refunded
     const postClientRefundUtxo = await getUnspentUtxos(clientAddress);
     const postClientRefundBalance = postClientRefundUtxo.reduce(
@@ -206,6 +212,7 @@ describe('Decred HTLC - Decred Network', () => {
       },
       0,
     );
+
     // client gets DCR back, minus a fee
     expect(preClientRefundBalance - postClientRefundBalance).to.be.lessThan(
       100000000,
@@ -236,12 +243,14 @@ describe('Decred HTLC - Decred Network', () => {
       .from(await getUnspentUtxos(clientAddress))
       .to(fundAddress, 1 * 100000000) // 100000000 atoms == 1 DCR
       .change(clientAddress)
+      .fee(0.005 * 100000000) // use geneous fee to speed up process
       .sign(clientPrivateKey);
 
     // client broadcasts transaction
     const spendTxHash = await broadcastTransaction(spendTx.toString());
 
     // wait for confirmation
+    await delay(500);
 
     // claim with wrong preimage
     const wrongPreimage = 'wrong-preimage';
@@ -304,6 +313,7 @@ describe('Decred HTLC - Decred Network', () => {
     const spendTxHash = await broadcastTransaction(spendTx.toString());
 
     // wait for confirmation
+    await delay(500);
 
     // get info from fund address
     const fundUtxos = await getUnspentUtxos(fundAddress.toString());
@@ -384,6 +394,9 @@ describe('Decred HTLC - Decred Network', () => {
     // client broadcasts transaction
     const spendTxHash = await broadcastTransaction(spendTx.toString());
 
+    // wait for confirmation
+    await delay(500);
+
     // get info from fund address
     const fundUtxos = await getUnspentUtxos(fundAddress.toString());
     const fundBalance = fundUtxos.reduce((prev, curr) => {
@@ -457,24 +470,10 @@ function broadcastTransaction(transaction: string) {
   });
 }
 
-/**
- * Set the utxos that we will spend in the funding transaction
- */
-async function setCoinbaseUtxos() {
-  // Get spendable outputs for initial fund (generated coins can't be spent for 100 blocks)
-  const coinbaseBlockNumber = (await rpcClient.getBlockCount()) - 100;
-  const coinbaseBlockHash = await rpcClient.getBlockHash(coinbaseBlockNumber);
-
-  const coinbaseBlock = (await rpcClient.getBlockByHash(
-    coinbaseBlockHash,
-  )) as BlockResult;
-  const coinbaseTxId = coinbaseBlock.tx[0];
-  const coinbaseUtxo = await rpcClient.getTxOutput(coinbaseTxId, 0);
-  coinbaseUtxos = [
-    {
-      tx_id: coinbaseTxId,
-      index: 0,
-      tokens: coinbaseUtxo.value,
-    },
-  ];
+function delay(ms: number) {
+  return new Promise(res => {
+    setTimeout(() => {
+      res(true);
+    }, ms);
+  });
 }

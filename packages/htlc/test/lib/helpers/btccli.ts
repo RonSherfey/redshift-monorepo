@@ -13,12 +13,5 @@ export async function mineBlocks(count: number = 1) {
         reject(err);
       },
     );
-    exec(
-      `docker-compose run test-dcrctl generate ${count}`,
-      (err, stdout, stderr) => {
-        if (stdout) return resolve();
-        reject(err);
-      },
-    );
   });
 }
