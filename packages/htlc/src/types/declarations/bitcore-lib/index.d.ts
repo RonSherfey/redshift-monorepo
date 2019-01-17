@@ -99,7 +99,7 @@ declare module 'bitcore-lib' {
 
     constructor(serialized?: any);
 
-    from(utxos: Transaction.UnspentOutput[]): this;
+    from(utxos: Transaction.UnspentOutput[] | any): this;
     to(address: Address[] | Address | string, amount: number): this;
     change(address: Address | string): this;
     fee(amount: number): this;
