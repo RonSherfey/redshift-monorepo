@@ -99,7 +99,6 @@ describe('Decred HTLC - Decred Network', () => {
       .from(await getUnspentUtxos(clientAddress))
       .to(fundAddress, 1 * 100000000) // 100000000 atoms == 1 DCR
       .change(clientAddress)
-      .fee(0.005 * 100000000) // use geneous fee to speed up process
       .sign(clientPrivateKey);
 
     // client broadcasts transaction
@@ -156,7 +155,6 @@ describe('Decred HTLC - Decred Network', () => {
       .from(await getUnspentUtxos(clientAddress))
       .to(fundAddress, 1 * 100000000) // 100000000 atoms == 1 DCR
       .change(clientAddress)
-      .fee(0.005 * 100000000) // use geneous fee to speed up process
       .sign(clientPrivateKey);
 
     // client broadcasts transaction
@@ -243,7 +241,6 @@ describe('Decred HTLC - Decred Network', () => {
       .from(await getUnspentUtxos(clientAddress))
       .to(fundAddress, 1 * 100000000) // 100000000 atoms == 1 DCR
       .change(clientAddress)
-      .fee(0.005 * 100000000) // use geneous fee to speed up process
       .sign(clientPrivateKey);
 
     // client broadcasts transaction
