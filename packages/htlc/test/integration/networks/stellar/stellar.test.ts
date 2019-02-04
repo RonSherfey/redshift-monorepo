@@ -30,7 +30,7 @@ describe('Stellar HTLC - Stellar Network', () => {
     it('should create and broadcast a transaction envelope', async () => {
       const htlc: StellarHtlc<Network.STELLAR> = HTLC.construct(
         Network.STELLAR,
-        StellarSubnet.ZULUCRYPTO,
+        StellarSubnet.ZULUCRYPTO_SIMNET,
         { secret: serverSecret },
       );
       // create envelope to broadcast
@@ -45,7 +45,7 @@ describe('Stellar HTLC - Stellar Network', () => {
     it('should create escrow account, create fund envelope then broadcast', async () => {
       const htlc: StellarHtlc<Network.STELLAR> = HTLC.construct(
         Network.STELLAR,
-        StellarSubnet.ZULUCRYPTO,
+        StellarSubnet.ZULUCRYPTO_SIMNET,
         { secret: serverSecret },
       );
       // server creates envelope to broadcast
@@ -78,7 +78,7 @@ describe('Stellar HTLC - Stellar Network', () => {
     it('should create escrow account, fund and claim', async () => {
       const htlc: StellarHtlc<Network.STELLAR> = HTLC.construct(
         Network.STELLAR,
-        StellarSubnet.ZULUCRYPTO,
+        StellarSubnet.ZULUCRYPTO_SIMNET,
         { secret: serverSecret },
       );
       // get initial server account balance
@@ -114,7 +114,7 @@ describe('Stellar HTLC - Stellar Network', () => {
     it('should create escrow account, fund and refund', async () => {
       const htlc: StellarHtlc<Network.STELLAR> = HTLC.construct(
         Network.STELLAR,
-        StellarSubnet.ZULUCRYPTO,
+        StellarSubnet.ZULUCRYPTO_SIMNET,
         { secret: serverSecret },
       );
       // get initial server account balance
@@ -170,7 +170,7 @@ describe('Stellar HTLC - Stellar Network', () => {
     it('should create escrow account, fund and claim with wrong preimage', async () => {
       const htlc: StellarHtlc<Network.STELLAR> = HTLC.construct(
         Network.STELLAR,
-        StellarSubnet.ZULUCRYPTO,
+        StellarSubnet.ZULUCRYPTO_SIMNET,
         { secret: serverSecret },
       );
       // server creates envelope to broadcast
@@ -205,7 +205,7 @@ describe('Stellar HTLC - Stellar Network', () => {
     it('should create escrow account, fund and claim with different keypair', async () => {
       const htlc: StellarHtlc<Network.STELLAR> = HTLC.construct(
         Network.STELLAR,
-        StellarSubnet.ZULUCRYPTO,
+        StellarSubnet.ZULUCRYPTO_SIMNET,
         { secret: serverSecret },
       );
       // server creates envelope to broadcast
@@ -223,7 +223,7 @@ describe('Stellar HTLC - Stellar Network', () => {
       // server pays invoice and gets preimage but signs with wrong keypair
       const wrongServerWallet: StellarHtlc<Network.STELLAR> = HTLC.construct(
         Network.STELLAR,
-        StellarSubnet.ZULUCRYPTO,
+        StellarSubnet.ZULUCRYPTO_SIMNET,
         { secret: 'SBRNVXKBUC6H7MGJLZTWKWDOFYLBGGHSLG3XKOVY6UIZJQMJFHRFRQLE' },
       );
       wrongServerWallet.escrowKeyPair = htlc.escrowKeyPair;
@@ -247,7 +247,7 @@ describe('Stellar HTLC - Stellar Network', () => {
     it('should create escrow account, fund and refund before timelock', async () => {
       const htlc: StellarHtlc<Network.STELLAR> = HTLC.construct(
         Network.STELLAR,
-        StellarSubnet.ZULUCRYPTO,
+        StellarSubnet.ZULUCRYPTO_SIMNET,
         { secret: serverSecret },
       );
       // server creates envelope to broadcast
@@ -287,7 +287,7 @@ describe('Stellar HTLC - Stellar Network', () => {
       try {
         const htlc: StellarHtlc<Network.STELLAR> = HTLC.construct(
           Network.STELLAR,
-          StellarSubnet.ZULUCRYPTO,
+          StellarSubnet.ZULUCRYPTO_SIMNET,
           { secret: serverSecret },
         );
         await htlc.accountInfo('invalid-pub-key');

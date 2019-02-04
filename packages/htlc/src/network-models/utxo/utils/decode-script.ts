@@ -1,16 +1,12 @@
-import {
-  crypto,
-  networks,
-  payments,
-  script,
-} from '../../../overrides/bitcoinjs-lib';
+import { crypto, payments, script } from '../../../overrides/bitcoinjs-lib';
 import {
   DecompiledOpCode,
   Network,
-  Subnet,
+  SubnetMap,
   SwapError,
   UTXO,
 } from '../../../types';
+import { getBitcoinJSNetwork } from './bitcoinjs-lib';
 
 /**
  *
@@ -20,12 +16,12 @@ import {
  * @throws {Error} if the redeemScriptHex is of unknown length or contains unexpected OPs
  * @return {SwapDetails}
  */
-export function getSwapRedeemScriptDetails(
-  network: Network,
-  subnet: Subnet,
+export function getSwapRedeemScriptDetails<N extends Network>(
+  network: N,
+  subnet: SubnetMap[N],
   redeemScriptHex: string,
-): UTXO.Details {
-  const networkPayload = networks[subnet];
+): UTXO.Details<N> {
+  const networkPayload = getBitcoinJSNetwork(network, subnet);
   const redeemScriptBuffer = Buffer.from(redeemScriptHex, 'hex');
   const scriptAssembly = script
     .toASM(script.decompile(redeemScriptBuffer))

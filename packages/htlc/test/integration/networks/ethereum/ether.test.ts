@@ -15,13 +15,13 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
   };
   before(() => {
     web3 = new Web3(
-      getRpcWebSocketUrl(Network.ETHEREUM, EthereumSubnet.GANACHE),
+      getRpcWebSocketUrl(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET),
     );
   });
 
   beforeEach(() => {
     args = config.random.args();
-    htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE, {
+    htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET, {
       web3,
       assetType: EVM.AssetType.ETHER,
       invoice: args.invoice,

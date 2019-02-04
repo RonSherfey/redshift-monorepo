@@ -1,9 +1,6 @@
 import bip39 from 'bip39';
-import {
-  bip32,
-  networks,
-  payments,
-} from '../../../src/overrides/bitcoinjs-lib';
+import { getBitcoinJSNetwork } from '../../../src/network-models/utxo/utils';
+import { bip32, payments } from '../../../src/overrides/bitcoinjs-lib';
 import { KeyPair, Network, Subnet } from '../../../src/types';
 
 /**
@@ -23,7 +20,7 @@ export function getKeyPairFromMnemonic(
     throw new Error('Invalid Mnemonic');
   }
   const seed = bip39.mnemonicToSeed(mnemonic);
-  const networkPayload = networks[subnet];
+  const networkPayload = getBitcoinJSNetwork(network, subnet);
   const root = bip32.fromSeed(seed, networkPayload);
   const keyPair = root.derivePath(`m/0'/0/${index}`);
   const { publicKey } = keyPair;

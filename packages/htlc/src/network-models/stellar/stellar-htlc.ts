@@ -44,19 +44,19 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     serverOptions?: Stellar.ServerOptions,
   ) {
     switch (subnet) {
-      case StellarSubnet.STELLAR:
+      case StellarSubnet.MAINNET:
         return {
           url: 'https://horizon.stellar.org',
           passphrase: stellarSdk.Networks.PUBLIC,
           allowHttp: false,
         };
-      case StellarSubnet.XLMTESTNET:
+      case StellarSubnet.TESTNET:
         return {
           url: 'https://horizon-testnet.stellar.org',
           passphrase: stellarSdk.Networks.TESTNET,
           allowHttp: false,
         };
-      case StellarSubnet.ZULUCRYPTO:
+      case StellarSubnet.ZULUCRYPTO_SIMNET:
         return {
           url: 'http://localhost:8000',
           passphrase: 'Integration Test Network ; zulucrypto',

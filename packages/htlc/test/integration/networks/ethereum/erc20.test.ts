@@ -12,7 +12,7 @@ import { transactionResponseSchema } from '../../../lib/schemas';
 
 describe('EVM HTLC - Ethereum Network - ERC20 Asset', () => {
   const { erc20Swap } = getContractAddressesForSubnetOrThrow(
-    EthereumSubnet.GANACHE,
+    EthereumSubnet.GANACHE_SIMNET,
   );
   const approvalAmount = '10';
   const fundAmount = '1';
@@ -26,7 +26,7 @@ describe('EVM HTLC - Ethereum Network - ERC20 Asset', () => {
   };
   before(async () => {
     web3 = new Web3(
-      getRpcWebSocketUrl(Network.ETHEREUM, EthereumSubnet.GANACHE),
+      getRpcWebSocketUrl(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET),
     );
     // Enable ERC20 token allowance
     erc20TokenContract = await new web3.eth.Contract(abi)
@@ -45,7 +45,7 @@ describe('EVM HTLC - Ethereum Network - ERC20 Asset', () => {
 
   beforeEach(async () => {
     args = config.random.args();
-    htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE, {
+    htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET, {
       web3,
       assetType: EVM.AssetType.ERC20,
       tokenContractAddress: erc20TokenContract.options.address,

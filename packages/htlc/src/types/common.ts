@@ -1,5 +1,5 @@
 import { EvmHtlc, UtxoHtlc } from '..';
-import { StellarHtlc } from '../network-models/index';
+import { StellarHtlc } from '../network-models';
 import {
   BitcoinSubnet,
   EthereumSubnet,
