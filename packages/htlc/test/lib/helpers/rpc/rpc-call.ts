@@ -8,7 +8,7 @@ import {
   NetworkError,
   RpcConnectionConfig,
   Subnet,
-} from '../../../../src/types';
+} from '@radartech/redshift-types';
 import { getRpcConnectionConfig } from './rpc-config';
 
 const clientInstancesCache: { [index: string]: AxiosInstance } = {};

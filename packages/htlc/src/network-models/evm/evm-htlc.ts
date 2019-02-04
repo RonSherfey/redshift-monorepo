@@ -1,7 +1,7 @@
-import Web3 from 'web3';
-import { TransactionReceipt } from 'web3/types';
 import {
+  ERC20SwapContract,
   EthereumSubnet,
+  EtherSwapContract,
   EVM,
   Network,
   NetworkError,
@@ -9,13 +9,14 @@ import {
   SubnetMap,
   SwapContract,
   UnsignedTx,
-} from '../../types';
+} from '@radartech/redshift-types';
+import Web3 from 'web3';
+import { TransactionReceipt } from 'web3/types';
 import { addHexPrefix } from '../../utils';
 import { BaseHtlc } from '../shared';
 import { getContractAddressesForSubnetOrThrow } from './contract-addresses';
 import { abi as erc20Abi } from './contract-artifacts/ERC20Swap.json';
 import { abi as etherAbi } from './contract-artifacts/EtherSwap.json';
-import { ERC20SwapContract, EtherSwapContract } from './contract-types';
 
 export class EvmHtlc<
   N extends Network,

@@ -3,7 +3,7 @@
   "compilerOptions": {
     "rootDirs": ["src", "test"],
     "outDir": "dist",
-    "typeRoots": ["src/types/declarations", "node_modules/@types"]
+    "typeRoots": ["src/types/declarations", "node_modules/@types", "node_modules/@radartech/redshift-types/declarations"]
   },
   "references": [
     { "path": "../redshift-types" }

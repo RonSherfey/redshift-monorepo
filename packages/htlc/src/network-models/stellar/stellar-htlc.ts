@@ -1,4 +1,10 @@
-import { crypto } from 'bitcoinjs-lib';
+import {
+  Network,
+  NetworkError,
+  Stellar,
+  StellarSubnet,
+  SubnetMap,
+} from '@radartech/redshift-types';
 import {
   Asset,
   Keypair,
@@ -9,13 +15,6 @@ import {
   Transaction,
   TransactionBuilder,
 } from 'stellar-sdk';
-import {
-  Network,
-  NetworkError,
-  Stellar,
-  StellarSubnet,
-  SubnetMap,
-} from '../../types';
 import { BaseHtlc } from '../shared';
 
 export class StellarHtlc<N extends Network> extends BaseHtlc<N> {

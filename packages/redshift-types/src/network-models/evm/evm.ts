@@ -1,8 +1,5 @@
 import Web3 from 'web3';
-import {
-  ERC20SwapContract,
-  EtherSwapContract,
-} from '../../network-models/evm/contract-types';
+import { ERC20SwapContract, EtherSwapContract } from './contracts';
 
 export namespace EVM {
   export enum AssetType {
