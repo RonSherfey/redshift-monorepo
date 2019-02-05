@@ -183,3 +183,9 @@ docker-compose up
 ```
 yarn test
 ```
+
+## Additional Information
+
+### Subnet Naming
+
+Subnets should be named `SIMNET`, `TESTNET`, or `MAINNET` if there is only one instance of the subnet type. If there are two or more instances of a single subnet type (multiple testnets, etc.) then the naming convention should be `SUBNETNAME_SUBNETTYPE`. e.g. `KOVAN_TESTNET`.
