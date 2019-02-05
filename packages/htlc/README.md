@@ -157,7 +157,7 @@ Build the `fundEnvelope` and `refundEnvelope` for the user:
 const fundEnvelope = await htlc.fund(
   userPubKey,
   fundAmount,
-  lnInvoiceHash,
+  paymentHash,
 );
 
 const refundEnvelope = await htlc.refund(
