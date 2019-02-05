@@ -9,6 +9,8 @@
     { "path": "../redshift-types" }
   ],
   "exclude": [
-    "test"
+    "test",
+    "dist",
+    "src/network-models/evm/contracts"
   ]
 }
