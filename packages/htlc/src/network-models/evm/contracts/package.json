@@ -1,5 +1,5 @@
 {
-  "name": "@radar-redshift/eth-htlc-contracts",
+  "name": "@radartech/eth-htlc-contracts",
   "version": "0.1.0",
   "description": "Simple Ethereum HTLCs",
   "main": "dist/index.js",

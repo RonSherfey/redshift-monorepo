@@ -1,11 +1,14 @@
 {
   "extends": "../tsconfig.settings.json",
   "compilerOptions": {
-    "rootDirs": ["src", "test"],
+    "rootDir": "src",
     "outDir": "dist",
     "typeRoots": ["src/types/declarations", "node_modules/@types"]
   },
   "references": [
     { "path": "../redshift-types" }
+  ],
+  "exclude": [
+    "test"
   ]
 }
