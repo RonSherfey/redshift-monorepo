@@ -1,6 +1,7 @@
 {
     "files": [],
     "references": [
+        { "path": "redshift-types" },
         { "path": "redshift.js" },
         { "path": "htlc" }
     ]

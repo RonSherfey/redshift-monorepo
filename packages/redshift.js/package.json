@@ -7,9 +7,9 @@
     "test": "mocha -r @ts-tools/node \"test/**/*.test.ts\" --watch-extensions ts --colors"
   },
   "keywords": [],
-  "author": "",
+  "author": "RadarTech",
   "license": "MIT",
   "dependencies": {
-    "@radar-redshift/htlc": "^0.1.0"
+    "@radartech/htlc": "^0.1.0"
   }
 }

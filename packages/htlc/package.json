@@ -1,5 +1,5 @@
 {
-  "name": "@radar-redshift/htlc",
+  "name": "@radartech/htlc",
   "version": "0.1.0",
   "description": "",
   "main": "dist/index.js",
@@ -8,7 +8,7 @@
     "test": "mocha -r @ts-tools/node \"test/**/*.test.ts\" --watch-extensions ts --colors"
   },
   "keywords": [],
-  "author": "",
+  "author": "RadarTech",
   "license": "MIT",
   "dependencies": {
     "big.js": "^5.2.2",
@@ -20,6 +20,7 @@
     "varuint-bitcoin": "^1.1.0"
   },
   "devDependencies": {
+    "@radartech/redshift-types": "^0.1.0",
     "@types/axios": "^0.14.0",
     "@types/big.js": "^4.0.5",
     "@types/bip32": "^1.0.0",

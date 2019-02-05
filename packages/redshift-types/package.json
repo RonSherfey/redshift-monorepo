@@ -1,0 +1,11 @@
+{
+  "name": "@radartech/redshift-types",
+  "version": "0.1.0",
+  "description": "redshift common types",
+  "main": "dist/main.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "RadarTech",
+  "license": "MIT",
+  "dependencies": {}
+}
