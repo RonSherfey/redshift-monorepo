@@ -1,5 +1,5 @@
 {
-	"simnet": {
+	"bitcoin_simnet": {
 		"messagePrefix": "\\x18Bitcoin Signed Message:\n",
 		"bech32": "sb",
 		"bip32": {
@@ -11,19 +11,31 @@
 		"wif": "EF"
 	},
 
-	"ltc": {
-		"messagePrefix": "\\x19Litecoin Signed Message:\n",
-		"bech32": "ltc",
+	"bitcoin_testnet": {
+		"messagePrefix": "\\x18Bitcoin Signed Message:\n",
+		"bech32": "tb",
 		"bip32": {
-			"public": "019DA462",
-			"private": "019D9CFE"
+			"public": "0x043587cf",
+			"private": "0x04358394"
 		},
-		"pubKeyHash": "30",
-		"scriptHash": "32",
-		"wif": "B0"
+		"pubKeyHash": "0x6f",
+		"scriptHash": "0xc4",
+		"wif": "0xef"
 	},
 
-	"ltctestnet": {
+	"bitcoin_mainnet": {
+		"messagePrefix": "\\x18Bitcoin Signed Message:\n",
+		"bech32": "bc",
+		"bip32": {
+			"public": "0x0488b21e",
+			"private":" 0x0488ade4"
+		},
+		"pubKeyHash": "0x00",
+		"scriptHash": "0x05",
+		"wif": "0x80"
+	},
+
+	"litecoin_testnet": {
 		"messagePrefix": "\\x19Litecoin Signed Message:\n",
 		"bech32": "tltc",
 		"bip32": {
@@ -35,27 +47,15 @@
 		"wif": "EF"
 	},
 
-	"bch": {
-		"messagePrefix": "\\x18Bitcoin Signed Message:\n",
-		"bech32": "bitcoincash",
+	"litecoin_mainnet": {
+		"messagePrefix": "\\x19Litecoin Signed Message:\n",
+		"bech32": "ltc",
 		"bip32": {
-			"public": "0488B21E",
-			"private": "0488ADE4"
+			"public": "019DA462",
+			"private": "019D9CFE"
 		},
-		"pubKeyHash": "00",
-		"scriptHash": "05",
-		"wif": "80"
-	},
-
-	"bchtestnet": {
-		"messagePrefix": "\\x18Bitcoin Signed Message:\n",
-		"bech32": "bchtest",
-		"bip32": {
-			"public": "043587CF",
-			"private": "04358394"
-		},
-		"pubKeyHash": "6F",
-		"scriptHash": "C4",
-		"wif": "EF"
+		"pubKeyHash": "30",
+		"scriptHash": "32",
+		"wif": "B0"
 	}
 }

@@ -4,32 +4,25 @@ import {
   address,
   crypto,
   ECPair,
-  networks,
   payments,
   script,
   Transaction,
   TransactionBuilder,
 } from '../../overrides/bitcoinjs-lib';
-import {
-  Network,
-  Subnet,
-  SubnetMap,
-  SwapError,
-  TxOutput,
-  UTXO,
-} from '../../types';
+import { Network, SubnetMap, SwapError, TxOutput, UTXO } from '../../types';
 import { isDefined } from '../../utils';
 import { BaseHtlc } from '../shared';
 import {
   createSwapRedeemScript,
   estimateFee,
+  getBitcoinJSNetwork,
   getSwapRedeemScriptDetails,
   toReversedByteOrderBuffer,
 } from './utils';
 
 export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
   private _redeemScript: string;
-  private _details: UTXO.Details;
+  private _details: UTXO.Details<N>;
 
   get redeemScript(): string {
     return this._redeemScript;
@@ -39,7 +32,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     return Buffer.from(this.redeemScript, 'hex');
   }
 
-  get details(): UTXO.Details {
+  get details(): UTXO.Details<N> {
     return this._details;
   }
 
@@ -47,7 +40,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * Create a new UTXO HTLC instance
    * @param network The chain network
    * @param subnet The chain subnet
-   * @param scriptArgs The redeem script or htlc creation options
+   * @param options The redeem script or htlc creation options
    */
   constructor(network: N, subnet: SubnetMap[N], options: UTXO.Options) {
     super(network, subnet);
@@ -74,7 +67,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     privateKey: string,
     fee: number = 0,
   ): string {
-    const networkPayload = networks[this._subnet as Subnet];
+    const networkPayload = getBitcoinJSNetwork(this._network, this._subnet);
     const tx = new TransactionBuilder(networkPayload);
 
     // The signing key
@@ -193,7 +186,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     tx.addOutput(
       address.toOutputScript(
         destinationAddress,
-        networks[this._subnet as Subnet],
+        getBitcoinJSNetwork(this._network, this._subnet),
       ),
       tokens,
     );
@@ -278,7 +271,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     // Create the signing key from the WIF string
     const signingKey = ECPair.fromWIF(
       privateKey,
-      networks[this._subnet as any],
+      getBitcoinJSNetwork(this._network, this._subnet),
     );
 
     utxos.forEach((output, i) => {

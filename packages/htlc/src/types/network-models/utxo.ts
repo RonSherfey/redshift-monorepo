@@ -1,12 +1,13 @@
 import { BIP32 } from 'bip32';
 import { Network, Subnet } from '..';
+import { SubnetMap } from '../common';
 
 export namespace UTXO {
   export type Options = string | RedeemScriptArgs;
 
-  export interface Details {
-    network: Network;
-    subnet: Subnet;
+  export interface Details<N extends Network> {
+    network: N;
+    subnet: SubnetMap[N];
     payment_hash: string; // payment hash hex string
     destination_public_key: string; // claim public key hex string
     refund_public_key_hash: string; // refund pubkey hash string

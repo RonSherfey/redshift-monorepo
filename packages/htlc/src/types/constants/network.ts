@@ -1,4 +1,3 @@
-import { EvmHtlc, UtxoHtlc } from '../../network-models';
 import { KnownKeys, ValueOf } from '../lib';
 
 // tslint:disable:variable-name
@@ -9,30 +8,30 @@ import { KnownKeys, ValueOf } from '../lib';
 export enum BitcoinSubnet {
   SIMNET = 'simnet',
   TESTNET = 'testnet',
-  BITCOIN = 'bitcoin',
+  MAINNET = 'mainnet',
 }
 
 /**
  * Litecoin testnet & mainnet
  */
 export enum LitecoinSubnet {
-  LTCTESTNET = 'ltctestnet',
-  LITECOIN = 'litecoin',
+  TESTNET = 'testnet',
+  MAINNET = 'mainnet',
 }
 
 /**
  * Ethereum private chain, testnet, & mainnet
  */
 export enum EthereumSubnet {
-  GANACHE = 'ganache',
-  KOVAN = 'kovan',
+  GANACHE_SIMNET = 'ganache_simnet',
+  KOVAN_TESTNET = 'kovan_testnet',
   MAINNET = 'mainnet',
 }
 
 export enum StellarSubnet {
-  ZULUCRYPTO = 'zulucrypto',
-  XLMTESTNET = 'xlmtestnet',
-  STELLAR = 'stellar',
+  ZULUCRYPTO_SIMNET = 'zulucrypto_simnet',
+  TESTNET = 'testnet',
+  MAINNET = 'mainnet',
   CUSTOM = 'custom',
 }
 

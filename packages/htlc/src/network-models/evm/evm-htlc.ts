@@ -38,7 +38,7 @@ export class EvmHtlc<
    * Create a new Ethereum HTLC instance
    * @param network The chain network
    * @param subnet The chain subnet
-   * @param web3 The web3 instance used for contract calls
+   * @param options The htlc options
    */
   constructor(network: N, subnet: SubnetMap[N], options: O) {
     super(network, subnet);
@@ -53,13 +53,13 @@ export class EvmHtlc<
    * Generate, and optionally send, the swap funding transaction
    * @param amount The fund amount in ether
    * @param paymentHash The hash of the payment secret
-   * @param shouldSend Whether or not the transaction should be broadcast
+   * @param shouldBroadcast Whether or not the transaction should be broadcast
    * @param txParams The optional transaction params
    */
   public async fund(
     amount: string,
     paymentHash: string,
-    shouldSend: boolean = true,
+    shouldBroadcast: boolean = true,
     txParams?: PartialTxParams,
   ): Promise<UnsignedTx | TransactionReceipt> {
     const unsignedTx = this.createFundTxForAssetType(
@@ -68,7 +68,7 @@ export class EvmHtlc<
       txParams,
     );
 
-    if (!shouldSend) {
+    if (!shouldBroadcast) {
       return unsignedTx;
     }
     return this._web3Instance.eth.sendTransaction(unsignedTx);
@@ -77,17 +77,17 @@ export class EvmHtlc<
   /**
    * Generate, and optionally send, the transaction to claim the on-chain asset
    * @param paymentSecret The payment secret
-   * @param shouldSend Whether or not the transaction should be broadcast
+   * @param shouldBroadcast Whether or not the transaction should be broadcast
    * @param txParams The optional transaction params
    */
   public async claim(
     paymentSecret: string,
-    shouldSend: boolean = true,
+    shouldBroadcast: boolean = true,
     txParams?: PartialTxParams,
   ): Promise<UnsignedTx | TransactionReceipt> {
     const unsignedTx = this.createClaimTxForAssetType(paymentSecret, txParams);
 
-    if (!shouldSend) {
+    if (!shouldBroadcast) {
       return unsignedTx;
     }
     return this._web3Instance.eth.sendTransaction(unsignedTx);
@@ -95,16 +95,16 @@ export class EvmHtlc<
 
   /**
    * Generate, and optionally send, the transaction to refund the on-chain asset to the funder
-   * @param shouldSend Whether or not the transaction should be broadcast
+   * @param shouldBroadcast Whether or not the transaction should be broadcast
    * @param txParams The optional transaction params
    */
   public async refund(
-    shouldSend: boolean = true,
+    shouldBroadcast: boolean = true,
     txParams?: PartialTxParams,
   ): Promise<UnsignedTx | TransactionReceipt> {
     const unsignedTx = this.createRefundTxForAssetType(txParams);
 
-    if (!shouldSend) {
+    if (!shouldBroadcast) {
       return unsignedTx;
     }
     return this._web3Instance.eth.sendTransaction(unsignedTx);
