@@ -1,7 +1,7 @@
 export namespace Stellar {
   export interface Options {
-    server?: ServerOptions;
     secret: string;
+    server?: ServerOptions;
   }
 
   export interface ServerOptions {

@@ -1,4 +1,14 @@
-import stellarSdk from 'stellar-sdk';
+import { crypto } from 'bitcoinjs-lib';
+import {
+  Asset,
+  Keypair,
+  Network as StellarNetwork,
+  Networks as StellarNetworks,
+  Operation,
+  Server,
+  Transaction,
+  TransactionBuilder,
+} from 'stellar-sdk';
 import {
   Network,
   NetworkError,
@@ -9,15 +19,19 @@ import {
 import { BaseHtlc } from '../shared';
 
 export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
-  private _server: stellarSdk.Server;
-  private _serverKeyPair: stellarSdk.Keypair;
-  public escrowKeyPair: stellarSdk.Keypair;
+  private _server: Server;
+  private _serverKeyPair: Keypair;
+  private _escrowKeyPair: Keypair;
+
+  get escrowKeyPair() {
+    return this._escrowKeyPair;
+  }
 
   /**
    * Create a new Stellar HTLC instance
-   * @param network
-   * @param subnet
-   * @param options
+   * @param network The chain network
+   * @param subnet The chain subnet
+   * @param options The htlc options
    */
   constructor(network: N, subnet: SubnetMap[N], options: Stellar.Options) {
     super(network, subnet);
@@ -26,18 +40,18 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
       passphrase,
       allowHttp = false,
     } = this.getServerDetailsForSubnet(subnet, options.server);
-    stellarSdk.Network.use(new stellarSdk.Network(passphrase));
-    this._server = new stellarSdk.Server(url, {
+    StellarNetwork.use(new StellarNetwork(passphrase));
+    this._server = new Server(url, {
       allowHttp,
     });
-    this._serverKeyPair = stellarSdk.Keypair.fromSecret(options.secret);
-    // create a completely new and unique pair of keys
-    this.escrowKeyPair = stellarSdk.Keypair.random();
+    this._serverKeyPair = Keypair.fromSecret(options.secret);
+    this._escrowKeyPair = Keypair.random();
   }
 
   /**
-   * Connect to mainnet, testnet or local
-   * @param subnet
+   * Connect to mainnet, testnet, zulucrypto simnet, or custom
+   * @param subnet The chain subnet
+   * @param serverOptions The optional server options
    */
   private getServerDetailsForSubnet(
     subnet: SubnetMap[N],
@@ -47,13 +61,13 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
       case StellarSubnet.MAINNET:
         return {
           url: 'https://horizon.stellar.org',
-          passphrase: stellarSdk.Networks.PUBLIC,
+          passphrase: StellarNetworks.PUBLIC,
           allowHttp: false,
         };
       case StellarSubnet.TESTNET:
         return {
           url: 'https://horizon-testnet.stellar.org',
-          passphrase: stellarSdk.Networks.TESTNET,
+          passphrase: StellarNetworks.TESTNET,
           allowHttp: false,
         };
       case StellarSubnet.ZULUCRYPTO_SIMNET:
@@ -80,183 +94,173 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
   }
 
   /**
-   * Broadcast signed envelope to network
-   * @param envelope
-   */
-  public async broadcast(envelope: string) {
-    const txFromEnvelope = new stellarSdk.Transaction(envelope);
-    const resp = await this._server.submitTransaction(txFromEnvelope);
-    return resp;
-  }
-
-  /**
    * Create a generic escrow account
-   * @param keyPair stellarSdk.Keypair.fromSecret('secret-here')
+   * @param shouldBroadcast Whether or not the transaction should be broadcast
    */
-  public async create(): Promise<string> {
+  public async create(shouldBroadcast: boolean = true): Promise<string | any> {
     const serverAccount = await this._server.loadAccount(
       this._serverKeyPair.publicKey(),
     );
-    // build transaction with operations
-    const tb = new stellarSdk.TransactionBuilder(serverAccount)
+
+    // Build transaction with operations
+    const tb = new TransactionBuilder(serverAccount)
       .addOperation(
-        stellarSdk.Operation.createAccount({
-          destination: this.escrowKeyPair.publicKey(), // create escrow account
+        Operation.createAccount({
+          destination: this.escrowKeyPair.publicKey(), // Create escrow account
           startingBalance: '2.00001', // 1 base + 0.5[base_reserve] per op(2) + tx fee (0.00001) => 2.00001 XLM minimum
         }),
       )
       .addOperation(
-        stellarSdk.Operation.setOptions({
+        Operation.setOptions({
           source: this.escrowKeyPair.publicKey(),
           signer: {
-            ed25519PublicKey: this._serverKeyPair.publicKey(), // add radar as signer on escrow account
+            ed25519PublicKey: this._serverKeyPair.publicKey(), // Add server as signer on escrow account
             weight: 1,
           },
         }),
       );
 
-    // build and sign transaction
+    // Build and sign transaction
     const tx = tb.build();
     tx.sign(this.escrowKeyPair, this._serverKeyPair);
-    return tx.toEnvelope().toXDR('base64');
+    const base64Tx = tx.toEnvelope().toXDR('base64');
+
+    if (shouldBroadcast) {
+      return this._server.submitTransaction(new Transaction(base64Tx));
+    }
+    return base64Tx;
   }
 
   /**
-   * Create claim envelope once the preimage is revealed. Broadcast to complete swap
-   * @param keyPair stellarSdk.Keypair.fromSecret('secret-here')
-   * @param escrowPubKey
-   * @param preimage
-   */
-  public async claim(preimage: string): Promise<string> {
-    // load escrow account from pub key
-    const escrowAccount = await this._server.loadAccount(
-      this.escrowKeyPair.publicKey(),
-    );
-    // build claim transaction
-    const tb = new stellarSdk.TransactionBuilder(escrowAccount).addOperation(
-      stellarSdk.Operation.accountMerge({
-        destination: this._serverKeyPair.publicKey(),
-      }),
-    );
-
-    // build and sign transaction
-    const tx = tb.build();
-    tx.sign(this._serverKeyPair);
-    // https://stellar.github.io/js-stellar-sdk/Transaction.html#signHashX
-    tx.signHashX(preimage);
-    return tx.toEnvelope().toXDR('base64');
-  }
-
-  /**
-   * Create fund envelope. User must sign to make valid. Once signed the escrow account becomes a multisig
-   * @param keyPair stellarSdk.Keypair.fromSecret('secret-here')
-   * @param userPubKey
-   * @param escrowPubKey
-   * @param amount
-   * @param hashX
+   * Create the fund envelope. User must sign to make valid. Once signed, the escrow account becomes a multisig.
+   * @param userPubKey The user's public key
+   * @param amount The fund amount
+   * @param paymentHash The hash of the payment secret
    */
   public async fund(
     userPubKey: string,
     amount: number,
-    hashX: string,
+    paymentHash: string,
   ): Promise<string> {
-    // load account to sign with
+    // Load account to sign with
     const account = await this._server.loadAccount(userPubKey);
-    // add a payment operation to the transaction
-    const tb = new stellarSdk.TransactionBuilder(account)
+
+    // Add a payment operation to the transaction
+    const tb = new TransactionBuilder(account)
       .addOperation(
-        stellarSdk.Operation.payment({
-          amount: amount.toString(), // user pays amount
+        Operation.payment({
+          amount: amount.toString(), // User pays amount
           destination: this.escrowKeyPair.publicKey(),
-          asset: stellarSdk.Asset.native(),
+          asset: Asset.native(),
         }),
       )
       .addOperation(
-        stellarSdk.Operation.setOptions({
+        Operation.setOptions({
           source: this.escrowKeyPair.publicKey(),
           signer: {
-            ed25519PublicKey: this._serverKeyPair.publicKey(), // add radar as signer on escrow account
+            ed25519PublicKey: this._serverKeyPair.publicKey(), // Add server as signer on escrow account
             weight: 1,
           },
         }),
       )
       .addOperation(
-        stellarSdk.Operation.setOptions({
+        Operation.setOptions({
           source: this.escrowKeyPair.publicKey(),
           signer: {
-            ed25519PublicKey: userPubKey, // add user as signer on escrow account
+            ed25519PublicKey: userPubKey, // Add user as signer on escrow account
             weight: 1,
           },
         }),
       )
       .addOperation(
-        stellarSdk.Operation.setOptions({
+        Operation.setOptions({
           source: this.escrowKeyPair.publicKey(),
           signer: {
-            sha256Hash: hashX, // add hash(x) as signer on escrow acount
+            sha256Hash: paymentHash, // Add hash(x) as signer on escrow acount
             weight: 1,
           },
-          masterWeight: 0, // escrow cannot sign its own txs
-          lowThreshold: 2, // and add signing thresholds (2 signatures required)
+          masterWeight: 0, // Escrow cannot sign its own txs
+          lowThreshold: 2, // Add signing thresholds (2 signatures required)
           medThreshold: 2,
           highThreshold: 2,
         }),
       );
 
-    // build and sign transaction
+    // Build and sign transaction
     const tx = tb.build();
     tx.sign(this._serverKeyPair);
     return tx.toEnvelope().toXDR('base64');
   }
 
   /**
-   * Create refund envelope in case something goes wrong. user must sign to be valid. can only broadcast after timelock
-   * @param keyPair stellarSdk.Keypair.fromSecret('secret-here')
-   * @param userPubKey
-   * @param escrowPubKey
-   * @param timelockSeconds
+   * Create claim envelope once the payment secret is revealed
+   * @param paymentSecret The payment secret
+   * @param shouldBroadcast Whether or not the transaction should be broadcast
+   */
+  public async claim(
+    paymentSecret: string,
+    shouldBroadcast: boolean = true,
+  ): Promise<string | any> {
+    // Load escrow account from pub key
+    const escrowAccount = await this._server.loadAccount(
+      this.escrowKeyPair.publicKey(),
+    );
+
+    // Build claim transaction
+    const tb = new TransactionBuilder(escrowAccount).addOperation(
+      Operation.accountMerge({
+        destination: this._serverKeyPair.publicKey(),
+      }),
+    );
+
+    // Build and sign transaction
+    const tx = tb.build();
+    tx.sign(this._serverKeyPair);
+    tx.signHashX(paymentSecret);
+    const base64Tx = tx.toEnvelope().toXDR('base64');
+
+    if (shouldBroadcast) {
+      return this._server.submitTransaction(new Transaction(base64Tx));
+    }
+    return base64Tx;
+  }
+
+  /**
+   * Create refund envelope in case something goes wrong. User must sign to make valid. Can only broadcast after timelock.
+   * @param userPubKey The user's public key
+   * @param timelockSeconds The timelock in seconds
    */
   public async refund(
     userPubKey: string,
     timelockSeconds: number,
   ): Promise<string> {
-    // load escrow account from pub key
+    // Load escrow account from pub key
     const escrowAccount = await this._server.loadAccount(
       this.escrowKeyPair.publicKey(),
     );
-    // build claim transaction with timelock
-    const tb = new stellarSdk.TransactionBuilder(escrowAccount, {
+
+    // Build claim transaction with timelock
+    const tb = new TransactionBuilder(escrowAccount, {
       timebounds: {
         minTime: Math.floor(Date.now() / 1000) + timelockSeconds,
         maxTime: 0,
       },
     })
       .addOperation(
-        stellarSdk.Operation.payment({
+        Operation.payment({
           destination: this._serverKeyPair.publicKey(),
-          asset: stellarSdk.Asset.native(),
-          amount: '2.00001', // send upfront cost back to radar
+          asset: Asset.native(),
+          amount: '2.00001', // Send upfront cost back to server
         }),
       )
       .addOperation(
-        stellarSdk.Operation.accountMerge({
-          destination: userPubKey, // merge remainder back to user
+        Operation.accountMerge({
+          destination: userPubKey, // Merge remainder back to user
         }),
       );
-    // build and sign transaction
-    const tx = tb.build();
-    tx.sign(this._serverKeyPair);
-    // https://www.stellar.org/developers/horizon/reference/xdr.html
-    return tx.toEnvelope().toXDR('base64');
-  }
 
-  /**
-   * Sign fund envelope or refund envelope
-   * @param keyPair stellarSdk.Keypair.fromSecret('secret-here')
-   * @param envelope
-   */
-  public sign(envelope: string): string {
-    const tx = new stellarSdk.Transaction(envelope);
+    // Build and sign transaction
+    const tx = tb.build();
     tx.sign(this._serverKeyPair);
     return tx.toEnvelope().toXDR('base64');
   }

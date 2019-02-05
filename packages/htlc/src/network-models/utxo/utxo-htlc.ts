@@ -40,7 +40,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * Create a new UTXO HTLC instance
    * @param network The chain network
    * @param subnet The chain subnet
-   * @param scriptArgs The redeem script or htlc creation options
+   * @param options The redeem script or htlc creation options
    */
   constructor(network: N, subnet: SubnetMap[N], options: UTXO.Options) {
     super(network, subnet);

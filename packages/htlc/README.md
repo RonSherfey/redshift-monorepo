@@ -36,7 +36,7 @@ Get the HTLC details:
 const { details } = htlc;
 ```
 
-Get the redeem script
+Get the redeem script:
 ```typescript
 const { redeemScript } = htlc;
 ```
@@ -79,7 +79,7 @@ const refundTxHex = htlc.refund(
 ```typescript
 import { HTLC } from '@radar-redshift/htlc';
 
-const htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE, {
+const htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET, {
   invoice,
   web3,
   assetType: EVM.AssetType.ETHER,
@@ -91,7 +91,7 @@ const htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE, {
 ```typescript
 import { HTLC } from '@radar-redshift/htlc';
 
-const htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE, {
+const htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET, {
   invoice,
   web3,
   tokenContractAddress,
@@ -128,74 +128,48 @@ const txReceipt = await htlc.refund(true, {
 });
 ```
 
-Don't want to sign and broadcast the transaction? Set `shouldSend` to false to return the unsigned transaction. You can now broadcast it using `eth_sendTransaction`:
+Don't want to sign and broadcast the transaction? Set `shouldBroadcast` to false to return the unsigned transaction. You can now broadcast it using `eth_sendTransaction`:
 ```typescript
 const unsignedTx = await htlc.refund(false);
 ```
 
 ## Stellar
 
-### Construct an Stellar HTLC:
+### Construct a Stellar HTLC:
 
 ```typescript
 import { HTLC } from '@radar-redshift/htlc';
-import stellarSdk from 'stellar-sdk';
 
-const secret = 'SCHMRGINH4CDPUPKBEQZTFZHNRSZKC3NYEFMSUYNDKA4OQK3ZA7JT7C6'
-const htlc = new StellarHtlc(secret, Network.STELLAR, StellarSubnet.XLMTESTNET);
-
+const htlc = HTLC.construct(Network.STELLAR, StellarSubnet.TESTNET, {
+  secret: 'SCHMRGINH4CDPUPKBEQZTFZHNRSZKC3NYEFMSUYNDKA4OQK3ZA7JT7C6',
+});
 ```
 
-Sever builds & signs a transaction (envelope) to create an escrow account (escrowPubKey):
+### Interact with the Stellar HTLC
+
+Build, sign, and broadcast a transaction (envelope) to create an escrow account (escrowPubKey):
 ```typescript
-const createEnvelope = await htlc.create();
-
-await htlc.broadcast(createEnvelope)
+await htlc.create();
 ```
 
-When escrow account is created, server builds `fundEnvelope` and `refundEnvelope` for user:
+Build the `fundEnvelope` and `refundEnvelope` for the user:
 ```typescript
 const fundEnvelope = await htlc.fund(
   userPubKey,
-  3, // tell user to fund 3 XLM
-  hashX, // hash from ln invoice
+  fundAmount,
+  lnInvoiceHash,
 );
 
 const refundEnvelope = await htlc.refund(
   userPubKey,
-  3600, // timelock in seconds (1hr)
+  timelockInSeconds,
 );
 ```
 
-User recieves the `escrowPubKey`, `fundEnvelope`, and `refundEnvelope`. If user agrees to the fund amount (3 XLM), then user will sign the fund envelope and broadcast:
-```typescript
-const secret = 'GDGFK52PNXSKD7BKE5GQJQJ7THDACI5ECDWWEIC6GR5KKBDY7SGPRV6'
-const userWallet = new StellarHtlc(secret, Network.STELLAR, StellarSubnet.XLMTESTNET);
-
-const signedFundEnvelope = userWallet.sign(fundEnvelope);
-
-await userWallet.broadcast(signedFundEnvelope);
-
-// once broadcasted, the escrow account becomes a 2/3 multisig
-```
-
-When escrow account is funded, server pays ln invoice to get preimage. Server uses preimage to claim XLM funds.
+Once the user funds, pay the invoice to get the payment secret. Use the payment secret to claim the funds.
+Once broadcast, the escrow account gets merged into the server account. Swap Complete.
 ``` typescript
-// get preimage from paying ln invoice
-const claimEnvelope = await htlc.claim(preimage);
-
-await htlc.broadcast(claimEnvelope);
-
-// once broadcasted, escrow account gets merged into server account aka swap complete
-```
-
-If server is does not pay invoice, user can broadcast refundEnvelope after timelock (1 hr)
-``` typescript
-const signedRefundEnvelope = userWallet.sign(refundEnvelope);
-
-await userWallet.broadcast(signedRefundEnvelope);
-
-// once broadcasted, XLM is returned back to user
+await htlc.claim(paymentSecret);
 ```
 
 ## Testing

@@ -29,7 +29,7 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
   });
 
   describe('Fund', () => {
-    it('should build a fund transaction and return the unsigned transaction when the shouldSend flag is set to false', async () => {
+    it('should build a fund transaction and return the unsigned transaction when the shouldBroadcast flag is set to false', async () => {
       const unsignedFundingTx = await htlc.fund(
         args.amount,
         args.paymentHash,
@@ -43,7 +43,7 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
       expect(fundTxResult).to.be.jsonSchema(transactionResponseSchema);
     });
 
-    it('should build and send a fund transaction when the shouldSend flag is set to true', async () => {
+    it('should build and send a fund transaction when the shouldBroadcast flag is set to true', async () => {
       const fundTxResult = await htlc.fund(
         args.amount,
         args.paymentHash,
@@ -66,7 +66,7 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
       });
     });
 
-    it('should build a claim transaction and return the unsigned transaction when the shouldSend flag is set to false', async () => {
+    it('should build a claim transaction and return the unsigned transaction when the shouldBroadcast flag is set to false', async () => {
       const unsignedClaimTx = await htlc.claim(args.paymentSecret, false);
       const claimTxResult = await web3.eth.sendTransaction({
         ...unsignedClaimTx,
@@ -76,7 +76,7 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
       expect(claimTxResult).to.be.jsonSchema(transactionResponseSchema);
     });
 
-    it('should build and send a claim transaction when the shouldSend flag is set to true', async () => {
+    it('should build and send a claim transaction when the shouldBroadcast flag is set to true', async () => {
       const claimTxResult = await htlc.claim(args.paymentSecret, true, {
         from: config.ethereum.accounts[0],
         gas: 200000,
@@ -110,7 +110,7 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
       });
     });
 
-    it('should build a refund transaction and return the unsigned transaction when the shouldSend flag is set to false', async () => {
+    it('should build a refund transaction and return the unsigned transaction when the shouldBroadcast flag is set to false', async () => {
       const unsignedRefundTx = await htlc.refund(false);
       const refundTxResult = await web3.eth.sendTransaction({
         ...unsignedRefundTx,
@@ -120,7 +120,7 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
       expect(refundTxResult).to.be.jsonSchema(transactionResponseSchema);
     });
 
-    it('should build and send a refund transaction when the shouldSend flag is set to true', async () => {
+    it('should build and send a refund transaction when the shouldBroadcast flag is set to true', async () => {
       const refundTxResult = await htlc.refund(true, {
         from: config.ethereum.accounts[0],
         gas: 200000,
