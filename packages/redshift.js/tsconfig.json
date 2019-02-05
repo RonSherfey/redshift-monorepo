@@ -1,10 +1,13 @@
 {
   "extends": "../tsconfig.settings.json",
   "compilerOptions": {
-    "rootDirs": ["src","test"],
+    "rootDir": "src",
     "outDir": "dist"
   },
   "references": [
     { "path": "../htlc" }
+  ],
+  "exclude": [
+    "test"
   ]
 }
