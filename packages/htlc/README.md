@@ -66,7 +66,6 @@ const refundTxHex = htlc.refund(
   currentBlockHeight,
   feeTokensPerVirtualByte,
   privateKey,
-  publicKey,
 );
 ```
 

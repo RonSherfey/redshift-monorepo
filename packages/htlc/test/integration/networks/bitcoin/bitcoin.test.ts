@@ -160,7 +160,6 @@ describe('UTXO HTLC - Bitcoin Network', () => {
         currentBlockHeight,
         feeTokensPerVirtualByte,
         refunder.private_key,
-        refunder.public_key,
       );
       refundTxId = await rpcClient.sendRawTransaction(refundTxHex);
       expect(refundTxId).to.be.a('string');

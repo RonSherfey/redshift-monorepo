@@ -139,7 +139,6 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * @param currentBlockHeight The current block height on the network
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
    * @param privateKey The private key WIF string
-   * @param publicKey The public key corresponding to the provided public key hash
    */
   public refund(
     utxos: TxOutput[],
@@ -147,15 +146,18 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     currentBlockHeight: number,
     feeTokensPerVirtualByte: number,
     privateKey: string,
-    publicKey: string,
   ): string {
+    const { publicKey } = ECPair.fromWIF(
+      privateKey,
+      getBitcoinJSNetwork(this._network, this._subnet),
+    );
     return this.buildTransaction(
       utxos,
       destinationAddress,
       currentBlockHeight,
       feeTokensPerVirtualByte,
       privateKey,
-      publicKey,
+      publicKey.toString('hex'),
     );
   }
 
