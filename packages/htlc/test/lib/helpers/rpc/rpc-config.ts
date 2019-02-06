@@ -1,4 +1,8 @@
-import { Network, RpcConnectionConfig, Subnet } from '../../../../src/types';
+import {
+  Network,
+  RpcConnectionConfig,
+  Subnet,
+} from '@radartech/redshift-types';
 
 const credentialsCache: { [network: string]: RpcConnectionConfig } = {};
 

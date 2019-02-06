@@ -1,5 +1,5 @@
+import { BitcoinSubnet, Network } from '@radartech/redshift-types';
 import { HTLC } from '../../../../src';
-import { BitcoinSubnet, Network } from '../../../../src/types';
 import { config, expect } from '../../../lib/helpers';
 
 describe('UTXO HTLC - Bitcoin Network', () => {

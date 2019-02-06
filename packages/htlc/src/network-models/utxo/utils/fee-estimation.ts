@@ -1,4 +1,4 @@
-import { TxOutput, WeightEstimationError } from '../../../types';
+import { TxOutput, WeightEstimationError } from '@radartech/redshift-types';
 import { isArray, isDefined } from '../../../utils';
 
 const shortPushdataLength = 1;

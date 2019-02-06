@@ -5,7 +5,7 @@ import {
   Network,
   NetworkError,
   StellarSubnet,
-} from '../types';
+} from '@radartech/redshift-types';
 
 /**
  * Get the subnets for a specific network

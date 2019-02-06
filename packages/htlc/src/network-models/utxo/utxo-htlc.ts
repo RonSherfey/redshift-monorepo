@@ -1,3 +1,9 @@
+import {
+  Network,
+  SubnetMap,
+  SwapError,
+  TxOutput,
+} from '@radartech/redshift-types';
 import bip65 from 'bip65';
 import { isString } from 'util';
 import {
@@ -9,7 +15,7 @@ import {
   Transaction,
   TransactionBuilder,
 } from '../../overrides/bitcoinjs-lib';
-import { Network, SubnetMap, SwapError, TxOutput, UTXO } from '../../types';
+import { UTXO } from '../../types';
 import { isDefined } from '../../utils';
 import { BaseHtlc } from '../shared';
 import {

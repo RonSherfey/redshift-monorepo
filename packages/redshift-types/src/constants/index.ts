@@ -1,3 +1,3 @@
 export * from './error';
-export * from './utxo';
 export * from './network';
+export * from './utxo';

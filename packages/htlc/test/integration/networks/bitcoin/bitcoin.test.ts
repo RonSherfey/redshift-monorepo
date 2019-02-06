@@ -1,12 +1,11 @@
-import { expect } from 'chai';
-import { HTLC, UtxoHtlc } from '../../../../src';
 import {
   BitcoinSubnet,
   BlockResult,
   Network,
   TxOutput,
-  UTXO,
-} from '../../../../src/types';
+} from '@radartech/redshift-types';
+import { expect } from 'chai';
+import { HTLC, UTXO, UtxoHtlc } from '../../../../src';
 import { config, toSatoshi, UtxoRpcClient } from '../../../lib/helpers';
 import { mineBlocks } from '../../../lib/helpers/btccli';
 
