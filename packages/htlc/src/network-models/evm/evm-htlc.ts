@@ -1,17 +1,19 @@
 import {
-  ERC20SwapContract,
   EthereumSubnet,
-  EtherSwapContract,
-  EVM,
   Network,
   NetworkError,
-  PartialTxParams,
   SubnetMap,
-  SwapContract,
-  UnsignedTx,
 } from '@radartech/redshift-types';
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3/types';
+import {
+  ERC20SwapContract,
+  EtherSwapContract,
+  EVM,
+  PartialTxParams,
+  SwapContract,
+  UnsignedTx,
+} from '../../types';
 import { addHexPrefix } from '../../utils';
 import { BaseHtlc } from '../shared';
 import { getContractAddressesForSubnetOrThrow } from './contract-addresses';

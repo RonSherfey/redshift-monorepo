@@ -1,5 +1,6 @@
-import { EVM, Network, Stellar, UTXO } from '@radartech/redshift-types';
+import { Network } from '@radartech/redshift-types';
 import { EvmHtlc, StellarHtlc, UtxoHtlc } from '../network-models';
+import { EVM, Stellar, UTXO } from './network-models';
 
 /**
  * HTLC options by network
@@ -20,3 +21,5 @@ export interface NetworkModelMap<N extends Network> {
   [Network.ETHEREUM]: EvmHtlc<N>;
   [Network.STELLAR]: StellarHtlc<N>;
 }
+
+export * from './network-models';

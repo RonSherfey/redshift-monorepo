@@ -1,7 +1,6 @@
 import {
   Network,
   NetworkError,
-  Stellar,
   StellarSubnet,
   SubnetMap,
 } from '@radartech/redshift-types';
@@ -15,6 +14,7 @@ import {
   Transaction,
   TransactionBuilder,
 } from 'stellar-sdk';
+import { Stellar } from '../../types';
 import { BaseHtlc } from '../shared';
 
 export class StellarHtlc<N extends Network> extends BaseHtlc<N> {

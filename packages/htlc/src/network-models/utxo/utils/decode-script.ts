@@ -3,9 +3,9 @@ import {
   Network,
   SubnetMap,
   SwapError,
-  UTXO,
 } from '@radartech/redshift-types';
 import { crypto, payments, script } from '../../../overrides/bitcoinjs-lib';
+import { UTXO } from '../../../types';
 import { getBitcoinJSNetwork } from './bitcoinjs-lib';
 
 /**

@@ -1,4 +1,4 @@
 export * from './connection';
 export * from './constants';
 export * from './common';
-export * from './network-models';
+export * from './blockchain';

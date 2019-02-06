@@ -1,7 +1,7 @@
-import { EthereumSubnet, EVM, Network } from '@radartech/redshift-types';
+import { EthereumSubnet, Network } from '@radartech/redshift-types';
 import Web3 from 'web3';
 import Contract from 'web3/eth/contract';
-import { EvmHtlc, HTLC } from '../../../../src';
+import { EVM, EvmHtlc, HTLC } from '../../../../src';
 import { getContractAddressesForSubnetOrThrow } from '../../../../src/network-models/evm/contract-addresses';
 import {
   abi,

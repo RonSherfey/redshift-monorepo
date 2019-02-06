@@ -3,10 +3,9 @@ import {
   BlockResult,
   Network,
   TxOutput,
-  UTXO,
 } from '@radartech/redshift-types';
 import { expect } from 'chai';
-import { HTLC, UtxoHtlc } from '../../../../src';
+import { HTLC, UTXO, UtxoHtlc } from '../../../../src';
 import { config, toSatoshi, UtxoRpcClient } from '../../../lib/helpers';
 import { mineBlocks } from '../../../lib/helpers/btccli';
 

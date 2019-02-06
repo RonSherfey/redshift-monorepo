@@ -1,7 +1,7 @@
-import { UTXO } from '@radartech/redshift-types';
 import bip65 from 'bip65';
 import varuint from 'varuint-bitcoin';
 import { opcodes, script } from '../../../overrides/bitcoinjs-lib';
+import { UTXO } from '../../../types';
 
 /**
  *
