@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "",
   "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "mocha -r @ts-tools/node \"test/**/*.test.ts\" --watch-extensions ts --colors"
   },

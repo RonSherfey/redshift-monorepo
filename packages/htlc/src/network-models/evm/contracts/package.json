@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Simple Ethereum HTLCs",
   "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
     "generate": "truffle compile && yarn typechain && yarn trim-artifacts",
     "typechain": "typechain --target truffle '../contract-artifacts/**/*.json'",
