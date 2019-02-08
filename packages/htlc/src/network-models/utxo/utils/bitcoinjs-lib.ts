@@ -1,5 +1,4 @@
-import { Network, SubnetMap } from '@radartech/redshift-types';
-import { networks } from '../../../overrides/bitcoinjs-lib';
+import { Network, SubnetMap, UtxoNetwork } from '@radartech/redshift-types';
 
 /**
  * Get bitcoinjs-lib network, which includes address and message prefixes
@@ -10,5 +9,5 @@ export function getBitcoinJSNetwork<N extends Network>(
   network: N,
   subnet: SubnetMap[N],
 ) {
-  return networks[`${network}_${subnet}`];
+  return UtxoNetwork[`${network}_${subnet}`];
 }

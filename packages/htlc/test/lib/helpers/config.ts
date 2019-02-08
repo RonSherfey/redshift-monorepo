@@ -1,5 +1,5 @@
 import { BitcoinSubnet, Network } from '@radartech/redshift-types';
-import { crypto } from '../../../src/overrides/bitcoinjs-lib';
+import { crypto } from 'bitcoinjs-lib';
 import { addHexPrefix } from '../../../src/utils';
 import { getTestingMnemonic } from './env-vars';
 import { getKeyPairFromMnemonic } from './wallet';
