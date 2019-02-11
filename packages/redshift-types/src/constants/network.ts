@@ -13,6 +13,7 @@ export enum Daemon {
   LITECOIND = 'litecoind',
   ETHEREUM_ETHER = 'ethereum_ether',
   ETHEREUM_ERC20 = 'ethereum_erc20',
+  LIGHTNING_CHANNELS = 'lightning_channels',
 }
 
 /**
