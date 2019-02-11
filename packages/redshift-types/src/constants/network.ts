@@ -3,6 +3,19 @@ import { KnownKeys, ValueOf } from '../lib';
 // tslint:disable:variable-name
 
 /**
+ * Supported Chain Daemons
+ */
+export enum Daemon {
+  UNKNOWN = 'unknown',
+  BTCD = 'btcd',
+  BITCOIND = 'bitcoind',
+  LTCD = 'ltcd',
+  LITECOIND = 'litecoind',
+  ETHEREUM_ETHER = 'ethereum_ether',
+  ETHEREUM_ERC20 = 'ethereum_erc20',
+}
+
+/**
  * Bitcoin simnet, testnet, & mainnet
  */
 export enum BitcoinSubnet {
