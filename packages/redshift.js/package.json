@@ -10,6 +10,6 @@
   "author": "RadarTech",
   "license": "MIT",
   "dependencies": {
-    "@radartech/htlc": "^0.1.3"
+    "@radartech/htlc": "^0.1.4"
   }
 }
