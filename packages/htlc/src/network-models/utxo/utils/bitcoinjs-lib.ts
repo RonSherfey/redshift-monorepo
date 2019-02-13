@@ -1,4 +1,4 @@
-import { Network, SubnetMap, UtxoNetwork } from '@radartech/redshift-types';
+import { Network, SubnetMap, UtxoNetwork } from '@radar/redshift-types';
 
 /**
  * Get bitcoinjs-lib network, which includes address and message prefixes

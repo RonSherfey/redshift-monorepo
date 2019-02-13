@@ -3,7 +3,7 @@ import {
   BlockResult,
   Network,
   TxOutput,
-} from '@radartech/redshift-types';
+} from '@radar/redshift-types';
 import { expect } from 'chai';
 import { HTLC, UTXO, UtxoHtlc } from '../../../../src';
 import { config, toSatoshi, UtxoRpcClient } from '../../../lib/helpers';

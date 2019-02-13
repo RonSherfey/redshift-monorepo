@@ -1,5 +1,5 @@
 {
-  "name": "@radartech/redshift.js",
+  "name": "@radar/redshift.js",
   "version": "0.1.0",
   "description": "",
   "main": "dist/main.js",
@@ -10,6 +10,6 @@
   "author": "RadarTech",
   "license": "MIT",
   "dependencies": {
-    "@radartech/htlc": "^0.1.4"
+    "@radar/htlc": "^0.1.0"
   }
 }

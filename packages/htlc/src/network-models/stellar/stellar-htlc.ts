@@ -3,7 +3,7 @@ import {
   NetworkError,
   StellarSubnet,
   SubnetMap,
-} from '@radartech/redshift-types';
+} from '@radar/redshift-types';
 import {
   Asset,
   Keypair,

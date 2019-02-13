@@ -1,4 +1,4 @@
-import { BitcoinSubnet, Network } from '@radartech/redshift-types';
+import { BitcoinSubnet, Network } from '@radar/redshift-types';
 import { crypto } from 'bitcoinjs-lib';
 import { addHexPrefix } from '../../../src/utils';
 import { getTestingMnemonic } from './env-vars';

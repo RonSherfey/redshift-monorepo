@@ -1,4 +1,4 @@
-import { EthereumSubnet, Network } from '@radartech/redshift-types';
+import { EthereumSubnet, Network } from '@radar/redshift-types';
 import Web3 from 'web3';
 import Contract from 'web3/eth/contract';
 import { EVM, EvmHtlc, HTLC } from '../../../../src';
