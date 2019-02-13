@@ -3,7 +3,7 @@ import {
   NetworkError,
   Subnet,
   SubnetMap,
-} from '@radartech/redshift-types';
+} from '@radar/redshift-types';
 import { getSubnetForNetwork } from '../../utils/network-utils';
 
 export abstract class BaseHtlc<N extends Network> {

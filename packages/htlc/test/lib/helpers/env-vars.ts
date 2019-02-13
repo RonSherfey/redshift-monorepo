@@ -1,4 +1,4 @@
-import { Network, Subnet } from '@radartech/redshift-types';
+import { Network, Subnet } from '@radar/redshift-types';
 import { getRpcConnectionConfig } from '.';
 
 export function getRpcWebSocketUrl(network: Network, subnet: Subnet): string {

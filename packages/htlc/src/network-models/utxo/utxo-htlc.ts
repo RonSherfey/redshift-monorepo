@@ -1,9 +1,4 @@
-import {
-  Network,
-  SubnetMap,
-  SwapError,
-  TxOutput,
-} from '@radartech/redshift-types';
+import { Network, SubnetMap, SwapError, TxOutput } from '@radar/redshift-types';
 import bip65 from 'bip65';
 import {
   address,

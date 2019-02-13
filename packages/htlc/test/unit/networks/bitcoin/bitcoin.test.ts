@@ -1,4 +1,4 @@
-import { BitcoinSubnet, Network } from '@radartech/redshift-types';
+import { BitcoinSubnet, Network } from '@radar/redshift-types';
 import { HTLC } from '../../../../src';
 import { config, expect } from '../../../lib/helpers';
 

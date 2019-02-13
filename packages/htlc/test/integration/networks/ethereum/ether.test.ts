@@ -1,4 +1,4 @@
-import { EthereumSubnet, Network } from '@radartech/redshift-types';
+import { EthereumSubnet, Network } from '@radar/redshift-types';
 import Web3 from 'web3';
 import { EVM, EvmHtlc, HTLC } from '../../../../src';
 import { config, expect, getRpcWebSocketUrl } from '../../../lib/helpers';

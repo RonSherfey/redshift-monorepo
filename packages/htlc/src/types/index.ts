@@ -1,4 +1,4 @@
-import { Network } from '@radartech/redshift-types';
+import { Network } from '@radar/redshift-types';
 import { EvmHtlc, StellarHtlc, UtxoHtlc } from '../network-models';
 import { EVM, Stellar, UTXO } from './network-models';
 

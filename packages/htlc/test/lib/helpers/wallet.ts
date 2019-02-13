@@ -1,4 +1,4 @@
-import { KeyPair, Network, Subnet } from '@radartech/redshift-types';
+import { KeyPair, Network, Subnet } from '@radar/redshift-types';
 import bip32 from 'bip32';
 import bip39 from 'bip39';
 import { payments } from 'bitcoinjs-lib';

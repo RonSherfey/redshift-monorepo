@@ -1,4 +1,4 @@
-import { Network, SubnetMap } from '@radartech/redshift-types';
+import { Network, SubnetMap } from '@radar/redshift-types';
 
 export namespace UTXO {
   export type Options = string | RedeemScriptArgs;

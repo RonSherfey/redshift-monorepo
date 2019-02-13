@@ -1,4 +1,4 @@
-import { Network, StellarSubnet } from '@radartech/redshift-types';
+import { Network, StellarSubnet } from '@radar/redshift-types';
 import axios from 'axios';
 import {
   Keypair,
