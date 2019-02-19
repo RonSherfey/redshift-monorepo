@@ -1,6 +1,6 @@
 {
   "name": "@radar/htlc",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,7 +11,7 @@
   "author": "RadarTech",
   "license": "MIT",
   "dependencies": {
-    "@radar/redshift-types": "^0.1.1",
+    "@radar/redshift-types": "^0.1.2",
     "@types/bitcoinjs-lib": "4.0.0",
     "@types/stellar-sdk": "0.10.4",
     "big.js": "^5.2.2",
