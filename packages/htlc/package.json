@@ -12,7 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "@radar/redshift-types": "^0.1.1",
-    "@types/bitcoinjs-lib": "^4.0.0",
+    "@types/bitcoinjs-lib": "4.0.0",
     "@types/stellar-sdk": "0.10.4",
     "big.js": "^5.2.2",
     "bip32": "^1.0.2",

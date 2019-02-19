@@ -126,6 +126,13 @@
   dependencies:
     "@types/node" "*"
 
+"@types/bip32@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@types/bip32/-/bip32-1.0.1.tgz#366e31ebf30809542f470bad13f451898c67d32a"
+  integrity sha512-wYXX2aKqnY5AsUep6eZsOPsZCZhzAJDeqO4ut19FY0Nhm6eyo4jN0GWEhs1xKoCuL4yU6WsLHXr0sx8tnWcnsg==
+  dependencies:
+    "@types/node" "*"
+
 "@types/bip39@^2.4.1":
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/@types/bip39/-/bip39-2.4.1.tgz#1a47b453b59a50d7b5856819b834c74798915eb3"
@@ -133,7 +140,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/bitcoinjs-lib@^4.0.0":
+"@types/bitcoinjs-lib@4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@types/bitcoinjs-lib/-/bitcoinjs-lib-4.0.0.tgz#5b54104fb66ecbc17d02a0c3e47349d0d057ec07"
   integrity sha512-rPrVR0vtIhD4AmnhuLWLuztN48iOQQ3CyOUP1WwFq2Lsyc89l4VHpu9nmdy+1WxWR86XY4tEai07yKeMEzfTjg==
