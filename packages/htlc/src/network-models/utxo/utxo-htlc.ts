@@ -4,7 +4,6 @@ import {
   address,
   crypto,
   ECPair,
-  opcodes,
   payments,
   script,
   Transaction,
@@ -163,13 +162,14 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
         privateKey,
       );
     }
-    const dummyUnlock = opcodes.OP_FALSE.toString(16);
+    // Public key spacer for fee estimation purposes
+    const publicKeySpacer = Buffer.alloc(33).toString('hex');
     return this.buildTransaction(
       utxos,
       destinationAddress,
       currentBlockHeight,
       feeTokensPerVirtualByte,
-      dummyUnlock,
+      publicKeySpacer,
     );
   }
 
@@ -278,7 +278,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * have been added. Otherwise, you'll end up with a different sig hash.
    * @param utxos The utxos we're spending
    * @param tx The tx instance
-   * @param unlock Claim secret (preimage), refund public key, or dummy spacer
+   * @param unlock Claim secret (preimage) or refund public key
    * @param privateKey The private key WIF string
    */
   private addWitnessScripts(
