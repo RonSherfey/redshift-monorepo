@@ -53,8 +53,8 @@ const claimTxHex = htlc.claim(
   destinationAddress,
   currentBlockHeight,
   feeTokensPerVirtualByte,
-  privateKey,
   paymentSecret,
+  privateKey,
 );
 ```
 

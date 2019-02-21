@@ -111,8 +111,8 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * @param destinationAddress The claim destination address
    * @param currentBlockHeight The current block height on the network
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
-   * @param privateKey The private key WIF string
    * @param paymentSecret The payment secret
+   * @param privateKey The private key WIF string
    */
   public claim(
     utxos: TxOutput[],
@@ -127,8 +127,8 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
       destinationAddress,
       currentBlockHeight,
       feeTokensPerVirtualByte,
-      privateKey,
       paymentSecret,
+      privateKey,
     );
   }
 
@@ -156,8 +156,8 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
       destinationAddress,
       currentBlockHeight,
       feeTokensPerVirtualByte,
-      privateKey,
       publicKey.toString('hex'),
+      privateKey,
     );
   }
 
@@ -167,16 +167,16 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * @param destinationAddress The destination address of the transaction
    * @param currentBlockHeight The current block height on the network
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
-   * @param privateKey The private key WIF string
    * @param unlock Claim secret (preimage) or refund public key
+   * @param privateKey The private key WIF string
    */
   private buildTransaction(
     utxos: TxOutput[],
     destinationAddress: string,
     currentBlockHeight: number,
     feeTokensPerVirtualByte: number,
-    privateKey: string,
     unlock: string,
+    privateKey: string,
   ): string {
     // Create a new transaction instance
     const tx = new Transaction();
