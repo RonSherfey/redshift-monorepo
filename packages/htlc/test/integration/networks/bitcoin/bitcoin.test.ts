@@ -127,8 +127,8 @@ describe('UTXO HTLC - Bitcoin Network', () => {
         claimer.p2pkh_address,
         currentBlockHeight,
         feeTokensPerVirtualByte,
-        claimer.private_key,
         paymentSecret,
+        claimer.private_key,
       );
       claimTxId = await rpcClient.sendRawTransaction(claimTxHex);
       expect(claimTxId).to.be.a('string');

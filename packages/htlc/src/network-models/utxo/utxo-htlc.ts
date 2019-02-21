@@ -4,6 +4,7 @@ import {
   address,
   crypto,
   ECPair,
+  opcodes,
   payments,
   script,
   Transaction,
@@ -112,24 +113,24 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * @param destinationAddress The claim destination address
    * @param currentBlockHeight The current block height on the network
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
-   * @param privateKey The private key WIF string
    * @param paymentSecret The payment secret
+   * @param privateKey The private key WIF string
    */
   public claim(
     utxos: TxOutput[],
     destinationAddress: string,
     currentBlockHeight: number,
     feeTokensPerVirtualByte: number,
-    privateKey: string,
     paymentSecret: string,
+    privateKey: string,
   ): string {
     return this.buildTransaction(
       utxos,
       destinationAddress,
       currentBlockHeight,
       feeTokensPerVirtualByte,
-      privateKey,
       paymentSecret,
+      privateKey,
     );
   }
 
@@ -139,26 +140,36 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * @param destinationAddress The refund destination address
    * @param currentBlockHeight The current block height on the network
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
-   * @param privateKey The private key WIF string
+   * @param privateKey The optional private key WIF string
    */
   public refund(
     utxos: TxOutput[],
     destinationAddress: string,
     currentBlockHeight: number,
     feeTokensPerVirtualByte: number,
-    privateKey: string,
+    privateKey?: string,
   ): string {
-    const { publicKey } = ECPair.fromWIF(
-      privateKey,
-      getBitcoinJSNetwork(this._network, this._subnet),
-    );
+    if (privateKey) {
+      const { publicKey } = ECPair.fromWIF(
+        privateKey,
+        getBitcoinJSNetwork(this._network, this._subnet),
+      );
+      return this.buildTransaction(
+        utxos,
+        destinationAddress,
+        currentBlockHeight,
+        feeTokensPerVirtualByte,
+        publicKey.toString('hex'),
+        privateKey,
+      );
+    }
+    const dummyUnlock = opcodes.OP_FALSE.toString(16);
     return this.buildTransaction(
       utxos,
       destinationAddress,
       currentBlockHeight,
       feeTokensPerVirtualByte,
-      privateKey,
-      publicKey.toString('hex'),
+      dummyUnlock,
     );
   }
 
@@ -168,16 +179,16 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * @param destinationAddress The destination address of the transaction
    * @param currentBlockHeight The current block height on the network
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
+   * @param unlock Claim secret (preimage), refund public key, or dummy spacer
    * @param privateKey The private key WIF string
-   * @param unlock Claim secret (preimage) or refund public key
    */
   private buildTransaction(
     utxos: TxOutput[],
     destinationAddress: string,
     currentBlockHeight: number,
     feeTokensPerVirtualByte: number,
-    privateKey: string,
     unlock: string,
+    privateKey?: string,
   ): string {
     // Create a new transaction instance
     const tx = new Transaction();
@@ -221,8 +232,13 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     const [out] = tx.outs;
     out.value -= fee;
 
+    // Exit early when no private key is provided
+    if (!privateKey) {
+      return tx.toHex();
+    }
+
     // Set the signed witnesses
-    this.addWitnessScripts(utxos, privateKey, unlock, tx);
+    this.addWitnessScripts(utxos, tx, unlock, privateKey);
 
     return tx.toHex();
   }
@@ -261,15 +277,15 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * Add witness scripts. hashForWitnessV0 must be called after all inputs
    * have been added. Otherwise, you'll end up with a different sig hash.
    * @param utxos The utxos we're spending
-   * @param privateKey The private key WIF string
-   * @param unlock Claim secret (preimage) or refund public key
    * @param tx The tx instance
+   * @param unlock Claim secret (preimage), refund public key, or dummy spacer
+   * @param privateKey The private key WIF string
    */
   private addWitnessScripts(
     utxos: TxOutput[],
-    privateKey: string,
-    unlock: string,
     tx: Transaction,
+    unlock: string,
+    privateKey: string,
   ) {
     // Create the signing key from the WIF string
     const signingKey = ECPair.fromWIF(
