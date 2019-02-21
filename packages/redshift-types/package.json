@@ -1,11 +1,17 @@
 {
-  "name": "@radartech/redshift-types",
-  "version": "0.1.0",
+  "name": "@radar/redshift-types",
+  "version": "0.1.2",
   "description": "redshift common types",
-  "main": "dist/main.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {},
   "keywords": [],
   "author": "RadarTech",
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "@types/bip32": "^1.0.1",
+    "@types/bitcoinjs-lib": "4.0.0",
+    "@types/web3": "^1.0.18"
+  },
+  "devDependencies": {}
 }

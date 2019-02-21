@@ -1,6 +1,6 @@
+import { EthereumSubnet, Network } from '@radar/redshift-types';
 import Web3 from 'web3';
 import { EVM, EvmHtlc, HTLC } from '../../../../src';
-import { EthereumSubnet, Network } from '../../../../src/types';
 import { config, expect, getRpcWebSocketUrl } from '../../../lib/helpers';
 import { transactionResponseSchema } from '../../../lib/schemas';
 

@@ -1,3 +1,4 @@
+import { EthereumSubnet, Network } from '@radar/redshift-types';
 import Web3 from 'web3';
 import Contract from 'web3/eth/contract';
 import { EVM, EvmHtlc, HTLC } from '../../../../src';
@@ -6,7 +7,6 @@ import {
   abi,
   bytecode,
 } from '../../../../src/network-models/evm/contract-artifacts/ERC20Token.json';
-import { EthereumSubnet, Network } from '../../../../src/types';
 import { config, expect, getRpcWebSocketUrl } from '../../../lib/helpers';
 import { transactionResponseSchema } from '../../../lib/schemas';
 

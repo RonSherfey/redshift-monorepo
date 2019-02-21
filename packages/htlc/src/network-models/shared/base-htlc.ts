@@ -1,4 +1,9 @@
-import { Network, NetworkError, Subnet, SubnetMap } from '../../types';
+import {
+  Network,
+  NetworkError,
+  Subnet,
+  SubnetMap,
+} from '@radar/redshift-types';
 import { getSubnetForNetwork } from '../../utils/network-utils';
 
 export abstract class BaseHtlc<N extends Network> {

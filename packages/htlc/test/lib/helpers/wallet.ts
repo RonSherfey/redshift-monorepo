@@ -1,7 +1,8 @@
+import { KeyPair, Network, Subnet } from '@radar/redshift-types';
+import bip32 from 'bip32';
 import bip39 from 'bip39';
+import { payments } from 'bitcoinjs-lib';
 import { getBitcoinJSNetwork } from '../../../src/network-models/utxo/utils';
-import { bip32, payments } from '../../../src/overrides/bitcoinjs-lib';
-import { KeyPair, Network, Subnet } from '../../../src/types';
 
 /**
  * Generate a key pair from a mnemonic and an index

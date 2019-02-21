@@ -36,6 +36,11 @@ jobs:
           nvm alias default 8.12
           yarn install
     - run:
+        name: Build packages
+        command: |
+          source ~/.bashrc
+          yarn build
+    - run:
         name: Run Tests
         command: |
           source ~/.bashrc

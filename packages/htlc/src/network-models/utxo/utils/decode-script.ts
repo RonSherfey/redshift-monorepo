@@ -1,11 +1,11 @@
-import { crypto, payments, script } from '../../../overrides/bitcoinjs-lib';
 import {
   DecompiledOpCode,
   Network,
   SubnetMap,
   SwapError,
-  UTXO,
-} from '../../../types';
+} from '@radar/redshift-types';
+import { crypto, payments, script } from 'bitcoinjs-lib';
+import { UTXO } from '../../../types';
 import { getBitcoinJSNetwork } from './bitcoinjs-lib';
 
 /**

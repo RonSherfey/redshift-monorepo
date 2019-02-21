@@ -1,9 +1,9 @@
 {
-  "name": "@radar-redshift/eth-htlc-contracts",
-  "version": "0.1.0",
+  "name": "@radar/eth-htlc-contracts",
+  "version": "0.1.1",
   "description": "Simple Ethereum HTLCs",
   "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
     "generate": "truffle compile && yarn typechain && yarn trim-artifacts",
     "typechain": "typechain --target truffle '../contract-artifacts/**/*.json'",
