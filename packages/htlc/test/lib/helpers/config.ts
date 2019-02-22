@@ -60,7 +60,7 @@ const networkSpecificConfigs = {
               '0398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25',
             paymentHash:
               'e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d',
-            refundPublicKeyHash: '3f1857b3db895b4d481a46e5a0129cb2b04781c8',
+            refundAddress: 'mmGa2VVPXEKP82YkrPM4VbnsLS4VjRwDCf',
             timelockBlockHeight: 3041,
           },
           details: {
