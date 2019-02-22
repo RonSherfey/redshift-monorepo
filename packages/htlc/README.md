@@ -1,4 +1,4 @@
-## @radar-redshift/htlc
+## @radar/htlc
 
 A small library used to construct and interact with HTLCs across multiple networks & network models.
 
@@ -7,7 +7,7 @@ A small library used to construct and interact with HTLCs across multiple networ
 ### Construct a new Bitcoin HTLC:
 
 ```typescript
-import { HTLC } from '@radar-redshift/htlc';
+import { HTLC } from '@radar/htlc';
 
 const htlc = HTLC.construct(Network.BITCOIN, BitcoinSubnet.SIMNET, {
   paymentHash: 'fba6da3ff596b9c6fabe67d4f728474697640ef6edd9e361c2a46be345112839',
@@ -20,7 +20,7 @@ const htlc = HTLC.construct(Network.BITCOIN, BitcoinSubnet.SIMNET, {
 ### Construct a Bitcoin HTLC from an existing redeem script:
 
 ```typescript
-import { HTLC } from '@radar-redshift/htlc';
+import { HTLC } from '@radar/htlc';
 
 const htlc = HTLC.construct(
   Network.BITCOIN,
@@ -76,7 +76,7 @@ const refundTxHex = htlc.refund(
 #### Asset: Ether
 
 ```typescript
-import { HTLC } from '@radar-redshift/htlc';
+import { HTLC } from '@radar/htlc';
 
 const htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET, {
   invoice,
@@ -88,7 +88,7 @@ const htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET, {
 #### Asset: ERC20
 
 ```typescript
-import { HTLC } from '@radar-redshift/htlc';
+import { HTLC } from '@radar/htlc';
 
 const htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET, {
   invoice,
@@ -137,7 +137,7 @@ const unsignedTx = await htlc.refund(false);
 ### Construct a Stellar HTLC:
 
 ```typescript
-import { HTLC } from '@radar-redshift/htlc';
+import { HTLC } from '@radar/htlc';
 
 const htlc = HTLC.construct(Network.STELLAR, StellarSubnet.TESTNET, {
   secret: 'SCHMRGINH4CDPUPKBEQZTFZHNRSZKC3NYEFMSUYNDKA4OQK3ZA7JT7C6',

@@ -1,13 +1,6 @@
+import { Network, SubnetMap } from '@radar/redshift-types';
 import { EvmHtlc, StellarHtlc, UtxoHtlc } from './network-models';
-import {
-  EVM,
-  Network,
-  NetworkModelMap,
-  Options,
-  Stellar,
-  SubnetMap,
-  UTXO,
-} from './types';
+import { EVM, NetworkModelMap, Options, Stellar, UTXO } from './types';
 
 /**
  * This namespace contains function(s) that simplify HTLC construction across multiple networks and network models.

@@ -1,3 +1,4 @@
+import { Network, StellarSubnet } from '@radar/redshift-types';
 import axios from 'axios';
 import {
   Keypair,
@@ -6,7 +7,6 @@ import {
   Transaction,
 } from 'stellar-sdk';
 import { HTLC, StellarHtlc } from '../../../../src';
-import { Network, StellarSubnet } from '../../../../src/types';
 import { expect } from '../../../lib/helpers';
 
 describe('Stellar HTLC - Stellar Network', () => {

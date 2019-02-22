@@ -1,5 +1,5 @@
+import { Network, SubnetMap, SwapError, TxOutput } from '@radar/redshift-types';
 import bip65 from 'bip65';
-import { isString } from 'util';
 import {
   address,
   crypto,
@@ -8,8 +8,9 @@ import {
   script,
   Transaction,
   TransactionBuilder,
-} from '../../overrides/bitcoinjs-lib';
-import { Network, SubnetMap, SwapError, TxOutput, UTXO } from '../../types';
+} from 'bitcoinjs-lib';
+import { isString } from 'util';
+import { UTXO } from '../../types';
 import { isDefined } from '../../utils';
 import { BaseHtlc } from '../shared';
 import {

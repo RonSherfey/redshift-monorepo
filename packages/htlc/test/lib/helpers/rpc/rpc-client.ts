@@ -1,4 +1,4 @@
-import { BlockResult, Network, Subnet } from '../../../../src/types';
+import { BlockResult, Network, Subnet } from '@radar/redshift-types';
 import { postRpcCall } from './rpc-call';
 
 export class UtxoRpcClient {

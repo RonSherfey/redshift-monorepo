@@ -126,6 +126,13 @@
   dependencies:
     "@types/node" "*"
 
+"@types/bip32@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@types/bip32/-/bip32-1.0.1.tgz#366e31ebf30809542f470bad13f451898c67d32a"
+  integrity sha512-wYXX2aKqnY5AsUep6eZsOPsZCZhzAJDeqO4ut19FY0Nhm6eyo4jN0GWEhs1xKoCuL4yU6WsLHXr0sx8tnWcnsg==
+  dependencies:
+    "@types/node" "*"
+
 "@types/bip39@^2.4.1":
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/@types/bip39/-/bip39-2.4.1.tgz#1a47b453b59a50d7b5856819b834c74798915eb3"
@@ -133,7 +140,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/bitcoinjs-lib@^4.0.0":
+"@types/bitcoinjs-lib@4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@types/bitcoinjs-lib/-/bitcoinjs-lib-4.0.0.tgz#5b54104fb66ecbc17d02a0c3e47349d0d057ec07"
   integrity sha512-rPrVR0vtIhD4AmnhuLWLuztN48iOQQ3CyOUP1WwFq2Lsyc89l4VHpu9nmdy+1WxWR86XY4tEai07yKeMEzfTjg==
@@ -202,7 +209,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/stellar-sdk@^0.10.4":
+"@types/stellar-sdk@0.10.4":
   version "0.10.4"
   resolved "https://registry.yarnpkg.com/@types/stellar-sdk/-/stellar-sdk-0.10.4.tgz#26c80f9f82c33d187e1b4a4643312782f7744e9e"
   integrity sha512-tbP9ZTflC0IrlVfMxnGR0CuJAk6zkNeFfAkX4SP0OKFYc4LJaDM+zWQ1D/XJsZu7C3L+OmFMwNBhV9c5ziOYUA==
@@ -219,10 +226,10 @@
   resolved "https://registry.yarnpkg.com/@types/underscore/-/underscore-1.8.9.tgz#fef41f800cd23db1b4f262ddefe49cd952d82323"
   integrity sha512-vfzZGgZKRFy7KEWcBGfIFk+h6B+thDCLfkD1exMBMRlUsx2icA+J6y4kAbZs/TjSTeY1duw89QUU133TSzr60Q==
 
-"@types/web3@^1.0.14":
-  version "1.0.14"
-  resolved "https://registry.yarnpkg.com/@types/web3/-/web3-1.0.14.tgz#709b700b3eecf7fe9fb09771c4bf484add89912a"
-  integrity sha512-N841xEBVwg0QNin3Zu+Yf7eEKKeJ0MROMc+FvfgtX8r/fwynFhSZVj3VONVcr9QP/Wffq+aggj+4lgrvG3lnFQ==
+"@types/web3@^1.0.18":
+  version "1.0.18"
+  resolved "https://registry.yarnpkg.com/@types/web3/-/web3-1.0.18.tgz#87a8651041d21fc37602ff02327df2c7ecf105d1"
+  integrity sha512-uXQL0LDszt2f476LEmYM6AvSv9F4vU4hWQvlUhwfLHNlIB6OyBXoYsCzWAIhhnc5U0HA7ZBcPybxRJ/yfA6THg==
   dependencies:
     "@types/bn.js" "*"
     "@types/underscore" "*"
@@ -1453,7 +1460,7 @@ bindings@^1.2.1, bindings@^1.3.0:
   resolved "https://registry.yarnpkg.com/bindings/-/bindings-1.3.1.tgz#21fc7c6d67c18516ec5aaa2815b145ff77b26ea5"
   integrity sha512-i47mqjF9UbjxJhxGf+pZ6kSxrnI3wBLlnGI2ArWJ4r0VrvDS7ZYXkprq/pLaBWYq4GM0r4zdHY+NNRqEMU7uew==
 
-bip32@^1.0.0:
+bip32@^1.0.0, bip32@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/bip32/-/bip32-1.0.2.tgz#982e2ad2cae6fc6a2f53dda3e6c3be9364674b28"
   integrity sha512-kedLYj8yvYzND+EfzeoMSlGiN7ImiRBF/MClJSZPkMfcU+OQO7ZpL5L/Yg+TunebBZIHhunstiQF//KLKSF5rg==

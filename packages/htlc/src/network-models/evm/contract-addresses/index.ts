@@ -1,4 +1,4 @@
-import { EthereumSubnet } from '../../../types';
+import { EthereumSubnet } from '@radar/redshift-types';
 
 export interface ContractAddresses {
   etherSwap: string;
