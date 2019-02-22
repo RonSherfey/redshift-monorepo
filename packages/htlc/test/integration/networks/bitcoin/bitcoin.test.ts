@@ -21,16 +21,16 @@ let paymentSecret: string;
 /**
  * Create an HTLC, fund it, and set the values necessary to take action on the swap.
  */
-function setupTestSuite() {
+function setupTestSuite(refundAddress: string = refunder.p2pkh_address) {
   before(async () => {
     await setCoinbaseUtxos();
 
     // Set the HTLC arguments being used
     const random = config.random.args(false);
     htlcArgs = {
+      refundAddress,
       paymentHash: random.paymentHash,
       destinationPublicKey: claimer.public_key,
-      refundPublicKeyHash: refunder.public_key_hash,
       timelockBlockHeight: await rpcClient.getBlockCount(),
     };
     paymentSecret = random.paymentSecret;
@@ -148,27 +148,54 @@ describe('UTXO HTLC - Bitcoin Network', () => {
   });
 
   describe('Refund', () => {
-    setupTestSuite();
+    describe('P2PKH Address Refund', () => {
+      setupTestSuite();
 
-    let refundTxId: string;
-    it('should build a valid refund transaction given valid parameters', async () => {
-      const currentBlockHeight = await rpcClient.getBlockCount();
-      const refundTxHex = htlc.refund(
-        fundingUtxos,
-        refunder.p2pkh_address,
-        currentBlockHeight,
-        feeTokensPerVirtualByte,
-        refunder.private_key,
-      );
-      refundTxId = await rpcClient.sendRawTransaction(refundTxHex);
-      expect(refundTxId).to.be.a('string');
+      let refundTxId: string;
+      it('should build a valid refund transaction given valid parameters', async () => {
+        const currentBlockHeight = await rpcClient.getBlockCount();
+        const refundTxHex = htlc.refund(
+          fundingUtxos,
+          refunder.p2pkh_address,
+          currentBlockHeight,
+          feeTokensPerVirtualByte,
+          refunder.private_key,
+        );
+        refundTxId = await rpcClient.sendRawTransaction(refundTxHex);
+        expect(refundTxId).to.be.a('string');
+      });
+
+      it('should have the correct refund values when mined', async () => {
+        const refundTx = await rpcClient.getTransactionByHash(refundTxId);
+        expect(refundTx.vout[0].value)
+          .to.be.above(0.009)
+          .and.below(0.01); // Refund Output less tx fee
+      });
     });
 
-    it('should have the correct refund values when mined', async () => {
-      const refundTx = await rpcClient.getTransactionByHash(refundTxId);
-      expect(refundTx.vout[0].value)
-        .to.be.above(0.009)
-        .and.below(0.01); // Refund Output less tx fee
+    describe('P2WPKH Address Refund', () => {
+      setupTestSuite(refunder.p2wpkh_address);
+
+      let refundTxId: string;
+      it('should build a valid refund transaction given valid parameters', async () => {
+        const currentBlockHeight = await rpcClient.getBlockCount();
+        const refundTxHex = htlc.refund(
+          fundingUtxos,
+          refunder.p2pkh_address,
+          currentBlockHeight,
+          feeTokensPerVirtualByte,
+          refunder.private_key,
+        );
+        refundTxId = await rpcClient.sendRawTransaction(refundTxHex);
+        expect(refundTxId).to.be.a('string');
+      });
+
+      it('should have the correct refund values when mined', async () => {
+        const refundTx = await rpcClient.getTransactionByHash(refundTxId);
+        expect(refundTx.vout[0].value)
+          .to.be.above(0.009)
+          .and.below(0.01); // Refund Output less tx fee
+      });
     });
   });
 });
