@@ -119,13 +119,6 @@
   dependencies:
     bignumber.js "*"
 
-"@types/bip32@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@types/bip32/-/bip32-1.0.0.tgz#792b26521267effbee4cb048f3425d114ad1e4f8"
-  integrity sha512-BXLhOIsl6vzm+OOHmb5aHMs/eCt3xY7sO9xDfMtNoQl5UyrUMR+QREFLZ1zDl0jt0mkFBhhp5mtEefUOQDTuRA==
-  dependencies:
-    "@types/node" "*"
-
 "@types/bip32@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@types/bip32/-/bip32-1.0.1.tgz#366e31ebf30809542f470bad13f451898c67d32a"

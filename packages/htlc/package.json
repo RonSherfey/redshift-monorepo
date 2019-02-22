@@ -26,7 +26,7 @@
   "devDependencies": {
     "@types/axios": "^0.14.0",
     "@types/big.js": "^4.0.5",
-    "@types/bip32": "^1.0.0",
+    "@types/bip32": "^1.0.1",
     "@types/bip39": "^2.4.1",
     "@types/chai-as-promised": "^7.1.0",
     "@types/chai-json-schema": "^1.4.3",
