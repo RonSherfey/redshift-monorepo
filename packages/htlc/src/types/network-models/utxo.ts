@@ -24,7 +24,7 @@ export namespace UTXO {
   export interface RedeemScriptArgs {
     destinationPublicKey: string;
     paymentHash: string;
-    refundPublicKeyHash: string;
+    refundAddress: string;
     timelockBlockHeight: number;
   }
 }

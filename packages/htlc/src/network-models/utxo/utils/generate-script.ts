@@ -1,5 +1,6 @@
+import { SwapError } from '@radar/redshift-types';
 import bip65 from 'bip65';
-import { opcodes, script } from 'bitcoinjs-lib';
+import { address, opcodes, script } from 'bitcoinjs-lib';
 import varuint from 'varuint-bitcoin';
 import { UTXO } from '../../../types';
 
@@ -7,9 +8,9 @@ import { UTXO } from '../../../types';
  *
  * Convert an iterable of script elements to a hex string
  *
- * @param {String} scriptElements - an iterable representation of a script
- * @throws {Error} on invalid script
- * @return {String} hex representation of the scriptElements
+ * @param scriptElements - an iterable representation of a script
+ * @throws on invalid script
+ * @return hex representation of the scriptElements
  */
 function convertScriptElementsToHex(scriptElements: any): string {
   return scriptElements
@@ -24,6 +25,32 @@ function convertScriptElementsToHex(scriptElements: any): string {
 }
 
 /**
+ * Convert a p2pkh or p2wpkh address to a public key hash
+ * @param addr The p2pkh or p2wpkh address
+ */
+function addressToPublicKeyHash(addr: string): string {
+  let publicKeyHash;
+  try {
+    const details = address.fromBase58Check(addr);
+    if (details) {
+      publicKeyHash = details.hash;
+    }
+  } catch (err) {}
+
+  try {
+    const details = address.fromBech32(addr);
+    if (details) {
+      publicKeyHash = details.data;
+    }
+  } catch (err) {}
+
+  if (!publicKeyHash) {
+    throw new Error(SwapError.INVALID_REFUND_ADDRESS);
+  }
+  return publicKeyHash.toString('hex');
+}
+
+/**
  *
  * Generate a swap redeem script for a public key hash refund path.
  *
@@ -32,15 +59,16 @@ function convertScriptElementsToHex(scriptElements: any): string {
  * if false check the lock time, pubkey hash, and push the local pubkey
  * Check remote or local pubkey signed the transaction
  *
- * @param {String} destinationPublicKey - destination public key for the hashlock
- * @param {String} paymentHash - lightning invoice payment hash
- * @param {String} refundPublicKeyHash - refund key hash for the CLTV op
- * @param {Number} timelockBlockHeight - block height at which the swap expires
- * @return {String} the hex representation of the redeem script
+ * @param destinationPublicKey - destination public key for the hashlock
+ * @param paymentHash - lightning invoice payment hash
+ * @param refundAddress - refund p2pkh or p2wpkh address
+ * @param timelockBlockHeight - block height at which the swap expires
+ * @return the hex representation of the redeem script
  */
 export function createSwapRedeemScript(
   scriptArgs: UTXO.RedeemScriptArgs,
 ): string {
+  const refundPublicKeyHash = addressToPublicKeyHash(scriptArgs.refundAddress);
   const [
     destinationPublicKeyBuffer,
     paymentHashBuffer,
@@ -48,7 +76,7 @@ export function createSwapRedeemScript(
   ] = [
     scriptArgs.destinationPublicKey,
     scriptArgs.paymentHash,
-    scriptArgs.refundPublicKeyHash,
+    refundPublicKeyHash,
   ].map(i => Buffer.from(i, 'hex'));
   const cltvBuffer = script.number.encode(
     bip65.encode({ blocks: scriptArgs.timelockBlockHeight }),
