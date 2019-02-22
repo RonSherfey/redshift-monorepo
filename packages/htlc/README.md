@@ -53,8 +53,8 @@ const claimTxHex = htlc.claim(
   destinationAddress,
   currentBlockHeight,
   feeTokensPerVirtualByte,
-  privateKey,
   paymentSecret,
+  privateKey,
 );
 ```
 
@@ -66,7 +66,6 @@ const refundTxHex = htlc.refund(
   currentBlockHeight,
   feeTokensPerVirtualByte,
   privateKey,
-  publicKey,
 );
 ```
 
