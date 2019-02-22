@@ -120,8 +120,8 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     destinationAddress: string,
     currentBlockHeight: number,
     feeTokensPerVirtualByte: number,
-    privateKey: string,
     paymentSecret: string,
+    privateKey: string,
   ): string {
     return this.buildTransaction(
       utxos,
