@@ -25,19 +25,6 @@ export namespace EVM {
   export type Options = EtherOptions | ERC20Options;
 }
 
-export interface UnsignedTx {
-  to: string;
-  data: string;
-  value?: string | number;
-}
-
-export interface PartialTxParams {
-  nonce?: string | number;
-  from?: string;
-  gas?: string | number;
-  gasPrice?: string | number;
-}
-
 export type SwapContract<O extends EVM.Options> = O extends EVM.ERC20Options
   ? ERC20SwapContract
   : EtherSwapContract;
