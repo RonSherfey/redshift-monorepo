@@ -1,10 +1,10 @@
 import {
   EthereumSubnet,
+  EvmUnsignedTx,
   Network,
   NetworkError,
-  PartialTxParams,
+  PartialEvmTxParams,
   SubnetMap,
-  UnsignedTx,
 } from '@radar/redshift-types';
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3/types';
@@ -63,8 +63,8 @@ export class EvmHtlc<
     amount: string,
     paymentHash: string,
     shouldBroadcast: boolean = true,
-    txParams?: PartialTxParams,
-  ): Promise<UnsignedTx | TransactionReceipt> {
+    txParams?: PartialEvmTxParams,
+  ): Promise<EvmUnsignedTx | TransactionReceipt> {
     const unsignedTx = this.createFundTxForAssetType(
       amount,
       paymentHash,
@@ -86,8 +86,8 @@ export class EvmHtlc<
   public async claim(
     paymentSecret: string,
     shouldBroadcast: boolean = true,
-    txParams?: PartialTxParams,
-  ): Promise<UnsignedTx | TransactionReceipt> {
+    txParams?: PartialEvmTxParams,
+  ): Promise<EvmUnsignedTx | TransactionReceipt> {
     const unsignedTx = this.createClaimTxForAssetType(paymentSecret, txParams);
 
     if (!shouldBroadcast) {
@@ -103,8 +103,8 @@ export class EvmHtlc<
    */
   public async refund(
     shouldBroadcast: boolean = true,
-    txParams?: PartialTxParams,
-  ): Promise<UnsignedTx | TransactionReceipt> {
+    txParams?: PartialEvmTxParams,
+  ): Promise<EvmUnsignedTx | TransactionReceipt> {
     const unsignedTx = this.createRefundTxForAssetType(txParams);
 
     if (!shouldBroadcast) {
@@ -150,7 +150,7 @@ export class EvmHtlc<
   private createFundTxForAssetType(
     amount: string,
     paymentHash: string,
-    txParams?: PartialTxParams,
+    txParams?: PartialEvmTxParams,
   ) {
     switch (this._assetType) {
       case EVM.AssetType.ERC20:
@@ -189,7 +189,7 @@ export class EvmHtlc<
    */
   private createClaimTxForAssetType(
     paymentSecret: string,
-    txParams?: PartialTxParams,
+    txParams?: PartialEvmTxParams,
   ) {
     switch (this._assetType) {
       case EVM.AssetType.ERC20:
@@ -223,7 +223,7 @@ export class EvmHtlc<
    * Create a refund transaction for the provided asset type
    * @param txParams The optional transaction params
    */
-  private createRefundTxForAssetType(txParams?: PartialTxParams) {
+  private createRefundTxForAssetType(txParams?: PartialEvmTxParams) {
     switch (this._assetType) {
       case EVM.AssetType.ERC20:
         const erc20Contract = this.contract as ERC20SwapContract;
