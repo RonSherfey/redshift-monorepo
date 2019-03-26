@@ -31,3 +31,13 @@ export enum NetworkError {
   INVALID_ASSET = 'InvalidAsset',
   RPC_CALL_FAILED = 'RpcCallFailed',
 }
+
+export enum ApiError {
+  INTERNAL_SERVER_ERROR = 'InternalServerError',
+  INVALID_OR_MISSING_MARKETS = 'InvalidOrMissingMarkets',
+  INVALID_OR_MISSING_CREDENTIALS = 'InvalidOrMissingCredentials',
+  INVALID_OR_MISSING_QUOTE_REQUEST_FIELDS = 'InvalidOrMissingQuoteRequestFields',
+  INVALID_INVOICE_HASH = 'InvalidInvoiceHash',
+  ORDER_NOT_FOUND = 'OrderNotFound',
+  NO_QUOTES_AVAILABLE = 'NoQuotesAvailable',
+}
