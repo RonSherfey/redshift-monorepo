@@ -1,4 +1,3 @@
-import { UnsignedTx } from '@radar/htlc';
 import { Market } from '.';
 
 //#region User
@@ -29,8 +28,21 @@ export interface UtxoDetails {
   payToAddress: string;
 }
 
+export interface EvmUnsignedTx {
+  to: string;
+  data: string;
+  value?: string | number;
+}
+
+export interface PartialEvmTxParams {
+  nonce?: string | number;
+  from?: string;
+  gas?: string | number;
+  gasPrice?: string | number;
+}
+
 export interface EvmDetails {
-  unsignedFundingTx: UnsignedTx;
+  unsignedFundingTx: EvmUnsignedTx;
 }
 
 export interface MakerQuoteRequest {
