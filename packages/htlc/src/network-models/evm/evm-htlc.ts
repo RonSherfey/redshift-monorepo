@@ -2,7 +2,9 @@ import {
   EthereumSubnet,
   Network,
   NetworkError,
+  PartialTxParams,
   SubnetMap,
+  UnsignedTx,
 } from '@radar/redshift-types';
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3/types';
@@ -10,9 +12,7 @@ import {
   ERC20SwapContract,
   EtherSwapContract,
   EVM,
-  PartialTxParams,
   SwapContract,
-  UnsignedTx,
 } from '../../types';
 import { addHexPrefix } from '../../utils';
 import { BaseHtlc } from '../shared';
