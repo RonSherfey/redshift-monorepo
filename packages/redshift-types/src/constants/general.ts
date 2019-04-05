@@ -27,6 +27,26 @@ export enum TransactionType {
 }
 
 /**
+ * Ticker symbols for supported on-chain assets (live and potential)
+ */
+export enum OnChainTicker {
+  BTC = 'BTC', // Bitcoin
+  ETH = 'ETH', // Ether
+  LTC = 'LTC', // Litecoin
+  DAI = 'DAI', // DAI
+  XLM = 'XLM', // Stellar Lumens
+  DCR = 'DCR', // Decred
+}
+
+/**
+ * Ticker symbols for supported off-chain assets (live and potential)
+ */
+export enum OffChainTicker {
+  LBTC = 'LBTC', // Lightning Bitcoin
+  LLTC = 'LLTC', // Lightning Litecoin
+}
+
+/**
  * Supported Markets (live and potential)
  */
 export enum Market {
