@@ -5,7 +5,7 @@ import { KnownKeys, ValueOf } from '../lib';
 /**
  * The swap order state
  */
-export enum SwapState {
+export enum InternalSwapState {
   WaitingForFundingTx = 0,
   WaitingForFundingTxConfirmation = 1,
   WaitingForAdditionalFundingTxConfirmation = 2,
@@ -19,6 +19,23 @@ export enum SwapState {
   WaitingForRefundTx = 8,
   WaitingForRefundTxConfirmation = 9,
   Refunded = 10,
+}
+
+/**
+ * The swap order state that concerns the user
+ */
+export enum UserSwapState {
+  WaitingForFundingTx = 0,
+  WaitingForFundingTxConfirmation = 1,
+  WaitingForAdditionalFundingTxConfirmation = 2,
+  PartiallyFunded = 3,
+  Funded = 4,
+
+  Complete = 5, // Invoice has been paid
+
+  WaitingForRefundTx = 6,
+  WaitingForRefundTxConfirmation = 7,
+  Refunded = 8,
 }
 
 /**

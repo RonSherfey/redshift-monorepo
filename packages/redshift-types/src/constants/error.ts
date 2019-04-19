@@ -37,6 +37,7 @@ export enum ApiError {
   INVALID_OR_MISSING_MARKETS = 'InvalidOrMissingMarkets',
   INVALID_OR_MISSING_CREDENTIALS = 'InvalidOrMissingCredentials',
   INVALID_OR_MISSING_QUOTE_REQUEST_FIELDS = 'InvalidOrMissingQuoteRequestFields',
+  INVALID_INVOICE = 'InvalidInvoice',
   INVALID_INVOICE_HASH = 'InvalidInvoiceHash',
   ORDER_NOT_FOUND = 'OrderNotFound',
   NO_QUOTES_AVAILABLE = 'NoQuotesAvailable',
