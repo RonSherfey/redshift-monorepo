@@ -1,3 +1,5 @@
+import { KnownKeys, ValueOf } from '../lib';
+
 // tslint:disable:variable-name
 
 /**
@@ -79,7 +81,7 @@ export const Market = {
   ...TestnetMarket,
   ...MainnetMarket,
 };
-export type Market = typeof Market;
+export type Market = ValueOf<Pick<typeof Market, KnownKeys<typeof Market>>>;
 
 export namespace Ws {
   /**
