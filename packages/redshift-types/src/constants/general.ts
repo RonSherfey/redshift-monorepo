@@ -1,3 +1,5 @@
+// tslint:disable:variable-name
+
 /**
  * The swap order state
  */
@@ -47,9 +49,21 @@ export enum OffChainTicker {
 }
 
 /**
- * Supported Markets (live and potential)
+ * Supported Testnet Markets (live and potential)
  */
-export enum Market {
+export enum TestnetMarket {
+  TBTC_LTBTC = 'TBTC_LTBTC',
+  KETH_LTBTC = 'KETH_LTBTC',
+  TLTC_LTBTC = 'TLTC_LTBTC',
+  KDAI_LTBTC = 'KDAI_LTBTC',
+  TXLM_LTBTC = 'TXLM_LTBTC',
+  TDCR_LTBTC = 'TDCR_LTBTC',
+}
+
+/**
+ * Supported Mainnet Markets (live and potential)
+ */
+export enum MainnetMarket {
   BTC_LBTC = 'BTC_LBTC',
   ETH_LBTC = 'ETH_LBTC',
   LTC_LBTC = 'LTC_LBTC',
@@ -57,6 +71,15 @@ export enum Market {
   XLM_LBTC = 'XLM_LBTC',
   DCR_LBTC = 'DCR_LBTC',
 }
+
+/**
+ * Supported Markets (live and potential)
+ */
+export const Market = {
+  ...TestnetMarket,
+  ...MainnetMarket,
+};
+export type Market = typeof Market;
 
 export namespace Ws {
   /**
