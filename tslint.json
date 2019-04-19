@@ -3,7 +3,8 @@
   "extends": ["@radarrelay/tslint-config"],
   "linterOptions": {
     "exclude": [
-        "packages/**/node_modules/**"
+        "packages/**/node_modules/**",
+        "packages/**/dist/**"
     ]
   },
   "jsRules": {
