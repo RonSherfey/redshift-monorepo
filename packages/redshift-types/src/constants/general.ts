@@ -48,9 +48,21 @@ export enum TransactionType {
 }
 
 /**
- * Ticker symbols for supported on-chain assets (live and potential)
+ * Ticker symbols for supported testnet on-chain assets (live and potential)
  */
-export enum OnChainTicker {
+export enum TestnetOnChainTicker {
+  TBTC = 'TBTC', // Testnet Bitcoin
+  KETH = 'KETH', // Kovan Testnet Ether
+  TLTC = 'TLTC', // Testnet Litecoin
+  KDAI = 'KDAI', // Kovan Testnet DAI
+  TXLM = 'TXLM', // Testnet Stellar Lumens
+  TDCR = 'TDCR', // Testnet Decred
+}
+
+/**
+ * Ticker symbols for supported mainnet on-chain assets (live and potential)
+ */
+export enum MainnetOnChainTicker {
   BTC = 'BTC', // Bitcoin
   ETH = 'ETH', // Ether
   LTC = 'LTC', // Litecoin
@@ -60,12 +72,42 @@ export enum OnChainTicker {
 }
 
 /**
- * Ticker symbols for supported off-chain assets (live and potential)
+ * Ticker symbols for supported on-chain assets (live and potential)
  */
-export enum OffChainTicker {
+export const OnChainTicker = {
+  ...TestnetOnChainTicker,
+  ...MainnetOnChainTicker,
+};
+export type OnChainTicker = ValueOf<
+  Pick<typeof OnChainTicker, KnownKeys<typeof OnChainTicker>>
+>;
+
+/**
+ * Ticker symbols for supported testnet off-chain assets (live and potential)
+ */
+export enum TestnetOffChainTicker {
+  LTBTC = 'LTBTC', // Lightning Testnet Bitcoin
+  LTLTC = 'LTLTC', // Lightning Testnet Litecoin
+}
+
+/**
+ * Ticker symbols for supported mainnet off-chain assets (live and potential)
+ */
+export enum MainnetOffChainTicker {
   LBTC = 'LBTC', // Lightning Bitcoin
   LLTC = 'LLTC', // Lightning Litecoin
 }
+
+/**
+ * Ticker symbols for supported off-chain assets (live and potential)
+ */
+export const OffChainTicker = {
+  ...TestnetOffChainTicker,
+  ...MainnetOffChainTicker,
+};
+export type OffChainTicker = ValueOf<
+  Pick<typeof OffChainTicker, KnownKeys<typeof OffChainTicker>>
+>;
 
 /**
  * Supported Testnet Markets (live and potential)
