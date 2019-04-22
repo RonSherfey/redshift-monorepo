@@ -84,7 +84,7 @@ describe('HTTP Client', () => {
         fixtures.valid.network,
         fixtures.valid.invoice,
       );
-      expect(state).to.equal(UserSwapState.Complete);
+      expect(state).to.equal(UserSwapState.COMPLETE);
     });
   });
 });

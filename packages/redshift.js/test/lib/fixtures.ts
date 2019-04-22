@@ -33,7 +33,7 @@ export const fixtures = {
       },
     },
     orderState: {
-      response: UserSwapState.Complete,
+      response: UserSwapState.COMPLETE,
     },
   },
   invalid: {

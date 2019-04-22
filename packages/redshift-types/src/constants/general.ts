@@ -6,36 +6,36 @@ import { KnownKeys, ValueOf } from '../lib';
  * The swap order state
  */
 export enum InternalSwapState {
-  WaitingForFundingTx = 0,
-  WaitingForFundingTxConfirmation = 1,
-  WaitingForAdditionalFundingTxConfirmation = 2,
-  PartiallyFunded = 3,
-  Funded = 4,
+  WAITING_FOR_FUNDING_TX = 'WaitingForFundingTx',
+  WAITING_FOR_FUNDING_TX_CONFIRMATION = 'WaitingForFundingTxConfirmation',
+  WAITING_FOR_ADDITIONAL_FUNDING_TX_CONFIRMATION = 'WaitingForAdditionalFundingTxConfirmation',
+  PARTIALLY_FUNDED = 'PartiallyFunded',
+  FUNDED = 'Funded',
 
-  WaitingForClaimingTx = 5,
-  WaitingForClaimingTxConfirmation = 6,
-  Complete = 7,
+  WAITING_FOR_CLAIMING_TX = 'WaitingForClaimingTx',
+  WAITING_FOR_CLAIMING_TX_CONFIRMATION = 'WaitingForClaimingTxConfirmation',
+  COMPLETE = 'Complete', // On-chain funds have been claimed
 
-  WaitingForRefundTx = 8,
-  WaitingForRefundTxConfirmation = 9,
-  Refunded = 10,
+  WAITING_FOR_REFUND_TX = 'WaitingForRefundTx',
+  WAITING_FOR_REFUND_TX_CONFIRMATION = 'WaitingForRefundTxConfirmation',
+  REFUNDED = 'Refunded',
 }
 
 /**
  * The swap order state that concerns the user
  */
 export enum UserSwapState {
-  WaitingForFundingTx = 0,
-  WaitingForFundingTxConfirmation = 1,
-  WaitingForAdditionalFundingTxConfirmation = 2,
-  PartiallyFunded = 3,
-  Funded = 4,
+  WAITING_FOR_FUNDING_TX = 'WaitingForFundingTx',
+  WAITING_FOR_FUNDING_TX_CONFIRMATION = 'WaitingForFundingTxConfirmation',
+  WAITING_FOR_ADDITIONAL_FUNDING_TX_CONFIRMATION = 'WaitingForAdditionalFundingTxConfirmation',
+  PARTIALLY_FUNDED = 'PartiallyFunded',
+  FUNDED = 'Funded',
 
-  Complete = 5, // Invoice has been paid
+  COMPLETE = 'Complete', // Invoice has been paid
 
-  WaitingForRefundTx = 6,
-  WaitingForRefundTxConfirmation = 7,
-  Refunded = 8,
+  WAITING_FOR_REFUND_TX = 'WaitingForRefundTx',
+  WAITING_FOR_REFUND_TX_CONFIRMATION = 'WaitingForRefundTxConfirmation',
+  REFUNDED = 'Refunded',
 }
 
 /**
