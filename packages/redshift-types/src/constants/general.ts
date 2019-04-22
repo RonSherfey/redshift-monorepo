@@ -5,20 +5,37 @@ import { KnownKeys, ValueOf } from '../lib';
 /**
  * The swap order state
  */
-export enum SwapState {
-  WaitingForFundingTx = 0,
-  WaitingForFundingTxConfirmation = 1,
-  WaitingForAdditionalFundingTxConfirmation = 2,
-  PartiallyFunded = 3,
-  Funded = 4,
+export enum InternalSwapState {
+  WAITING_FOR_FUNDING_TX = 'WaitingForFundingTx',
+  WAITING_FOR_FUNDING_TX_CONFIRMATION = 'WaitingForFundingTxConfirmation',
+  WAITING_FOR_ADDITIONAL_FUNDING_TX_CONFIRMATION = 'WaitingForAdditionalFundingTxConfirmation',
+  PARTIALLY_FUNDED = 'PartiallyFunded',
+  FUNDED = 'Funded',
 
-  WaitingForClaimingTx = 5,
-  WaitingForClaimingTxConfirmation = 6,
-  Complete = 7,
+  WAITING_FOR_CLAIMING_TX = 'WaitingForClaimingTx',
+  WAITING_FOR_CLAIMING_TX_CONFIRMATION = 'WaitingForClaimingTxConfirmation',
+  COMPLETE = 'Complete', // On-chain funds have been claimed
 
-  WaitingForRefundTx = 8,
-  WaitingForRefundTxConfirmation = 9,
-  Refunded = 10,
+  WAITING_FOR_REFUND_TX = 'WaitingForRefundTx',
+  WAITING_FOR_REFUND_TX_CONFIRMATION = 'WaitingForRefundTxConfirmation',
+  REFUNDED = 'Refunded',
+}
+
+/**
+ * The swap order state that concerns the user
+ */
+export enum UserSwapState {
+  WAITING_FOR_FUNDING_TX = 'WaitingForFundingTx',
+  WAITING_FOR_FUNDING_TX_CONFIRMATION = 'WaitingForFundingTxConfirmation',
+  WAITING_FOR_ADDITIONAL_FUNDING_TX_CONFIRMATION = 'WaitingForAdditionalFundingTxConfirmation',
+  PARTIALLY_FUNDED = 'PartiallyFunded',
+  FUNDED = 'Funded',
+
+  COMPLETE = 'Complete', // Invoice has been paid
+
+  WAITING_FOR_REFUND_TX = 'WaitingForRefundTx',
+  WAITING_FOR_REFUND_TX_CONFIRMATION = 'WaitingForRefundTxConfirmation',
+  REFUNDED = 'Refunded',
 }
 
 /**
@@ -31,9 +48,21 @@ export enum TransactionType {
 }
 
 /**
- * Ticker symbols for supported on-chain assets (live and potential)
+ * Ticker symbols for supported testnet on-chain assets (live and potential)
  */
-export enum OnChainTicker {
+export enum TestnetOnChainTicker {
+  TBTC = 'TBTC', // Testnet Bitcoin
+  KETH = 'KETH', // Kovan Testnet Ether
+  TLTC = 'TLTC', // Testnet Litecoin
+  KDAI = 'KDAI', // Kovan Testnet DAI
+  TXLM = 'TXLM', // Testnet Stellar Lumens
+  TDCR = 'TDCR', // Testnet Decred
+}
+
+/**
+ * Ticker symbols for supported mainnet on-chain assets (live and potential)
+ */
+export enum MainnetOnChainTicker {
   BTC = 'BTC', // Bitcoin
   ETH = 'ETH', // Ether
   LTC = 'LTC', // Litecoin
@@ -43,12 +72,42 @@ export enum OnChainTicker {
 }
 
 /**
- * Ticker symbols for supported off-chain assets (live and potential)
+ * Ticker symbols for supported on-chain assets (live and potential)
  */
-export enum OffChainTicker {
+export const OnChainTicker = {
+  ...TestnetOnChainTicker,
+  ...MainnetOnChainTicker,
+};
+export type OnChainTicker = ValueOf<
+  Pick<typeof OnChainTicker, KnownKeys<typeof OnChainTicker>>
+>;
+
+/**
+ * Ticker symbols for supported testnet off-chain assets (live and potential)
+ */
+export enum TestnetOffChainTicker {
+  LTBTC = 'LTBTC', // Lightning Testnet Bitcoin
+  LTLTC = 'LTLTC', // Lightning Testnet Litecoin
+}
+
+/**
+ * Ticker symbols for supported mainnet off-chain assets (live and potential)
+ */
+export enum MainnetOffChainTicker {
   LBTC = 'LBTC', // Lightning Bitcoin
   LLTC = 'LLTC', // Lightning Litecoin
 }
+
+/**
+ * Ticker symbols for supported off-chain assets (live and potential)
+ */
+export const OffChainTicker = {
+  ...TestnetOffChainTicker,
+  ...MainnetOffChainTicker,
+};
+export type OffChainTicker = ValueOf<
+  Pick<typeof OffChainTicker, KnownKeys<typeof OffChainTicker>>
+>;
 
 /**
  * Supported Testnet Markets (live and potential)

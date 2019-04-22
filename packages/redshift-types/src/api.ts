@@ -1,4 +1,5 @@
-import { Market } from '.';
+import { Market, OffChainTicker, OnChainTicker } from '.';
+import { Network, Subnet, UserSwapState } from './constants';
 
 //#region User
 
@@ -10,6 +11,23 @@ export interface TakerQuoteRequest {
 
 export interface StateUpdateRequest {
   invoiceHash: string;
+}
+
+export type MarketsResponse = {
+  onchainTicker: OnChainTicker;
+  offchainTicker: OffChainTicker;
+  market: Market;
+}[];
+
+export interface OrderResponse {
+  network: Network;
+  subnet: Subnet;
+  createdAt: string;
+  state: UserSwapState;
+  swapAddress: string;
+  amount: string;
+  amountPaid: string;
+  paymentHash: string;
 }
 
 //#endregion
