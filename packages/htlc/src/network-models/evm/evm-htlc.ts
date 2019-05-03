@@ -227,11 +227,7 @@ export class EvmHtlc<
         };
       case EVM.AssetType.ETHER:
         const etherMethodArgs = abi
-          .simpleEncode(
-            'refund(bytes32)',
-            this._invoiceHash,
-            addHexPrefix(this._invoiceHash),
-          )
+          .simpleEncode('refund(bytes32)', this._invoiceHash)
           .toString('hex');
         return {
           to: this._swapContractAddress,

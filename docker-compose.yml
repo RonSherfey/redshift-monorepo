@@ -16,10 +16,10 @@ services:
     entrypoint: ["./start-btcctl.sh"]
 
   test-ganache:
-    image: trufflesuite/ganache-cli:v6.2.3
+    image: trufflesuite/ganache-cli:v6.4.3
     ports:
     - "8545:8545"
-    command: ["-a 10", "-s testing"]
+    command: ["-a 10", "-s testing", "-e 10000"]
 
   test-stellar:
     image: zulucrypto/stellar-integration-test-network
