@@ -80,7 +80,7 @@ import { HTLC } from '@radar/htlc';
 
 const htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET, {
   invoice,
-  web3,
+  provider: web3.currentProvider,
   assetType: EVM.AssetType.ETHER,
 });
 ```
@@ -92,7 +92,7 @@ import { HTLC } from '@radar/htlc';
 
 const htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET, {
   invoice,
-  web3,
+  provider: web3.currentProvider,
   tokenContractAddress,
   assetType: EVM.AssetType.ERC20,
 });
@@ -105,17 +105,17 @@ Get the deployed HTLC contract instance:
 const { contract } = htlc;
 ```
 
-Generate, sign, and broadcast the fund transaction using the provided `web3` instance:
+Generate, sign, and broadcast the fund transaction using the passed provider:
 ```typescript
 const txReceipt = await htlc.fund(amount, paymentHash);
 ```
 
-Generate and broadcast the claim transaction using the provided `web3` instance:
+Generate and broadcast the claim transaction using the passed provider:
 ```typescript
 const txReceipt = await htlc.claim(paymentSecret);
 ```
 
-Generate and broadcast the refund transaction using the provided `web3` instance:
+Generate and broadcast the refund transaction using the passed provider:
 ```typescript
 const txReceipt = await htlc.refund();
 ```
