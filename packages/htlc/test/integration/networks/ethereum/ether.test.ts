@@ -1,12 +1,23 @@
 import { EthereumSubnet, Network } from '@radar/redshift-types';
 import Web3 from 'web3';
-import { EVM, EvmHtlc, HTLC } from '../../../../src';
-import { config, expect, getRpcWebSocketUrl } from '../../../lib/helpers';
+import { Contract } from 'web3-eth-contract/types';
+import {
+  EVM,
+  EvmHtlc,
+  getContractAddressesForSubnetOrThrow,
+  HTLC,
+} from '../../../../src';
+import { abi as etherAbi } from '../../../../src/network-models/evm/contract-artifacts/EtherSwap.json';
+import { config, expect, getRpcUrl } from '../../../lib/helpers';
 import { transactionResponseSchema } from '../../../lib/schemas';
 
 describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
+  const { etherSwap } = getContractAddressesForSubnetOrThrow(
+    EthereumSubnet.GANACHE_SIMNET,
+  );
   let web3: Web3;
   let htlc: EvmHtlc<Network.ETHEREUM>;
+  let etherSwapContract: Contract;
   let args: {
     invoice: string;
     paymentSecret: string;
@@ -14,15 +25,14 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
     amount: string;
   };
   before(() => {
-    web3 = new Web3(
-      getRpcWebSocketUrl(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET),
-    );
+    web3 = new Web3(getRpcUrl(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET));
+    etherSwapContract = new web3.eth.Contract(etherAbi, etherSwap);
   });
 
   beforeEach(() => {
     args = config.random.args();
     htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET, {
-      web3,
+      provider: web3.currentProvider,
       assetType: EVM.AssetType.ETHER,
       invoice: args.invoice,
     });
@@ -53,7 +63,7 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
           gas: 200000,
         },
       );
-      expect(fundTxResult).to.be.jsonSchema(transactionResponseSchema);
+      expect(fundTxResult).to.match(config.pattern.hex256Bit);
     });
   });
 
@@ -81,14 +91,14 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
         from: config.ethereum.accounts[0],
         gas: 200000,
       });
-      expect(claimTxResult).to.be.jsonSchema(transactionResponseSchema);
+      expect(claimTxResult).to.match(config.pattern.hex256Bit);
     });
   });
 
   describe('Refund', () => {
     before(async () => {
       // Set refund delay to something small
-      await htlc.contract.methods.setRefundDelay(0).send({
+      await etherSwapContract.methods.setRefundDelay(0).send({
         from: config.ethereum.accounts[0],
         gas: 150000,
       });
@@ -96,7 +106,7 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
 
     after(async () => {
       // Reset refund delay
-      await htlc.contract.methods.setRefundDelay(4 * 60 * 4).send({
+      await etherSwapContract.methods.setRefundDelay(4 * 60 * 4).send({
         from: config.ethereum.accounts[0],
         gas: 150000,
       });
@@ -125,7 +135,7 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
         from: config.ethereum.accounts[0],
         gas: 200000,
       });
-      expect(refundTxResult).to.be.jsonSchema(transactionResponseSchema);
+      expect(refundTxResult).to.match(config.pattern.hex256Bit);
     });
   });
 });

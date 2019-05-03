@@ -1,5 +1,3 @@
-import { config } from '../../helpers';
-
 export const transactionResponseSchema = {
   id: '/transactionResponseSchema',
   type: 'object',
@@ -23,73 +21,19 @@ export const transactionResponseSchema = {
       type: 'string',
     },
     gasUsed: {
-      type: 'integer',
+      type: 'string',
     },
     cumulativeGasUsed: {
-      type: 'integer',
+      type: 'string',
     },
     contractAddress: {
       type: ['null', 'string'],
     },
     logs: {
       type: 'array',
-      items: [
-        {
-          type: 'object',
-          properties: {
-            logIndex: {
-              type: 'integer',
-            },
-            transactionIndex: {
-              type: 'integer',
-            },
-            transactionHash: {
-              type: 'string',
-            },
-            blockHash: {
-              type: 'string',
-            },
-            blockNumber: {
-              type: 'integer',
-            },
-            address: {
-              type: 'string',
-            },
-            data: {
-              type: 'string',
-            },
-            topics: {
-              type: 'array',
-              items: [
-                {
-                  type: 'string',
-                },
-              ],
-            },
-            type: {
-              type: 'string',
-            },
-            id: {
-              type: 'string',
-            },
-          },
-          required: [
-            'logIndex',
-            'transactionIndex',
-            'transactionHash',
-            'blockHash',
-            'blockNumber',
-            'address',
-            'data',
-            'topics',
-            'type',
-            'id',
-          ],
-        },
-      ],
     },
     status: {
-      type: 'boolean',
+      type: 'string',
     },
     logsBloom: {
       type: 'string',

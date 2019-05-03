@@ -46,17 +46,17 @@ export interface UtxoDetails {
   payToAddress: string;
 }
 
-export interface EvmUnsignedTx {
+export interface PartialEvmTxParams {
+  from?: string | number;
+  gas?: number | string;
+  gasPrice?: number | string;
+  nonce?: number;
+}
+
+export interface EvmUnsignedTx extends PartialEvmTxParams {
   to: string;
   data: string;
   value?: string | number;
-}
-
-export interface PartialEvmTxParams {
-  nonce?: string | number;
-  from?: string;
-  gas?: string | number;
-  gasPrice?: string | number;
 }
 
 export interface EvmDetails {
