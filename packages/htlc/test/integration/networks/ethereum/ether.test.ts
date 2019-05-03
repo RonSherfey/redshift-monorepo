@@ -32,7 +32,7 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
   beforeEach(() => {
     args = config.random.args();
     htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET, {
-      provider: web3.currentProvider as any,
+      provider: web3.currentProvider,
       assetType: EVM.AssetType.ETHER,
       invoice: args.invoice,
     });
