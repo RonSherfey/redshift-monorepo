@@ -1,4 +1,3 @@
-import Web3 from 'web3';
 import { ERC20SwapContract, EtherSwapContract } from './contracts';
 
 export namespace EVM {
@@ -8,9 +7,9 @@ export namespace EVM {
   }
 
   interface SharedOptions {
-    web3: Web3;
     invoice: string;
     assetType: AssetType;
+    provider?: Provider;
   }
 
   export interface EtherOptions extends SharedOptions {
@@ -28,3 +27,7 @@ export namespace EVM {
 export type SwapContract<O extends EVM.Options> = O extends EVM.ERC20Options
   ? ERC20SwapContract
   : EtherSwapContract;
+
+export declare class Provider {
+  send(method: string, params: any): Promise<any>;
+}
