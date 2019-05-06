@@ -13,6 +13,12 @@ export interface StateUpdateRequest {
   invoiceHash: string;
 }
 
+export interface BroadcastTxRequest {
+  onchainTicker: OnChainTicker;
+  invoiceHash: string;
+  signedTxHex: string;
+}
+
 export type MarketsResponse = {
   onchainTicker: OnChainTicker;
   offchainTicker: OffChainTicker;
