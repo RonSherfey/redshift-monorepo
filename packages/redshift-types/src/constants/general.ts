@@ -164,6 +164,7 @@ export namespace Ws {
     REQUEST_QUOTE = 'requestQuote',
     SUBSCRIBE_TO_ORDER_STATE = 'subscribeToOrderState',
     UNSUBSCRIBE_FROM_ORDER_STATE = 'unsubscribeFromOrderState',
+    BROADCAST_TRANSACTION='broadcastTransaction',
     // CLIENT
     MAKER_QUOTE = 'makerQuote',
     STATE_CHANGED = 'stateChanged',
