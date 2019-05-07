@@ -165,6 +165,7 @@ export namespace Ws {
     SUBSCRIBE_TO_ORDER_STATE = 'subscribeToOrderState',
     UNSUBSCRIBE_FROM_ORDER_STATE = 'unsubscribeFromOrderState',
     BROADCAST_TRANSACTION = 'broadcastTransaction',
+    REQUEST_REFUND_DETAILS = 'requestRefundDetails',
     // CLIENT
     MAKER_QUOTE = 'makerQuote',
     STATE_CHANGED = 'stateChanged',
