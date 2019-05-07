@@ -19,6 +19,11 @@ export interface BroadcastTxRequest {
   signedTxHex: string;
 }
 
+export interface RefundDetailsRequest {
+  invoiceHash: string;
+  onchainTicker: OnChainTicker;
+}
+
 export type MarketsResponse = {
   onchainTicker: OnChainTicker;
   offchainTicker: OffChainTicker;
