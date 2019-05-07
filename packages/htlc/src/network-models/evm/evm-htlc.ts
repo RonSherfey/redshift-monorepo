@@ -33,7 +33,7 @@ export class EvmHtlc<
     super(network, subnet);
     this._assetType = options.assetType;
     this._invoiceHash = addHexPrefix(
-      abi.soliditySHA3(['string'], [options.invoice]).toString('hex'),
+      abi.soliditySHA256(['string'], [options.invoice]).toString('hex'),
     );
     this._provider = options.provider;
     this._tokenContractAddress = (options as EVM.ERC20Options).tokenContractAddress;
