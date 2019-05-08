@@ -158,7 +158,7 @@ export class EvmHtlc<
         return {
           to: this._swapContractAddress,
           data: addHexPrefix(etherMethodArgs),
-          value: new Big(amount).times(10e18).toString(), // Ether to Wei
+          value: new Big(amount).times(1e18).toString(), // Ether to Wei
           ...txParams,
         };
     }
