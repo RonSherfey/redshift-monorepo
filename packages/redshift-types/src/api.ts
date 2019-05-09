@@ -14,9 +14,15 @@ export interface StateUpdateRequest {
 }
 
 export interface BroadcastTxRequest {
-  network: Network;
+  onchainTicker: OnChainTicker;
   invoiceHash: string;
   signedTxHex: string;
+}
+
+export interface BroadcastTxResponse {
+  network: Network;
+  success: boolean;
+  txId: string;
 }
 
 export interface RefundDetailsRequest {
