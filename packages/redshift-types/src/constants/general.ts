@@ -48,6 +48,18 @@ export enum TransactionType {
 }
 
 /**
+ * Ticker symbols for supported simnet on-chain assets (testing only)
+ */
+export enum SimnetOnChainTicker {
+  SBTC = 'SBTC', // Simnet Bitcoin
+  SETH = 'SETH', // Simnet Ether
+  SLTC = 'SLTC', // Simnet Litecoin
+  SDAI = 'SDAI', // Simnet DAI
+  SXLM = 'SXLM', // Simnet Stellar Lumens
+  SDCR = 'SDCR', // Simnet Decred
+}
+
+/**
  * Ticker symbols for supported testnet on-chain assets (live and potential)
  */
 export enum TestnetOnChainTicker {
@@ -75,6 +87,7 @@ export enum MainnetOnChainTicker {
  * Ticker symbols for supported on-chain assets (live and potential)
  */
 export const OnChainTicker = {
+  ...SimnetOnChainTicker,
   ...TestnetOnChainTicker,
   ...MainnetOnChainTicker,
 };

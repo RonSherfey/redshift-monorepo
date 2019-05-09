@@ -14,8 +14,7 @@ export interface StateUpdateRequest {
 }
 
 export interface BroadcastTxRequest {
-  network: Network;
-  invoiceHash: string;
+  onchainTicker: OnChainTicker;
   signedTxHex: string;
 }
 
