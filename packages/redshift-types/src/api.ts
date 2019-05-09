@@ -19,12 +19,6 @@ export interface BroadcastTxRequest {
   signedTxHex: string;
 }
 
-export interface BroadcastTxResponse {
-  network: Network;
-  success: boolean;
-  txId: string;
-}
-
 export interface RefundDetailsRequest {
   invoiceHash: string;
   onchainTicker: OnChainTicker;
