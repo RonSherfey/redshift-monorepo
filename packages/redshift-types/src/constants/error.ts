@@ -40,6 +40,7 @@ export enum ApiError {
   INVALID_INVOICE = 'InvalidInvoice',
   INVALID_INVOICE_HASH = 'InvalidInvoiceHash',
   INVALID_ONCHAIN_TICKER = 'InvalidOnchainTicker',
+  INVALID_SIGNED_TX_HEX = 'InvalidSignedTxHex',
   ORDER_NOT_FOUND = 'OrderNotFound',
   NO_QUOTES_AVAILABLE = 'NoQuotesAvailable',
 }
