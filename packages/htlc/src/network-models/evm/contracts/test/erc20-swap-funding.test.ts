@@ -10,7 +10,7 @@ const ERC20Token = artifacts.require('ERC20Token');
 const ERC20Swap = artifacts.require('ERC20Swap');
 
 contract('ERC20Swap - Funding', accounts => {
-  const [{ lninvoiceHash, hash, tokenAmount, refundDelay }] = config.valid;
+  const [{ orderUUID, hash, tokenAmount, refundDelay }] = config.valid;
   let erc20TokenInstance: ERC20TokenInstance;
   let erc20SwapInstance: ERC20SwapInstance;
 
@@ -27,7 +27,7 @@ contract('ERC20Swap - Funding', accounts => {
     await erc20TokenInstance.approve(erc20SwapInstance.address, tokenAmount);
     // fund swap contract
     const res = await erc20SwapInstance.fund(
-      lninvoiceHash,
+      orderUUID,
       hash,
       erc20TokenInstance.address,
       tokenAmount,
@@ -37,7 +37,7 @@ contract('ERC20Swap - Funding', accounts => {
       {
         event: 'OrderErc20FundingReceived',
         args: {
-          lninvoiceHash,
+          orderUUID,
           onchainAmount: tokenAmount,
           paymentHash: hash,
           refundBlockHeight: res.receipt.blockNumber + refundDelay,
@@ -53,7 +53,7 @@ contract('ERC20Swap - Funding', accounts => {
     await erc20TokenInstance.approve(erc20SwapInstance.address, tokenAmount);
     // fund swap contract
     const res = await erc20SwapInstance.fund(
-      lninvoiceHash,
+      orderUUID,
       hash,
       erc20TokenInstance.address,
       tokenAmount,
@@ -63,7 +63,7 @@ contract('ERC20Swap - Funding', accounts => {
       {
         event: 'OrderErc20FundingReceived',
         args: {
-          lninvoiceHash,
+          orderUUID,
           onchainAmount: tokenAmount * 2,
           paymentHash: hash,
           refundBlockHeight: res.receipt.blockNumber + refundDelay - 2, // because 2 function calls: approve and fund

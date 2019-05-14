@@ -1,10 +1,10 @@
 export namespace Stellar {
-  export interface Options {
+  export interface Config {
     secret: string;
-    server?: ServerOptions;
+    server?: ServerConfig;
   }
 
-  export interface ServerOptions {
+  export interface ServerConfig {
     url: string;
     passphrase: string;
     allowHttp?: boolean;

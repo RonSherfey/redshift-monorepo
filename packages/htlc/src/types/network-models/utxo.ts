@@ -1,7 +1,7 @@
 import { Network, SubnetMap } from '@radar/redshift-types';
 
 export namespace UTXO {
-  export type Options = string | RedeemScriptArgs;
+  export type Config = string | RedeemScriptArgs;
 
   export interface Details<N extends Network> {
     network: N;

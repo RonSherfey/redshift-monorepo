@@ -44,4 +44,5 @@ export enum ApiError {
   INVALID_ORDER_ID = 'InvalidOrderId',
   ORDER_NOT_FOUND = 'OrderNotFound',
   NO_QUOTES_AVAILABLE = 'NoQuotesAvailable',
+  SWAP_ALREADY_IN_PROGRESS = 'SwapAlreadyInProgress',
 }

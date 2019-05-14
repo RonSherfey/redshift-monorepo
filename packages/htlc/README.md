@@ -79,7 +79,7 @@ const refundTxHex = htlc.refund(
 import { HTLC } from '@radar/htlc';
 
 const htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET, {
-  invoice,
+  orderUUID,
   provider: web3.currentProvider,
   assetType: EVM.AssetType.ETHER,
 });
@@ -91,7 +91,7 @@ const htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET, {
 import { HTLC } from '@radar/htlc';
 
 const htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET, {
-  invoice,
+  orderUUID,
   provider: web3.currentProvider,
   tokenContractAddress,
   assetType: EVM.AssetType.ERC20,

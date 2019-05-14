@@ -1,4 +1,17 @@
 /**
+ * Determine if the passed string is a valid hex
+ * @param arg The string to check
+ */
+export function isHex(arg: string) {
+  if (
+    new RegExp(/^(0x)?[a-f0-9]+$/i).test(arg) // Valid hex
+  ) {
+    return true;
+  }
+  return false;
+}
+
+/**
  * Determine if a string has a hex prefix
  * @param arg The string to check
  */

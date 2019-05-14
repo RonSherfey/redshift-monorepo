@@ -14,7 +14,7 @@ contract('EtherSwap - Refunding', accounts => {
   before(async () => {
     init();
     swapInstance = await Swap.deployed();
-    await swapInstance.fund(validArgs.lninvoiceHash, validArgs.hash, {
+    await swapInstance.fund(validArgs.orderUUID, validArgs.hash, {
       from: accounts[1],
       value: etherToWei(0.01),
     });
@@ -22,36 +22,36 @@ contract('EtherSwap - Refunding', accounts => {
   });
 
   it('should revert if the order does not exist', async () => {
-    await expect(
-      swapInstance.refund(invalidArgs.lninvoiceHash),
-    ).to.be.rejectedWith(/VM Exception while processing transaction: revert/);
+    await expect(swapInstance.refund(invalidArgs.orderUUID)).to.be.rejectedWith(
+      /VM Exception while processing transaction: revert/,
+    );
   });
 
   it('should revert if the preimage is incorrect', async () => {
-    await expect(
-      swapInstance.refund(invalidArgs.lninvoiceHash),
-    ).to.be.rejectedWith(/VM Exception while processing transaction: revert/);
+    await expect(swapInstance.refund(invalidArgs.orderUUID)).to.be.rejectedWith(
+      /VM Exception while processing transaction: revert/,
+    );
   });
 
   it('should revert if the timelock has not been exceeded', async () => {
-    await expect(
-      swapInstance.refund(invalidArgs.lninvoiceHash),
-    ).to.be.rejectedWith(/VM Exception while processing transaction: revert/);
+    await expect(swapInstance.refund(invalidArgs.orderUUID)).to.be.rejectedWith(
+      /VM Exception while processing transaction: revert/,
+    );
   });
 
   it('should succeed if the args are valid', async () => {
     const moreValidArgs = config.valid[1];
-    await swapInstance.fund(moreValidArgs.lninvoiceHash, moreValidArgs.hash, {
+    await swapInstance.fund(moreValidArgs.orderUUID, moreValidArgs.hash, {
       from: accounts[1],
       value: etherToWei(0.01),
     });
-    const res = await swapInstance.refund(moreValidArgs.lninvoiceHash);
+    const res = await swapInstance.refund(moreValidArgs.orderUUID);
     assert.web3Event(
       res,
       {
         event: 'OrderRefunded',
         args: {
-          lninvoiceHash: moreValidArgs.lninvoiceHash,
+          orderUUID: moreValidArgs.orderUUID,
         },
       },
       'OrderRefunded was emitted',

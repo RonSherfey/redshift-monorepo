@@ -30,31 +30,31 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
    * Create a new Stellar HTLC instance
    * @param network The chain network
    * @param subnet The chain subnet
-   * @param options The htlc options
+   * @param config The htlc config
    */
-  constructor(network: N, subnet: SubnetMap[N], options: Stellar.Options) {
+  constructor(network: N, subnet: SubnetMap[N], config: Stellar.Config) {
     super(network, subnet);
     const {
       url,
       passphrase,
       allowHttp = false,
-    } = this.getServerDetailsForSubnet(subnet, options.server);
+    } = this.getServerDetailsForSubnet(subnet, config.server);
     StellarNetwork.use(new StellarNetwork(passphrase));
     this._server = new Server(url, {
       allowHttp,
     });
-    this._serverKeyPair = Keypair.fromSecret(options.secret);
+    this._serverKeyPair = Keypair.fromSecret(config.secret);
     this._escrowKeyPair = Keypair.random();
   }
 
   /**
    * Connect to mainnet, testnet, zulucrypto simnet, or custom
    * @param subnet The chain subnet
-   * @param serverOptions The optional server options
+   * @param serverConfig The optional server config
    */
   private getServerDetailsForSubnet(
     subnet: SubnetMap[N],
-    serverOptions?: Stellar.ServerOptions,
+    serverConfig?: Stellar.ServerConfig,
   ) {
     switch (subnet) {
       case StellarSubnet.MAINNET:
@@ -77,7 +77,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
         };
       case StellarSubnet.CUSTOM:
         return {
-          ...(serverOptions as Stellar.ServerOptions),
+          ...(serverConfig as Stellar.ServerConfig),
         };
       default:
         throw new Error(NetworkError.INVALID_SUBNET);

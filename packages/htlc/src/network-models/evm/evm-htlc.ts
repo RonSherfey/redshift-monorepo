@@ -8,36 +8,35 @@ import {
 } from '@radar/redshift-types';
 import Big from 'big.js';
 import abi from 'ethereumjs-abi';
+import uuidToHex from 'uuid-to-hex';
 import { EVM, Provider } from '../../types';
-import { addHexPrefix } from '../../utils';
+import { addHexPrefix, isHex } from '../../utils';
 import { BaseHtlc } from '../shared';
 import { getContractAddressesForSubnetOrThrow } from './contract-addresses';
 
 export class EvmHtlc<
   N extends Network,
-  O extends EVM.Options = EVM.Options
+  O extends EVM.Config = EVM.Config
 > extends BaseHtlc<N> {
   private _assetType: EVM.AssetType;
   private _provider: Provider | undefined;
   private _swapContractAddress: string;
   private _tokenContractAddress: string;
-  private _invoiceHash: string;
+  private _orderUUID: string;
 
   /**
    * Create a new Ethereum HTLC instance
    * @param network The chain network
    * @param subnet The chain subnet
-   * @param options The htlc options
+   * @param config The htlc config
    */
-  constructor(network: N, subnet: SubnetMap[N], options: O) {
+  constructor(network: N, subnet: SubnetMap[N], config: O) {
     super(network, subnet);
-    this._assetType = options.assetType;
-    this._invoiceHash = addHexPrefix(
-      abi.soliditySHA256(['string'], [options.invoice]).toString('hex'),
-    );
-    this._provider = options.provider;
-    this._tokenContractAddress = (options as EVM.ERC20Options).tokenContractAddress;
-    this._swapContractAddress = this.getSwapContractAddress(subnet, options);
+    this._assetType = config.assetType;
+    this._orderUUID = this.formatOrderUUID(config.orderUUID);
+    this._provider = config.provider;
+    this._tokenContractAddress = (config as EVM.ERC20Config).tokenContractAddress;
+    this._swapContractAddress = this.getSwapContractAddress(subnet, config);
   }
 
   /**
@@ -102,15 +101,26 @@ export class EvmHtlc<
   }
 
   /**
+   * Convert the passed order UUID to valid hex with a prefix
+   * @param uuid The UUID to format
+   */
+  private formatOrderUUID(uuid: string) {
+    if (isHex(uuid)) {
+      return addHexPrefix(uuid);
+    }
+    return uuidToHex(uuid, true);
+  }
+
+  /**
    * Get the swap contract address for the active subnet and asset
    * @param subnet The Ethereum subnet
-   * @param options The Ethereum htlc options
+   * @param config The Ethereum htlc config
    */
-  private getSwapContractAddress(subnet: SubnetMap[N], options: EVM.Options) {
+  private getSwapContractAddress(subnet: SubnetMap[N], config: EVM.Config) {
     const { erc20Swap, etherSwap } = getContractAddressesForSubnetOrThrow(
       subnet as EthereumSubnet,
     );
-    switch (options.assetType) {
+    switch (config.assetType) {
       case EVM.AssetType.ERC20:
         return erc20Swap;
       case EVM.AssetType.ETHER:
@@ -135,8 +145,8 @@ export class EvmHtlc<
       case EVM.AssetType.ERC20:
         const erc20MethodArgs = abi
           .simpleEncode(
-            'fund(bytes32,bytes32,address,uint)',
-            this._invoiceHash,
+            'fund(bytes16,bytes32,address,uint)',
+            this._orderUUID,
             addHexPrefix(paymentHash),
             this._tokenContractAddress,
             amount,
@@ -150,8 +160,8 @@ export class EvmHtlc<
       case EVM.AssetType.ETHER:
         const etherMethodArgs = abi
           .simpleEncode(
-            'fund(bytes32,bytes32)',
-            this._invoiceHash,
+            'fund(bytes16,bytes32)',
+            this._orderUUID,
             addHexPrefix(paymentHash),
           )
           .toString('hex');
@@ -177,9 +187,9 @@ export class EvmHtlc<
       case EVM.AssetType.ERC20:
         const erc20MethodArgs = abi
           .simpleEncode(
-            'claim(bytes32,bytes32,bytes32)',
+            'claim(bytes16,bytes32,bytes32)',
+            this._orderUUID,
             this._tokenContractAddress,
-            this._invoiceHash,
             addHexPrefix(paymentSecret),
           )
           .toString('hex');
@@ -191,8 +201,8 @@ export class EvmHtlc<
       case EVM.AssetType.ETHER:
         const etherMethodArgs = abi
           .simpleEncode(
-            'claim(bytes32,bytes32)',
-            this._invoiceHash,
+            'claim(bytes16,bytes32)',
+            this._orderUUID,
             addHexPrefix(paymentSecret),
           )
           .toString('hex');
@@ -215,9 +225,9 @@ export class EvmHtlc<
       case EVM.AssetType.ERC20:
         const erc20MethodArgs = abi
           .simpleEncode(
-            'refund(address,bytes32)',
+            'refund(bytes16,address)',
+            this._orderUUID,
             this._tokenContractAddress,
-            this._invoiceHash,
           )
           .toString('hex');
         return {
@@ -227,7 +237,7 @@ export class EvmHtlc<
         };
       case EVM.AssetType.ETHER:
         const etherMethodArgs = abi
-          .simpleEncode('refund(bytes32)', this._invoiceHash)
+          .simpleEncode('refund(bytes16)', this._orderUUID)
           .toString('hex');
         return {
           to: this._swapContractAddress,

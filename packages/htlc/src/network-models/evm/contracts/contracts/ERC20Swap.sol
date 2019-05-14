@@ -16,24 +16,24 @@ contract ERC20Swap is Swap {
         OrderState state;
         bool exist;
     }
-    
-    mapping(bytes32 => SwapOrder) orders;
+
+    mapping(bytes16 => SwapOrder) orders;
 
     event OrderErc20FundingReceived(
-        bytes32 lninvoiceHash,
+        bytes16 orderUUID,
         uint onchainAmount,
         bytes32 paymentHash,
         uint refundBlockHeight,
         address tokenContractAddress
     );
-    event OrderErc20Claimed(bytes32 lninvoiceHash);
-    event OrderErc20Refunded(bytes32 lninvoiceHash);
-    
+    event OrderErc20Claimed(bytes16 orderUUID);
+    event OrderErc20Refunded(bytes16 orderUUID);
+
     /**
      * Allow the sender to fund a swap in one or more transactions.
      */
-    function fund(bytes32 lninvoiceHash, bytes32 paymentHash, address tokenContractAddress, uint tokenAmount) public {
-        SwapOrder storage order = orders[lninvoiceHash];
+    function fund(bytes16 orderUUID, bytes32 paymentHash, address tokenContractAddress, uint tokenAmount) public {
+        SwapOrder storage order = orders[orderUUID];
 
         if (!order.exist) {
             order.user = msg.sender;
@@ -53,9 +53,9 @@ contract ERC20Swap is Swap {
         require(ERC20Interface(tokenContractAddress).transferFrom(msg.sender, this, tokenAmount), "Unable to transfer token.");
 
         order.onchainAmount += tokenAmount;
-            
+
         emit OrderErc20FundingReceived(
-            lninvoiceHash,
+            orderUUID,
             order.onchainAmount,
             order.paymentHash,
             order.refundBlockHeight,
@@ -67,36 +67,36 @@ contract ERC20Swap is Swap {
      * Allow the recipient to claim the funds once they know the preimage of the hashlock.
      * Anyone can claim but tokens only send to owner.
      */
-    function claim(address tokenContractAddress, bytes32 lninvoiceHash, bytes32 preimage) public {
-        SwapOrder storage order = orders[lninvoiceHash];
+    function claim(bytes16 orderUUID, address tokenContractAddress, bytes32 preimage) public {
+        SwapOrder storage order = orders[orderUUID];
 
         require(order.exist == true, "Order does not exist.");
         require(order.state == OrderState.HasFundingBalance, "Order cannot be claimed.");
         require(sha256(abi.encodePacked(preimage)) == order.paymentHash, "Incorrect payment preimage.");
         require(block.number <= order.refundBlockHeight, "Too late to claim.");
-        
+
         order.preimage = preimage;
         // transfer token to owner
         ERC20Interface(tokenContractAddress).transfer(owner, order.onchainAmount);
         order.state = OrderState.Claimed;
-            
-        emit OrderErc20Claimed(lninvoiceHash);
+
+        emit OrderErc20Claimed(orderUUID);
     }
-    
+
     /**
      * Refund the sent token amount back to the funder if the timelock has expired.
      */
-    function refund(address tokenContractAddress, bytes32 lninvoiceHash) public {
-        SwapOrder storage order = orders[lninvoiceHash];
-        
+    function refund(bytes16 orderUUID, address tokenContractAddress) public {
+        SwapOrder storage order = orders[orderUUID];
+
         require(order.exist == true, "Order does not exist.");
         require(order.state == OrderState.HasFundingBalance, "Order cannot be refunded.");
         require(block.number > order.refundBlockHeight, "Too early to refund.");
 
-        // transfer token to recepient        
+        // transfer token to recepient
         ERC20Interface(tokenContractAddress).transfer(order.user, order.onchainAmount);
         order.state = OrderState.Refunded;
-            
-        emit OrderErc20Refunded(lninvoiceHash);
+
+        emit OrderErc20Refunded(orderUUID);
     }
 }
