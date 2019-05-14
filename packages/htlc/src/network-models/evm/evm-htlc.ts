@@ -8,8 +8,9 @@ import {
 } from '@radar/redshift-types';
 import Big from 'big.js';
 import abi from 'ethereumjs-abi';
+import uuidToHex from 'uuid-to-hex';
 import { EVM, Provider } from '../../types';
-import { addHexPrefix } from '../../utils';
+import { addHexPrefix, isHex, isHexPrefixed } from '../../utils';
 import { BaseHtlc } from '../shared';
 import { getContractAddressesForSubnetOrThrow } from './contract-addresses';
 
@@ -32,7 +33,7 @@ export class EvmHtlc<
   constructor(network: N, subnet: SubnetMap[N], options: O) {
     super(network, subnet);
     this._assetType = options.assetType;
-    this._orderUUID = options.orderUUID;
+    this._orderUUID = this.formatOrderUUID(options.orderUUID);
     this._provider = options.provider;
     this._tokenContractAddress = (options as EVM.ERC20Options).tokenContractAddress;
     this._swapContractAddress = this.getSwapContractAddress(subnet, options);
@@ -97,6 +98,17 @@ export class EvmHtlc<
       return unsignedTx;
     }
     return this._provider.send('eth_sendTransaction', unsignedTx);
+  }
+
+  /**
+   * Convert the passed order UUID to valid hex with a prefix
+   * @param uuid The UUID to format
+   */
+  private formatOrderUUID(uuid: string) {
+    if (isHex(uuid)) {
+      return addHexPrefix(uuid);
+    }
+    return uuidToHex(uuid, true);
   }
 
   /**

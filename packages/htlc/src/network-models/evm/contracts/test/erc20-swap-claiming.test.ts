@@ -29,7 +29,7 @@ contract('ERC20Swap - Claiming', accounts => {
     );
     // fund swap contract
     await erc20SwapInstance.fund(
-      validArgs.lninvoiceHash,
+      validArgs.orderUUID,
       validArgs.hash,
       erc20TokenInstance.address,
       validArgs.tokenAmount,
@@ -39,8 +39,8 @@ contract('ERC20Swap - Claiming', accounts => {
   it('should revert if the order does not exist', async () => {
     await expect(
       erc20SwapInstance.claim(
+        invalidArgs.orderUUID,
         erc20TokenInstance.address,
-        invalidArgs.lninvoiceHash,
         validArgs.preimage,
       ),
     ).to.be.rejectedWith(/VM Exception while processing transaction: revert/);
@@ -49,8 +49,8 @@ contract('ERC20Swap - Claiming', accounts => {
   it('should revert if the preimage is incorrect', async () => {
     await expect(
       erc20SwapInstance.claim(
+        validArgs.orderUUID,
         erc20TokenInstance.address,
-        validArgs.lninvoiceHash,
         invalidArgs.preimage,
       ),
     ).to.be.rejectedWith(/VM Exception while processing transaction: revert/);
@@ -58,8 +58,8 @@ contract('ERC20Swap - Claiming', accounts => {
 
   it('should succeed if the args are valid', async () => {
     const res = await erc20SwapInstance.claim(
+      validArgs.orderUUID,
       erc20TokenInstance.address,
-      validArgs.lninvoiceHash,
       validArgs.preimage,
     );
     assert.web3Event(
@@ -67,7 +67,7 @@ contract('ERC20Swap - Claiming', accounts => {
       {
         event: 'OrderErc20Claimed',
         args: {
-          lninvoiceHash: validArgs.lninvoiceHash,
+          orderUUID: validArgs.orderUUID,
         },
       },
       'OrderErc20Claimed was emitted',

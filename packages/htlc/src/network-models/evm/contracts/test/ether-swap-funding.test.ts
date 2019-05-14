@@ -6,7 +6,7 @@ import { config, etherToWei } from './lib';
 const Swap = artifacts.require('EtherSwap');
 
 contract('EtherSwap - Funding', accounts => {
-  const [{ lninvoiceHash, hash, refundDelay }] = config.valid;
+  const [{ orderUUID, hash, refundDelay }] = config.valid;
   let swapInstance: EtherSwapInstance;
   before(async () => {
     init();
@@ -14,7 +14,7 @@ contract('EtherSwap - Funding', accounts => {
   });
 
   it('should change the order state when a valid funding payment is received', async () => {
-    const res = await swapInstance.fund(lninvoiceHash, hash, {
+    const res = await swapInstance.fund(orderUUID, hash, {
       from: accounts[1],
       value: etherToWei(0.01),
     });
@@ -23,7 +23,7 @@ contract('EtherSwap - Funding', accounts => {
       {
         event: 'OrderFundingReceived',
         args: {
-          lninvoiceHash,
+          orderUUID,
           onchainAmount: etherToWei(0.01),
           paymentHash: hash,
           refundBlockHeight: res.receipt.blockNumber + refundDelay,
@@ -34,7 +34,7 @@ contract('EtherSwap - Funding', accounts => {
   });
 
   it('should increment the on chain amount when a second valid funding payment is received', async () => {
-    const res = await swapInstance.fund(lninvoiceHash, hash, {
+    const res = await swapInstance.fund(orderUUID, hash, {
       from: accounts[1],
       value: etherToWei(0.01),
     });
@@ -43,7 +43,7 @@ contract('EtherSwap - Funding', accounts => {
       {
         event: 'OrderFundingReceived',
         args: {
-          lninvoiceHash,
+          orderUUID,
           onchainAmount: etherToWei(0.01 * 2),
           paymentHash: hash,
           refundBlockHeight: res.receipt.blockNumber + refundDelay - 1, // because 1 function call: fund
