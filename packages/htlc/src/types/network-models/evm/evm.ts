@@ -6,25 +6,25 @@ export namespace EVM {
     ERC20 = 'erc20',
   }
 
-  interface SharedOptions {
+  interface SharedConfig {
     orderUUID: string;
     assetType: AssetType;
     provider?: Provider;
   }
 
-  export interface EtherOptions extends SharedOptions {
+  export interface EtherConfig extends SharedConfig {
     assetType: AssetType.ETHER;
   }
 
-  export interface ERC20Options extends SharedOptions {
+  export interface ERC20Config extends SharedConfig {
     assetType: AssetType.ERC20;
     tokenContractAddress: string;
   }
 
-  export type Options = EtherOptions | ERC20Options;
+  export type Config = EtherConfig | ERC20Config;
 }
 
-export type SwapContract<O extends EVM.Options> = O extends EVM.ERC20Options
+export type SwapContract<O extends EVM.Config> = O extends EVM.ERC20Config
   ? ERC20SwapContract
   : EtherSwapContract;
 

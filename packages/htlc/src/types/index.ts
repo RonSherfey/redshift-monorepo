@@ -3,13 +3,13 @@ import { EvmHtlc, StellarHtlc, UtxoHtlc } from '../network-models';
 import { EVM, Stellar, UTXO } from './network-models';
 
 /**
- * HTLC options by network
+ * HTLC config options by network
  */
-export interface Options {
-  [Network.BITCOIN]: UTXO.Options;
-  [Network.LITECOIN]: UTXO.Options;
-  [Network.ETHEREUM]: EVM.Options;
-  [Network.STELLAR]: Stellar.Options;
+export interface Config {
+  [Network.BITCOIN]: UTXO.Config;
+  [Network.LITECOIN]: UTXO.Config;
+  [Network.ETHEREUM]: EVM.Config;
+  [Network.STELLAR]: Stellar.Config;
 }
 
 /**

@@ -41,13 +41,13 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * Create a new UTXO HTLC instance
    * @param network The chain network
    * @param subnet The chain subnet
-   * @param options The redeem script or htlc creation options
+   * @param config The redeem script or htlc creation config
    */
-  constructor(network: N, subnet: SubnetMap[N], options: UTXO.Options) {
+  constructor(network: N, subnet: SubnetMap[N], config: UTXO.Config) {
     super(network, subnet);
-    this._redeemScript = isString(options)
-      ? options
-      : createSwapRedeemScript(options);
+    this._redeemScript = isString(config)
+      ? config
+      : createSwapRedeemScript(config);
     this._details = getSwapRedeemScriptDetails(
       this._network,
       this._subnet,

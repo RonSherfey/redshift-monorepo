@@ -10,13 +10,13 @@ import Big from 'big.js';
 import abi from 'ethereumjs-abi';
 import uuidToHex from 'uuid-to-hex';
 import { EVM, Provider } from '../../types';
-import { addHexPrefix, isHex, isHexPrefixed } from '../../utils';
+import { addHexPrefix, isHex } from '../../utils';
 import { BaseHtlc } from '../shared';
 import { getContractAddressesForSubnetOrThrow } from './contract-addresses';
 
 export class EvmHtlc<
   N extends Network,
-  O extends EVM.Options = EVM.Options
+  O extends EVM.Config = EVM.Config
 > extends BaseHtlc<N> {
   private _assetType: EVM.AssetType;
   private _provider: Provider | undefined;
@@ -28,15 +28,15 @@ export class EvmHtlc<
    * Create a new Ethereum HTLC instance
    * @param network The chain network
    * @param subnet The chain subnet
-   * @param options The htlc options
+   * @param config The htlc config
    */
-  constructor(network: N, subnet: SubnetMap[N], options: O) {
+  constructor(network: N, subnet: SubnetMap[N], config: O) {
     super(network, subnet);
-    this._assetType = options.assetType;
-    this._orderUUID = this.formatOrderUUID(options.orderUUID);
-    this._provider = options.provider;
-    this._tokenContractAddress = (options as EVM.ERC20Options).tokenContractAddress;
-    this._swapContractAddress = this.getSwapContractAddress(subnet, options);
+    this._assetType = config.assetType;
+    this._orderUUID = this.formatOrderUUID(config.orderUUID);
+    this._provider = config.provider;
+    this._tokenContractAddress = (config as EVM.ERC20Config).tokenContractAddress;
+    this._swapContractAddress = this.getSwapContractAddress(subnet, config);
   }
 
   /**
@@ -114,13 +114,13 @@ export class EvmHtlc<
   /**
    * Get the swap contract address for the active subnet and asset
    * @param subnet The Ethereum subnet
-   * @param options The Ethereum htlc options
+   * @param config The Ethereum htlc config
    */
-  private getSwapContractAddress(subnet: SubnetMap[N], options: EVM.Options) {
+  private getSwapContractAddress(subnet: SubnetMap[N], config: EVM.Config) {
     const { erc20Swap, etherSwap } = getContractAddressesForSubnetOrThrow(
       subnet as EthereumSubnet,
     );
-    switch (options.assetType) {
+    switch (config.assetType) {
       case EVM.AssetType.ERC20:
         return erc20Swap;
       case EVM.AssetType.ETHER:
