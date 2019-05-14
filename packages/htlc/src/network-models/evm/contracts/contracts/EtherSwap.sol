@@ -14,18 +14,18 @@ contract EtherSwap is Swap {
         OrderState state;
         bool exist;
     }
-    
-    mapping(bytes32 => SwapOrder) orders;
 
-    event OrderFundingReceived(bytes32 lninvoiceHash, uint onchainAmount, bytes32 paymentHash, uint refundBlockHeight);
-    event OrderClaimed(bytes32 lninvoiceHash);
-    event OrderRefunded(bytes32 lninvoiceHash);
-    
+    mapping(bytes16 => SwapOrder) orders;
+
+    event OrderFundingReceived(bytes16 orderUUID, uint onchainAmount, bytes32 paymentHash, uint refundBlockHeight);
+    event OrderClaimed(bytes16 orderUUID);
+    event OrderRefunded(bytes16 orderUUID);
+
     /**
      * Allow the sender to fund a swap in one or more transactions.
      */
-    function fund(bytes32 lninvoiceHash, bytes32 paymentHash) public payable {
-        SwapOrder storage order = orders[lninvoiceHash];
+    function fund(bytes16 orderUUID, bytes32 paymentHash) public payable {
+        SwapOrder storage order = orders[orderUUID];
 
         if (!order.exist) {
             order.user = msg.sender;
@@ -38,42 +38,42 @@ contract EtherSwap is Swap {
             require(order.state == OrderState.HasFundingBalance, "Order already claimed or refunded.");
         }
         order.onchainAmount += msg.value;
-            
-        emit OrderFundingReceived(lninvoiceHash, order.onchainAmount, order.paymentHash, order.refundBlockHeight);
+
+        emit OrderFundingReceived(orderUUID, order.onchainAmount, order.paymentHash, order.refundBlockHeight);
     }
 
     /**
      * Allow the recipient to claim the funds once they know the preimage of the hashlock.
      * Anyone can claim but tokens only send to owner.
      */
-    function claim(bytes32 lninvoiceHash, bytes32 preimage) public {
-        SwapOrder storage order = orders[lninvoiceHash];
+    function claim(bytes16 orderUUID, bytes32 preimage) public {
+        SwapOrder storage order = orders[orderUUID];
 
         require(order.exist == true, "Order does not exist.");
         require(order.state == OrderState.HasFundingBalance, "Order cannot be claimed.");
         require(sha256(abi.encodePacked(preimage)) == order.paymentHash, "Incorrect payment preimage.");
         require(block.number <= order.refundBlockHeight, "Too late to claim.");
-        
+
         order.preimage = preimage;
         owner.transfer(order.onchainAmount);
         order.state = OrderState.Claimed;
-            
-        emit OrderClaimed(lninvoiceHash);
+
+        emit OrderClaimed(orderUUID);
     }
-    
+
     /**
      * Refund the sent amount back to the funder if the timelock has expired.
      */
-    function refund(bytes32 lninvoiceHash) public {
-        SwapOrder storage order = orders[lninvoiceHash];
-        
+    function refund(bytes16 orderUUID) public {
+        SwapOrder storage order = orders[orderUUID];
+
         require(order.exist == true, "Order does not exist.");
         require(order.state == OrderState.HasFundingBalance, "Order cannot be refunded.");
         require(block.number > order.refundBlockHeight, "Too early to refund.");
-        
+
         order.user.transfer(order.onchainAmount);
         order.state = OrderState.Refunded;
-            
-        emit OrderRefunded(lninvoiceHash);
+
+        emit OrderRefunded(orderUUID);
     }
 }

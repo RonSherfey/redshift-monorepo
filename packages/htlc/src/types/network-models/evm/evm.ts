@@ -7,7 +7,7 @@ export namespace EVM {
   }
 
   interface SharedOptions {
-    invoice: string;
+    orderUUID: string;
     assetType: AssetType;
     provider?: Provider;
   }

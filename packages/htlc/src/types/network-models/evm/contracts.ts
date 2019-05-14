@@ -7,11 +7,11 @@ import { TransactionObject } from 'web3/eth/types';
 export interface EtherSwapContract extends Contract {
   methods: {
     [fnName: string]: (...args: any[]) => TransactionObject<any>;
-    fund(lninvoiceHash: string, paymentHash: string): TransactionObject<any>;
+    fund(orderUUID: string, paymentHash: string): TransactionObject<any>;
 
-    claim(lninvoiceHash: string, preimage: string): TransactionObject<any>;
+    claim(orderUUID: string, preimage: string): TransactionObject<any>;
 
-    refund(lninvoiceHash: string): TransactionObject<any>;
+    refund(orderUUID: string): TransactionObject<any>;
 
     setRefundDelay(delay: number | string): TransactionObject<any>;
   };
@@ -24,21 +24,21 @@ export interface ERC20SwapContract extends Contract {
   methods: {
     [fnName: string]: (...args: any[]) => TransactionObject<any>;
     fund(
-      lninvoiceHash: string,
+      orderUUID: string,
       paymentHash: string,
       tokenContractAddress: string,
       tokenAmount: string,
     ): TransactionObject<any>;
 
     claim(
+      orderUUID: string,
       tokenContractAddress: string,
-      lninvoiceHash: string,
       preimage: string,
     ): TransactionObject<any>;
 
     refund(
+      orderUUID: string,
       tokenContractAddress: string,
-      lninvoiceHash: string,
     ): TransactionObject<any>;
 
     setRefundDelay(delay: number | string): TransactionObject<any>;

@@ -1,5 +1,6 @@
 import { BitcoinSubnet, Network } from '@radar/redshift-types';
 import { crypto } from 'bitcoinjs-lib';
+import uuidv4 from 'uuid/v4';
 import { addHexPrefix } from '../../../src/utils';
 import { getTestingMnemonic } from './env-vars';
 import { getKeyPairFromMnemonic } from './wallet';
@@ -26,8 +27,8 @@ function sha256Hash(str: string) {
  * Generate random invoice, secret, and hash values for testing
  * @param prefixHex Whether or not the hex secret & hash should be prefixed
  */
-function generateRandomInvoiceSecretAndHashValues(prefixHex: boolean) {
-  const invoice = generateRandomHexString();
+function generateRandomIdSecretAndHashValues(prefixHex: boolean) {
+  const orderUUID = uuidv4();
   let paymentSecret = sha256Hash(generateRandomHexString());
   let paymentHash = sha256Hash(paymentSecret);
 
@@ -36,7 +37,7 @@ function generateRandomInvoiceSecretAndHashValues(prefixHex: boolean) {
     paymentHash = addHexPrefix(paymentHash);
   }
   return {
-    invoice,
+    orderUUID,
     paymentSecret,
     paymentHash,
     amount: Math.random()
@@ -136,7 +137,7 @@ const networkSpecificConfigs = {
 const sharedConfig = {
   random: {
     args: (prefixHex: boolean = false) =>
-      generateRandomInvoiceSecretAndHashValues(prefixHex),
+      generateRandomIdSecretAndHashValues(prefixHex),
   },
   pattern: {
     hex: /^(0x)?[0-9a-fA-F]+$/,

@@ -22,7 +22,7 @@ describe('EVM HTLC - Ethereum Network - ERC20 Asset', () => {
   let web3: Web3;
   let htlc: EvmHtlc<Network.ETHEREUM>;
   let args: {
-    invoice: string;
+    orderUUID: string;
     paymentSecret: string;
     paymentHash: string;
   };
@@ -47,10 +47,10 @@ describe('EVM HTLC - Ethereum Network - ERC20 Asset', () => {
   beforeEach(async () => {
     args = config.random.args();
     htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET, {
+      orderUUID: args.orderUUID,
       provider: web3.currentProvider,
       assetType: EVM.AssetType.ERC20,
       tokenContractAddress: erc20TokenContract.options.address,
-      invoice: args.invoice,
     });
   });
 
