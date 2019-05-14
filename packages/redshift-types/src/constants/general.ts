@@ -19,6 +19,8 @@ export enum InternalSwapState {
   WAITING_FOR_REFUND_TX = 'WaitingForRefundTx',
   WAITING_FOR_REFUND_TX_CONFIRMATION = 'WaitingForRefundTxConfirmation',
   REFUNDED = 'Refunded',
+
+  INACTIVE = 'Inactive', // The fund window had elapsed or another quote has been funded
 }
 
 /**
@@ -36,6 +38,8 @@ export enum UserSwapState {
   WAITING_FOR_REFUND_TX = 'WaitingForRefundTx',
   WAITING_FOR_REFUND_TX_CONFIRMATION = 'WaitingForRefundTxConfirmation',
   REFUNDED = 'Refunded',
+
+  INACTIVE = 'Inactive', // The fund window had elapsed or another quote has been funded
 }
 
 /**
