@@ -1,6 +1,15 @@
 import { Market, OffChainTicker, OnChainTicker } from '.';
 import { Network, Subnet, UserSwapState } from './constants';
 
+//#region General
+
+export interface WebSocketResponse<T> {
+  success: boolean;
+  message?: T;
+}
+
+//#endregion
+
 //#region User
 
 export interface TakerQuoteRequest {
@@ -10,7 +19,7 @@ export interface TakerQuoteRequest {
 }
 
 export interface StateUpdateRequest {
-  invoiceHash: string;
+  orderId: string;
 }
 
 export interface BroadcastTxRequest {
@@ -19,8 +28,7 @@ export interface BroadcastTxRequest {
 }
 
 export interface RefundDetailsRequest {
-  invoiceHash: string;
-  onchainTicker: OnChainTicker;
+  orderId: string;
 }
 
 export type MarketsResponse = {
