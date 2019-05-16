@@ -25,12 +25,12 @@ export const UtxoNetwork = {
     messagePrefix: '\\x18Bitcoin Signed Message:\n',
     bech32: 'sb',
     bip32: {
-      public: 70617039,
-      private: 70615956,
+      public: 69254458,
+      private: 69253376,
     },
-    pubKeyHash: 111,
-    scriptHash: 196,
-    wif: 239,
+    pubKeyHash: 63,
+    scriptHash: 123,
+    wif: 115,
   },
   bitcoin_testnet: {
     messagePrefix: '\\x18Bitcoin Signed Message:\n',
