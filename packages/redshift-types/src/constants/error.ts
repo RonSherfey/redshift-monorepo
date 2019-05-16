@@ -46,3 +46,11 @@ export enum ApiError {
   NO_QUOTES_AVAILABLE = 'NoQuotesAvailable',
   SWAP_ALREADY_IN_PROGRESS = 'SwapAlreadyInProgress',
 }
+
+export enum LightningError {
+  PAY_REQ_EXPIRED = 'PaymentRequestExpired',
+  PAY_REQ_EXPIRES_TOO_SOON = 'PaymentRequestExpiresTooSoon',
+  PAY_REQ_AMT_BELOW_MIN_ALLOWED = 'PaymentRequestAmountBelowMinimumAllowed',
+  PAY_REQ_AMT_ABOVE_MAX_ALLOWED = 'PaymentRequestAmountAboveMaximumAllowed',
+  PAY_REQ_NOT_ROUTABLE = 'PaymentRequestNotRoutable',
+}
