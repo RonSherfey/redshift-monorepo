@@ -43,7 +43,7 @@ export class EvmHtlc<
    * Generate, and optionally send, the swap funding transaction
    * @param amount The fund amount in ether
    * @param paymentHash The hash of the payment secret
-   * @param shouldBroadcast Whether or not the transaction should be broadcast
+   * @param shouldBroadcast Whether or not the transaction should be broadcast (Default: true)
    * @param txParams The optional transaction params
    */
   public async fund(

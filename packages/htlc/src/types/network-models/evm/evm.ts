@@ -24,7 +24,7 @@ export namespace EVM {
   export type Config = EtherConfig | ERC20Config;
 }
 
-export type SwapContract<O extends EVM.Config> = O extends EVM.ERC20Config
+export type SwapContract<C extends EVM.Config> = C extends EVM.ERC20Config
   ? ERC20SwapContract
   : EtherSwapContract;
 
