@@ -1,4 +1,4 @@
-import { ApiError, NetworkError, UserSwapState } from '@radar/redshift-types';
+import { ApiError, UserSwapState } from '@radar/redshift-types';
 import nock from 'nock';
 import sha256 from 'simple-sha256';
 import { HttpClient } from '../src';
@@ -24,34 +24,41 @@ describe('HTTP Client', () => {
     });
   });
 
-  describe('getOrder', () => {
+  describe('getOrders', () => {
     before(async () => {
       nock(`${config.url}/api`)
-        .get(
-          `/${fixtures.valid.network}/orders/${await sha256(
-            fixtures.valid.invoice,
-          )}`,
-        )
-        .reply(200, fixtures.valid.order.response);
-    });
-
-    it('should return an error if the network is invalid', async () => {
-      await expect(
-        client.getOrder(fixtures.invalid.network, fixtures.valid.invoice),
-      ).to.be.rejectedWith(Error, NetworkError.INVALID_NETWORK);
+        .get('/orders')
+        .query({ invoiceHash: await sha256(fixtures.valid.invoice) })
+        .reply(200, fixtures.valid.orders.response);
     });
 
     it('should return an error if the invoice is invalid', async () => {
       await expect(
-        client.getOrder(fixtures.valid.network, fixtures.invalid.invoice),
+        client.getOrders(fixtures.invalid.invoice),
       ).to.be.rejectedWith(Error, ApiError.INVALID_INVOICE);
     });
 
-    it('should return an order when passed valid params', async () => {
-      const order = await client.getOrder(
-        fixtures.valid.network,
-        fixtures.valid.invoice,
-      );
+    it('should return orders if the invoice is valid', async () => {
+      const orders = await client.getOrders(fixtures.valid.invoice);
+      expect(orders).to.deep.equal(fixtures.valid.orders.response);
+    });
+  });
+
+  describe('getOrder', () => {
+    before(async () => {
+      nock(`${config.url}/api`)
+        .get(`/orders/${fixtures.valid.orderId}`)
+        .reply(200, fixtures.valid.order.response);
+    });
+
+    it('should return an error if the order id is invalid', async () => {
+      await expect(
+        client.getOrder(fixtures.invalid.orderId),
+      ).to.be.rejectedWith(Error, ApiError.INVALID_ORDER_ID);
+    });
+
+    it('should return an order if the order id is valid', async () => {
+      const order = await client.getOrder(fixtures.valid.orderId);
       expect(order).to.deep.equal(fixtures.valid.order.response);
     });
   });
@@ -59,32 +66,40 @@ describe('HTTP Client', () => {
   describe('getOrderState', () => {
     before(async () => {
       nock(`${config.url}/api`)
-        .get(
-          `/${fixtures.valid.network}/orders/${await sha256(
-            fixtures.valid.invoice,
-          )}/state`,
-        )
+        .get(`/orders/${fixtures.valid.orderId}/state`)
         .reply(200, fixtures.valid.orderState.response);
     });
 
-    it('should return an error if the network is invalid', async () => {
+    it('should return an error if the order id is invalid', async () => {
       await expect(
-        client.getOrderState(fixtures.invalid.network, fixtures.valid.invoice),
-      ).to.be.rejectedWith(Error, NetworkError.INVALID_NETWORK);
+        client.getOrderState(fixtures.invalid.orderId),
+      ).to.be.rejectedWith(Error, ApiError.INVALID_ORDER_ID);
     });
 
-    it('should return an error if the invoice is invalid', async () => {
-      await expect(
-        client.getOrderState(fixtures.valid.network, fixtures.invalid.invoice),
-      ).to.be.rejectedWith(Error, ApiError.INVALID_INVOICE);
-    });
-
-    it('should return an order', async () => {
-      const state = await client.getOrderState(
-        fixtures.valid.network,
-        fixtures.valid.invoice,
-      );
+    it('should return an orders state if the order id is valid', async () => {
+      const state = await client.getOrderState(fixtures.valid.orderId);
       expect(state).to.equal(UserSwapState.COMPLETE);
+    });
+  });
+
+  describe('getOrderRefundDetails', () => {
+    before(async () => {
+      nock(`${config.url}/api`)
+        .get(`/orders/${fixtures.valid.orderId}/refund`)
+        .reply(200, fixtures.valid.orderRefund.response);
+    });
+
+    it('should return an error if the order id is invalid', async () => {
+      await expect(
+        client.getOrderRefundDetails(fixtures.invalid.orderId),
+      ).to.be.rejectedWith(Error, ApiError.INVALID_ORDER_ID);
+    });
+
+    it('should return an orders refund details if the id is valid', async () => {
+      const details = await client.getOrderRefundDetails(
+        fixtures.valid.orderId,
+      );
+      expect(details).to.deep.equal(fixtures.valid.orderRefund.response);
     });
   });
 });

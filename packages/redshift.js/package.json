@@ -11,7 +11,7 @@
   "author": "RadarTech",
   "license": "MIT",
   "dependencies": {
-    "@radar/redshift-types": "^0.2.0",
+    "@radar/redshift-types": "^0.3.2",
     "axios": "^0.18.0",
     "bech32": "^1.1.3",
     "simple-sha256": "^1.0.0",

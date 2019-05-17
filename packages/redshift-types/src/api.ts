@@ -1,7 +1,51 @@
 import { Market, OffChainTicker, OnChainTicker } from '.';
+import { TxOutput } from './blockchain';
 import { Network, Subnet, UserSwapState } from './constants';
 
-//#region General
+//#region HTTP
+
+export type MarketsResponse = {
+  onchainTicker: OnChainTicker;
+  offchainTicker: OffChainTicker;
+  market: Market;
+}[];
+
+export interface OrderResponse {
+  network: Network;
+  subnet: Subnet;
+  createdAt: string;
+  state: UserSwapState;
+  swapAddress: string;
+  amount: string;
+  amountPaid: string;
+  paymentHash: string;
+}
+
+export type OrdersResponse = OrderResponse[];
+
+export interface UtxoRefundDetails {
+  refundAddress: string;
+  currentBlockHeight: number;
+  feeTokensPerVirtualByte: number;
+  utxos: TxOutput[];
+}
+
+export interface EthRefundDetails {
+  to: string;
+  data: string;
+}
+
+export interface RefundDetailsResponse<
+  T extends UtxoRefundDetails | EthRefundDetails
+> {
+  blocksRemaining: string | number;
+  refundBalance: string;
+  details: T;
+}
+
+//#endregion
+
+//#region WebSocket - General
 
 export interface WebSocketResponse<T> {
   success: boolean;
@@ -10,7 +54,7 @@ export interface WebSocketResponse<T> {
 
 //#endregion
 
-//#region User
+//#region WebSocket - User
 
 export interface TakerQuoteRequest {
   market: Market;
@@ -31,26 +75,9 @@ export interface RefundDetailsRequest {
   orderId: string;
 }
 
-export type MarketsResponse = {
-  onchainTicker: OnChainTicker;
-  offchainTicker: OffChainTicker;
-  market: Market;
-}[];
-
-export interface OrderResponse {
-  network: Network;
-  subnet: Subnet;
-  createdAt: string;
-  state: UserSwapState;
-  swapAddress: string;
-  amount: string;
-  amountPaid: string;
-  paymentHash: string;
-}
-
 //#endregion
 
-//#region Liquidity Provider
+//#region WebSocket - Liquidity Provider
 
 export interface AuthenticationRequest {
   apiKey: string;
