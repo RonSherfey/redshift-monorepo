@@ -1,6 +1,6 @@
 import { Market, OffChainTicker, OnChainTicker } from '.';
 import { TxOutput } from './blockchain';
-import { Network, Subnet, UserSwapState } from './constants';
+import { InternalSwapState, Network, Subnet, UserSwapState } from './constants';
 
 //#region HTTP
 
@@ -73,6 +73,19 @@ export interface BroadcastTxRequest {
 
 export interface RefundDetailsRequest {
   orderId: string;
+}
+
+export interface TxResult {
+  txId: string;
+}
+
+export interface StateUpdate {
+  state: InternalSwapState;
+}
+
+export interface Quote {
+  orderId: string;
+  details: UtxoDetails | EvmDetails;
 }
 
 //#endregion

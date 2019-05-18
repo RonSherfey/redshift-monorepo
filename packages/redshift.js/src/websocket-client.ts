@@ -1,11 +1,14 @@
 import {
   ApiError,
   BroadcastTxRequest,
-  InternalSwapState,
+  Quote,
   RefundDetails,
+  StateUpdate,
   TakerQuoteRequest,
+  TxResult,
   WebSocketError,
   WebSocketResponse,
+  WebSocketSuccess,
   Ws,
 } from '@radar/redshift-types';
 import io from 'socket.io-client';
@@ -42,13 +45,13 @@ export class WebSocketClient {
         opts,
       );
       this._socket.once('connect', () => {
-        resolve('connected');
+        resolve(WebSocketSuccess.SOCKET_CONNECTED);
       });
       this._socket.once('connect_error', () => {
-        reject('connect_error');
+        reject(WebSocketError.SOCKET_CONNECT_ERROR);
       });
       this._socket.once('connect_timeout', () => {
-        reject('connect_timeout');
+        reject(WebSocketError.SOCKET_CONNECT_TIMEOUT);
       });
     });
   }
@@ -66,7 +69,7 @@ export class WebSocketClient {
    * Request a quote for the provided invoice in the selected on-chain asset
    * @param request The quote request details
    */
-  public async requestQuote(request: TakerQuoteRequest): Promise<any> {
+  public async requestQuote(request: TakerQuoteRequest): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!this._socket || !this._socket.connected) {
         return reject(WebSocketError.SOCKET_NOT_CONNECTED);
@@ -89,9 +92,9 @@ export class WebSocketClient {
       this._socket.emit(
         Ws.Event.REQUEST_QUOTE,
         request,
-        ({ success, message }: WebSocketResponse<any>) => {
+        ({ success, message }: WebSocketResponse<string>) => {
           if (success) {
-            return resolve(message);
+            return resolve();
           }
           return reject(message);
         },
@@ -99,8 +102,15 @@ export class WebSocketClient {
     });
   }
 
-  public onQuote() {
-    // TODO
+  /**
+   * Listen for quotes and call the provided function when one if received
+   * @param cb The function to call when we get the event
+   */
+  public onQuoteReceived(cb: (quote: Quote) => void) {
+    if (!this._socket || !this._socket.connected) {
+      throw new Error(WebSocketError.SOCKET_NOT_CONNECTED);
+    }
+    this._socket.on(Ws.Event.MAKER_QUOTE, cb);
   }
 
   /**
@@ -130,9 +140,11 @@ export class WebSocketClient {
     });
   }
 
-  public onOrderStateChanged(
-    cb: ({ state }: { state: InternalSwapState }) => void,
-  ) {
+  /**
+   * Listen for order state changes and call the provided function when one is received
+   * @param cb The function to call when we get the event
+   */
+  public onOrderStateChanged(cb: (update: StateUpdate) => void) {
     if (!this._socket || !this._socket.connected) {
       throw new Error(WebSocketError.SOCKET_NOT_CONNECTED);
     }
@@ -197,7 +209,9 @@ export class WebSocketClient {
    * Broadcast signed transaction hex to your network of choice
    * @param request The on-chain ticker and signed tx hex
    */
-  public async broadcastTransaction(request: BroadcastTxRequest): Promise<any> {
+  public async broadcastTransaction(
+    request: BroadcastTxRequest,
+  ): Promise<TxResult> {
     return new Promise((resolve, reject) => {
       if (!this._socket || !this._socket.connected) {
         return reject(WebSocketError.SOCKET_NOT_CONNECTED);
@@ -214,7 +228,7 @@ export class WebSocketClient {
       this._socket.emit(
         Ws.Event.BROADCAST_TRANSACTION,
         request,
-        ({ success, message }: WebSocketResponse<any>) => {
+        ({ success, message }: WebSocketResponse<TxResult>) => {
           if (success) {
             return resolve(message);
           }

@@ -60,4 +60,6 @@ export enum LightningError {
 
 export enum WebSocketError {
   SOCKET_NOT_CONNECTED = 'SocketNotConnected',
+  SOCKET_CONNECT_ERROR = 'SocketConnectError',
+  SOCKET_CONNECT_TIMEOUT = 'SocketConnectTimeout',
 }

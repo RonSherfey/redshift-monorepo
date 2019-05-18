@@ -205,3 +205,10 @@ export namespace Ws {
     ...UserEvent,
   };
 }
+
+/**
+ * WebSocket success states
+ */
+export enum WebSocketSuccess {
+  SOCKET_CONNECTED = 'SocketConnected',
+}

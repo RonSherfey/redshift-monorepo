@@ -1,6 +1,8 @@
 import {
   ApiError,
+  InternalSwapState,
   RefundDetails,
+  TxResult,
   WebSocketResponse,
   Ws,
 } from '@radar/redshift-types';
@@ -95,6 +97,33 @@ describe('WebSocket Client', () => {
     });
   });
 
+  describe('onQuoteReceived', () => {
+    before(() => {
+      // Stubbed websocket server success response
+      server.on(Ws.Event.REQUEST_QUOTE, () => {
+        server.emit(Ws.Event.MAKER_QUOTE, {
+          orderId: fixtures.valid.orderId,
+          quote: {},
+        });
+      });
+    });
+
+    it('should call the callback function with the quote when one is received', done => {
+      client.onQuoteReceived(quote => {
+        expect(quote).to.deep.equal({
+          orderId: fixtures.valid.orderId,
+          quote: {},
+        });
+        done();
+      });
+      client.requestQuote({
+        market: fixtures.valid.market,
+        invoice: fixtures.valid.invoice,
+        refundAddress: fixtures.valid.bitcoinAddress,
+      });
+    });
+  });
+
   describe('subscribeToOrderState', () => {
     before(() => {
       // Stubbed websocket server success response
@@ -114,6 +143,23 @@ describe('WebSocket Client', () => {
     it('should succeed when valid params are provided', async () => {
       await expect(client.subscribeToOrderState(fixtures.valid.orderId)).to.not
         .be.rejected;
+    });
+  });
+
+  describe('onOrderStateChanged', () => {
+    before(() => {
+      // Stubbed websocket server success response
+      server.on(Ws.Event.SUBSCRIBE_TO_ORDER_STATE, () => {
+        server.emit(Ws.Event.STATE_CHANGED, InternalSwapState.FUNDED);
+      });
+    });
+
+    it('should call the callback function with the order state when one is received', done => {
+      client.onOrderStateChanged(state => {
+        expect(state).to.equal(InternalSwapState.FUNDED);
+        done();
+      });
+      client.subscribeToOrderState(fixtures.valid.orderId);
     });
   });
 
@@ -143,8 +189,8 @@ describe('WebSocket Client', () => {
     const serverResponse: WebSocketResponse<RefundDetails> = {
       success: true,
       message: {
-        to: '0xdeadbeed',
-        data: '0xdeadbeef',
+        to: fixtures.valid.hex,
+        data: fixtures.valid.hex,
       },
     };
     before(() => {
@@ -167,10 +213,10 @@ describe('WebSocket Client', () => {
   });
 
   describe('broadcastTransaction', () => {
-    const serverResponse: WebSocketResponse<any> = {
+    const serverResponse: WebSocketResponse<TxResult> = {
       success: true,
       message: {
-        txId: '0xdeadbeef', // TODO: Use fixtures
+        txId: fixtures.valid.hex,
       },
     };
     before(() => {
