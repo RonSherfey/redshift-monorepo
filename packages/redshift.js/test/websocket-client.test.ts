@@ -38,6 +38,63 @@ describe('WebSocket Client', () => {
     socketStub.restore();
   });
 
+  describe('requestQuote', () => {
+    before(() => {
+      // Stubbed websocket server success response
+      server.on(Ws.Event.REQUEST_QUOTE, (_, cb: Function) => {
+        cb({
+          success: true,
+        });
+      });
+    });
+
+    it('should throw an error if the request params are missing', async () => {
+      await expect(client.requestQuote(undefined)).to.be.rejectedWith(
+        ApiError.INVALID_OR_MISSING_QUOTE_REQUEST_FIELDS,
+      );
+    });
+
+    it('should throw an error if the market is invalid', async () => {
+      await expect(
+        client.requestQuote({
+          market: fixtures.invalid.market,
+          invoice: fixtures.valid.invoice,
+          refundAddress: fixtures.valid.bitcoinAddress,
+        }),
+      ).to.be.rejectedWith(ApiError.INVALID_MARKET);
+    });
+
+    it('should throw an error if the invoice is invalid', async () => {
+      await expect(
+        client.requestQuote({
+          market: fixtures.valid.market,
+          invoice: fixtures.invalid.invoice,
+          refundAddress: fixtures.valid.bitcoinAddress,
+        }),
+      ).to.be.rejectedWith(ApiError.INVALID_INVOICE);
+    });
+
+    it('should throw an error if the refund address is invalid', async () => {
+      await expect(
+        client.requestQuote({
+          market: fixtures.valid.market,
+          invoice: fixtures.valid.invoice,
+          refundAddress: fixtures.invalid.bitcoinAddress,
+        }),
+      ).to.be.rejectedWith(ApiError.INVALID_REFUND_ADDRESS);
+    });
+
+    it('should succeed when valid params are provided', async () => {
+      await expect(
+        client.requestQuote({
+          market: fixtures.valid.market,
+          invoice: fixtures.valid.invoice,
+          refundAddress: fixtures.valid.bitcoinAddress,
+        }),
+      ).to.not.be.rejected;
+    });
+  });
+
   describe('subscribeToOrderState', () => {
     before(() => {
       // Stubbed websocket server success response
@@ -121,6 +178,12 @@ describe('WebSocket Client', () => {
       server.on(Ws.Event.BROADCAST_TRANSACTION, (_, cb: Function) => {
         cb(serverResponse);
       });
+    });
+
+    it('should throw an error if the request params are missing', async () => {
+      await expect(client.broadcastTransaction(undefined)).to.be.rejectedWith(
+        ApiError.INVALID_OR_MISSING_BROADCAST_TX_REQUEST_FIELDS,
+      );
     });
 
     it('should throw an error if the on-chain ticker is invalid', async () => {

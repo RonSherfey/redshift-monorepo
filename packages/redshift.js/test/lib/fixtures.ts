@@ -1,13 +1,20 @@
-import { Network, OnChainTicker, UserSwapState } from '@radar/redshift-types';
+import {
+  Market,
+  Network,
+  OnChainTicker,
+  UserSwapState,
+} from '@radar/redshift-types';
 
 export const fixtures = {
   valid: {
     network: Network.ETHEREUM,
+    market: Market.BTC_LBTC,
+    onchainTicker: OnChainTicker.ETH,
+    hex: '0xdeadbeef',
+    bitcoinAddress: 'mjaGqWTjd9HVSE4zgx9MGRs5GtmnM6HKTW',
     invoice:
       'lntb10m1pwt5decpp5r0j4ksda7h4chpjppzg3ysk6mufq90wpnpx6auhlrpxaqrm7nrvsdqs23jhxarfdenjqw3fcqzysxqyz5vqzya5x9kdf4z078qteypj30m3l8d8de5vsmfk4qsyy8q2fmgwll69eenlwvd42xl8eq83azck2d499k4hlznhxp92jqzu7dhve53a9ycpru9g7t',
     orderId: '0553bb1a-7832-11e9-8f9e-2a86e4085a59',
-    hex: '0xdeadbeef',
-    onchainTicker: OnChainTicker.ETH,
     markets: {
       response: [
         {
@@ -80,8 +87,10 @@ export const fixtures = {
   },
   invalid: {
     network: 'invalid_network' as Network,
+    market: 'invalid_market' as Market,
     onchainTicker: 'invalid_ticker' as OnChainTicker,
     hex: 'invalid_hex',
+    bitcoinAddress: 'mjaGqWTjd9HVSE4zgx9MGRs5GtmnM6HKT', // The above bitcoin address with a single character missing
     invoice:
       'lntb10m1pwt5decpp5r0j4ksda7h4chpjppzg3ysk6mufq90wpnpx6auhlrpxaqrm7nrvsdqs23jhxarfdenjqw3fcqzysxqyz5vqzya5x9kdf4z078qteypj30m3l8d8de5vsmfk4qsyy8q2fgwll69eenlwvd42xl8eq83azck2d499k4hlznhxp92jqzu7dhve53a9ycpru9g7t', // The above invoice with a single character missing
     orderId: '0553bb1a-7832-11e9-8f9e-2a86e4085a5', // The above order id with a single character missing
