@@ -35,9 +35,9 @@ export interface EthRefundDetails {
   data: string;
 }
 
-export interface RefundDetailsResponse<
-  T extends UtxoRefundDetails | EthRefundDetails
-> {
+export type RefundDetails = UtxoDetails | EthRefundDetails;
+
+export interface RefundDetailsResponse<T extends RefundDetails> {
   blocksRemaining: string | number;
   refundBalance: string;
   details: T;

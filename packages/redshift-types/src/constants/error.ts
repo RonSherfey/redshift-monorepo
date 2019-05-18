@@ -37,11 +37,14 @@ export enum ApiError {
   INVALID_OR_MISSING_MARKETS = 'InvalidOrMissingMarkets',
   INVALID_OR_MISSING_CREDENTIALS = 'InvalidOrMissingCredentials',
   INVALID_OR_MISSING_QUOTE_REQUEST_FIELDS = 'InvalidOrMissingQuoteRequestFields',
+  INVALID_OR_MISSING_BROADCAST_TX_REQUEST_FIELDS = 'InvalidOrMissingBroadcastTxRequestFields',
   INVALID_INVOICE = 'InvalidInvoice',
   INVALID_INVOICE_HASH = 'InvalidInvoiceHash',
   INVALID_ONCHAIN_TICKER = 'InvalidOnchainTicker',
   INVALID_SIGNED_TX_HEX = 'InvalidSignedTxHex',
   INVALID_ORDER_ID = 'InvalidOrderId',
+  INVALID_MARKET = 'InvalidMarket',
+  INVALID_REFUND_ADDRESS = 'InvalidRefundAddress',
   ORDER_NOT_FOUND = 'OrderNotFound',
   NO_QUOTES_AVAILABLE = 'NoQuotesAvailable',
   SWAP_ALREADY_IN_PROGRESS = 'SwapAlreadyInProgress',
@@ -53,4 +56,8 @@ export enum LightningError {
   PAY_REQ_AMT_BELOW_MIN_ALLOWED = 'PaymentRequestAmountBelowMinimumAllowed',
   PAY_REQ_AMT_ABOVE_MAX_ALLOWED = 'PaymentRequestAmountAboveMaximumAllowed',
   PAY_REQ_NOT_ROUTABLE = 'PaymentRequestNotRoutable',
+}
+
+export enum WebSocketError {
+  SOCKET_NOT_CONNECTED = 'SocketNotConnected',
 }

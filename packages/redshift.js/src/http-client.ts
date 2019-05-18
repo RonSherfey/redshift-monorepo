@@ -1,13 +1,12 @@
 import {
   ApiError,
-  EthRefundDetails,
   MarketsResponse,
   OnChainTicker,
   OrderResponse,
   OrdersResponse,
+  RefundDetails,
   RefundDetailsResponse,
   UserSwapState,
-  UtxoRefundDetails,
 } from '@radar/redshift-types';
 import axios from 'axios';
 import sha256 from 'simple-sha256';
@@ -17,6 +16,10 @@ import { utils } from './utils';
 export class HttpClient {
   private _apiBase: string;
 
+  /**
+   * Instantiate the HTTP client
+   * @param url The redshift API url without the path
+   */
   constructor(url: string = config.url) {
     this._apiBase = `${url}/api`;
   }
@@ -86,9 +89,9 @@ export class HttpClient {
    * Get the refund details for an order
    * @param orderId The uuid of the order
    */
-  public async getOrderRefundDetails<
-    T extends UtxoRefundDetails | EthRefundDetails
-  >(orderId: string): Promise<RefundDetailsResponse<T>> {
+  public async getOrderRefundDetails<T extends RefundDetails>(
+    orderId: string,
+  ): Promise<RefundDetailsResponse<T>> {
     if (!utils.isValidUUID(orderId)) {
       throw new Error(ApiError.INVALID_ORDER_ID);
     }
