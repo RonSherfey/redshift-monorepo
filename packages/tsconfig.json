@@ -3,6 +3,6 @@
     "references": [
         { "path": "redshift-types" },
         { "path": "redshift.js" },
-        { "path": "htlc" }
+        { "path": "htlc/tsconfig.cjs.json" }
     ]
 }

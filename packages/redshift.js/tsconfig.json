@@ -5,7 +5,7 @@
     "outDir": "dist"
   },
   "references": [
-    { "path": "../htlc" }
+    { "path": "../htlc/tsconfig.cjs.json" }
   ],
   "exclude": [
     "test",
