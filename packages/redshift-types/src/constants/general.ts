@@ -20,7 +20,8 @@ export enum InternalSwapState {
   WAITING_FOR_REFUND_TX_CONFIRMATION = 'WaitingForRefundTxConfirmation',
   REFUNDED = 'Refunded',
 
-  INACTIVE = 'Inactive', // The fund window had elapsed or another quote has been funded
+  FUND_WINDOW_ELAPSED = 'FundWindowElapsed', // The fund window has elapsed
+  FUNDED_BY_OTHER_QUOTE = 'FundedByOtherQuote', // Another quote for the same invoice has been funded
 }
 
 /**
@@ -39,7 +40,8 @@ export enum UserSwapState {
   WAITING_FOR_REFUND_TX_CONFIRMATION = 'WaitingForRefundTxConfirmation',
   REFUNDED = 'Refunded',
 
-  INACTIVE = 'Inactive', // The fund window had elapsed or another quote has been funded
+  FUND_WINDOW_ELAPSED = 'FundWindowElapsed', // The fund window has elapsed
+  FUNDED_BY_OTHER_QUOTE = 'FundedByOtherQuote', // Another quote for the same invoice has been funded
 }
 
 /**
