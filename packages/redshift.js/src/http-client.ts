@@ -1,9 +1,11 @@
 import {
   ApiError,
   MarketsResponse,
-  Network,
-  NetworkError,
+  OnChainTicker,
   OrderResponse,
+  OrdersResponse,
+  RefundDetails,
+  RefundDetailsResponse,
   UserSwapState,
 } from '@radar/redshift-types';
 import axios from 'axios';
@@ -14,6 +16,10 @@ import { utils } from './utils';
 export class HttpClient {
   private _apiBase: string;
 
+  /**
+   * Instantiate the HTTP client
+   * @param url The redshift API url without the path
+   */
   constructor(url: string = config.url) {
     this._apiBase = `${url}/api`;
   }
@@ -27,45 +33,70 @@ export class HttpClient {
   }
 
   /**
-   * Get a swap order
-   * @param network The network of the on-chain asset used to fund the swap
+   * Get all swap orders for a specific invoice
    * @param invoice The invoice that will be payed by the swap provider
+   * @param onchainTicker The optional ticker of the on-chain asset used to fund the swap
    */
-  public async getOrder(
-    network: Network,
+  public async getOrders(
     invoice: string,
-  ): Promise<OrderResponse> {
-    if (!utils.isValidNetwork(network)) {
-      throw new Error(NetworkError.INVALID_NETWORK);
-    }
+    onchainTicker?: OnChainTicker,
+  ): Promise<OrdersResponse> {
     if (!utils.isValidBech32(invoice)) {
       throw new Error(ApiError.INVALID_INVOICE);
     }
+    if (onchainTicker && !utils.isValidOnchainTicker(onchainTicker)) {
+      throw new Error(ApiError.INVALID_ONCHAIN_TICKER);
+    }
     const invoiceHash = await sha256(invoice);
+    const json = await axios.get<OrdersResponse>(`${this._apiBase}/orders`, {
+      params: {
+        invoiceHash,
+        onchainTicker,
+      },
+    });
+    return json.data;
+  }
+
+  /**
+   * Get a swap order
+   * @param orderId The uuid of the order
+   */
+  public async getOrder(orderId: string): Promise<OrderResponse> {
+    if (!utils.isValidUUID(orderId)) {
+      throw new Error(ApiError.INVALID_ORDER_ID);
+    }
     const json = await axios.get<OrderResponse>(
-      `${this._apiBase}/${network}/orders/${invoiceHash}`,
+      `${this._apiBase}/orders/${orderId}`,
     );
     return json.data;
   }
 
   /**
    * Get the state of an order
-   * @param network The network of the on-chain asset used to fund the swap
-   * @param invoice The invoice that will be payed by the swap provider
+   * @param orderId The uuid of the order
    */
-  public async getOrderState(
-    network: Network,
-    invoice: string,
-  ): Promise<UserSwapState> {
-    if (!utils.isValidNetwork(network)) {
-      throw new Error(NetworkError.INVALID_NETWORK);
+  public async getOrderState(orderId: string): Promise<UserSwapState> {
+    if (!utils.isValidUUID(orderId)) {
+      throw new Error(ApiError.INVALID_ORDER_ID);
     }
-    if (!utils.isValidBech32(invoice)) {
-      throw new Error(ApiError.INVALID_INVOICE);
-    }
-    const invoiceHash = await sha256(invoice);
     const json = await axios.get<UserSwapState>(
-      `${this._apiBase}/${network}/orders/${invoiceHash}/state`,
+      `${this._apiBase}/orders/${orderId}/state`,
+    );
+    return json.data;
+  }
+
+  /**
+   * Get the refund details for an order
+   * @param orderId The uuid of the order
+   */
+  public async getOrderRefundDetails<T extends RefundDetails>(
+    orderId: string,
+  ): Promise<RefundDetailsResponse<T>> {
+    if (!utils.isValidUUID(orderId)) {
+      throw new Error(ApiError.INVALID_ORDER_ID);
+    }
+    const json = await axios.get<RefundDetailsResponse<T>>(
+      `${this._apiBase}/orders/${orderId}/refund`,
     );
     return json.data;
   }

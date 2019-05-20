@@ -1,8 +1,21 @@
-## @radar/htlc
+# @radar/htlc
+A library used to construct and interact with HTLCs across multiple networks & network models.
 
-A small library used to construct and interact with HTLCs across multiple networks & network models.
+## Installation
 
-## Bitcoin
+### npm
+
+```
+npm install @radar/htlc
+```
+
+### yarn
+
+```
+yarn add @radar/htlc
+```
+
+## Usage - Bitcoin
 
 ### Construct a new Bitcoin HTLC:
 
@@ -69,7 +82,7 @@ const refundTxHex = htlc.refund(
 );
 ```
 
-## Ethereum
+## Usage - Ethereum
 
 ### Construct an Ethereum HTLC:
 
@@ -132,7 +145,7 @@ Don't want to sign and broadcast the transaction? Set `shouldBroadcast` to false
 const unsignedTx = await htlc.refund(false);
 ```
 
-## Stellar
+## Usage - Stellar
 
 ### Construct a Stellar HTLC:
 
