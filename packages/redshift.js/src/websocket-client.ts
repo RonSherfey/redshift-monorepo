@@ -66,7 +66,7 @@ export class WebSocketClient {
   }
 
   /**
-   * Request a quote for the provided invoice in the selected on-chain asset
+   * Request a quote for the provided invoice and selected on-chain asset
    * @param request The quote request details
    */
   public async requestQuote(request: TakerQuoteRequest): Promise<void> {
@@ -103,7 +103,7 @@ export class WebSocketClient {
   }
 
   /**
-   * Listen for quotes and call the provided function when one if received
+   * Listen for quotes and execute the callback function when one is received
    * @param cb The function to call when we get the event
    */
   public onQuoteReceived(cb: (quote: Quote) => void) {
@@ -141,7 +141,7 @@ export class WebSocketClient {
   }
 
   /**
-   * Listen for order state changes and call the provided function when one is received
+   * Listen for order state changes and execute the callback function when one is received
    * @param cb The function to call when we get the event
    */
   public onOrderStateChanged(cb: (update: StateUpdate) => void) {
