@@ -122,9 +122,19 @@ export interface EvmDetails {
 }
 
 export interface MakerQuoteRequest {
+  orderId: string;
   market: Market;
+  invoice: string;
+  refundAddress?: string;
+  takerSocketId: string;
+  requestExpiryTimestampMs: number;
+}
+
+export interface MakerQuote {
+  orderId: string;
   details: UtxoDetails | EvmDetails;
-  id: string; // The socket id that was passed to the maker in the quote request
+  takerSocketId: string; // The socket id that was passed to the maker in the quote request
+  quoteExpiryTimestampMs: number;
 }
 
 //#endregion
