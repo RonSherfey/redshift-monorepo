@@ -1,7 +1,9 @@
 {
   "private": true,
   "scripts": {
-    "build": "tsc -b packages/redshift-types packages/htlc packages/redshift.js",
+    "build": "concurrently 'yarn build:cjs' 'yarn build:esm'",
+    "build:cjs": "tsc -b packages/redshift-types packages/htlc/tsconfig.cjs.json packages/redshift.js",
+    "build:esm": "tsc -b packages/htlc/tsconfig.esm.json",
     "test": "lerna run test --stream --parallel",
     "lint": "tslint -c tslint.json 'packages/**/*.ts' --fix",
     "clean": "rimraf packages/**/dist"
@@ -13,6 +15,7 @@
     "@types/mocha": "^5.2.5",
     "@types/node": "^10.12.12",
     "chai": "^4.2.0",
+    "concurrently": "^4.1.0",
     "husky": "^1.2.0",
     "lerna": "^2.9.0",
     "lint-staged": "^8.1.0",

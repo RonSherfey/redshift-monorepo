@@ -2,8 +2,9 @@
   "name": "@radar/htlc",
   "version": "0.3.1",
   "description": "",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "types": "dist/cjs/index.d.ts",
+  "module": "dist/esm/index.js",
   "scripts": {
     "test": "mocha -r @ts-tools/node \"test/**/*.test.ts\" --watch-extensions ts --colors"
   },
