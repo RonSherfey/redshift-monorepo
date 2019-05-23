@@ -126,14 +126,12 @@ export interface MakerQuoteRequest {
   market: Market;
   invoice: string;
   refundAddress?: string;
-  takerSocketId: string;
   requestExpiryTimestampMs: number;
 }
 
 export interface MakerQuote {
   orderId: string;
   details: UtxoDetails | EvmDetails;
-  takerSocketId: string; // The socket id that was passed to the maker in the quote request
   quoteExpiryTimestampMs: number;
 }
 

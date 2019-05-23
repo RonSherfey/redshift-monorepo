@@ -45,9 +45,11 @@ export enum ApiError {
   INVALID_ORDER_ID = 'InvalidOrderId',
   INVALID_MARKET = 'InvalidMarket',
   INVALID_REFUND_ADDRESS = 'InvalidRefundAddress',
+  INVALID_MARKET_FOR_INVOICE = 'InvalidMarketForInvoice',
   ORDER_NOT_FOUND = 'OrderNotFound',
   NO_QUOTES_AVAILABLE = 'NoQuotesAvailable',
   SWAP_ALREADY_IN_PROGRESS = 'SwapAlreadyInProgress',
+  SWAP_HAS_ACTIVE_QUOTE_FOR_SAME_FUND_ASSET = 'SwapHasActiveQuoteForSameFundAsset',
 }
 
 export enum LightningError {
