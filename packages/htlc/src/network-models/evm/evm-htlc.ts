@@ -16,7 +16,7 @@ import { getContractAddressesForSubnetOrThrow } from './contract-addresses';
 
 export class EvmHtlc<
   N extends Network,
-  O extends EVM.Config = EVM.Config
+  C extends EVM.Config = EVM.Config
 > extends BaseHtlc<N> {
   private _assetType: EVM.AssetType;
   private _provider: Provider | undefined;
@@ -30,7 +30,7 @@ export class EvmHtlc<
    * @param subnet The chain subnet
    * @param config The htlc config
    */
-  constructor(network: N, subnet: SubnetMap[N], config: O) {
+  constructor(network: N, subnet: SubnetMap[N], config: C) {
     super(network, subnet);
     this._assetType = config.assetType;
     this._orderUUID = this.formatOrderUUID(config.orderUUID);

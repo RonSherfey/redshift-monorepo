@@ -102,6 +102,14 @@ export type OnChainTicker = ValueOf<
 >;
 
 /**
+ * Ticker symbols for simnet off-chain assets (testing only)
+ */
+export enum SimnetOffChainTicker {
+  LSBTC = 'LSBTC', // Lightning Simnet Bitcoin
+  LSLTC = 'LSLTC', // Lightning Simnet Litecoin
+}
+
+/**
  * Ticker symbols for supported testnet off-chain assets (live and potential)
  */
 export enum TestnetOffChainTicker {
@@ -121,12 +129,25 @@ export enum MainnetOffChainTicker {
  * Ticker symbols for supported off-chain assets (live and potential)
  */
 export const OffChainTicker = {
+  ...SimnetOffChainTicker,
   ...TestnetOffChainTicker,
   ...MainnetOffChainTicker,
 };
 export type OffChainTicker = ValueOf<
   Pick<typeof OffChainTicker, KnownKeys<typeof OffChainTicker>>
 >;
+
+/**
+ * Supported Simnet Markets (testing only)
+ */
+export enum SimnetMarket {
+  SBTC_LSBTC = 'SBTC_LSBTC',
+  SETH_LSBTC = 'SETH_LSBTC',
+  SLTC_LSBTC = 'SLTC_LSBTC',
+  SDAI_LSBTC = 'SDAI_LSBTC',
+  SXLM_LSBTC = 'SXLM_LSBTC',
+  SDCR_LSBTC = 'SDCR_LSBTC',
+}
 
 /**
  * Supported Testnet Markets (live and potential)
@@ -156,6 +177,7 @@ export enum MainnetMarket {
  * Supported Markets (live and potential)
  */
 export const Market = {
+  ...SimnetMarket,
   ...TestnetMarket,
   ...MainnetMarket,
 };
