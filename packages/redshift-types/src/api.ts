@@ -35,7 +35,7 @@ export interface EthRefundDetails {
   data: string;
 }
 
-export type RefundDetails = UtxoDetails | EthRefundDetails;
+export type RefundDetails = UtxoRefundDetails | EthRefundDetails;
 
 export interface RefundDetailsResponse<T extends RefundDetails> {
   blocksRemaining: string | number;
@@ -101,6 +101,7 @@ export type QuoteSubscriptionRequest = Market[];
 
 export interface UtxoDetails {
   redeemScript: string;
+  amount: string;
   payToAddress: string;
 }
 
