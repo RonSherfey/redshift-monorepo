@@ -47,10 +47,14 @@ export enum ApiError {
   INVALID_MARKET = 'InvalidMarket',
   INVALID_REFUND_ADDRESS = 'InvalidRefundAddress',
   INVALID_MARKET_FOR_INVOICE = 'InvalidMarketForInvoice',
+  INVALID_REDEEM_SCRIPT = 'InvalidRedeemScript',
+  INVALID_PAYMENT_HASH = 'InvalidPaymentHash',
   ORDER_NOT_FOUND = 'OrderNotFound',
   NO_QUOTES_AVAILABLE = 'NoQuotesAvailable',
   SWAP_ALREADY_IN_PROGRESS = 'SwapAlreadyInProgress',
   SWAP_HAS_ACTIVE_QUOTE_FOR_SAME_FUND_ASSET = 'SwapHasActiveQuoteForSameFundAsset',
+  REDEEM_SCRIPT_PARSING_FAILED = 'RedeemScriptParsingFailed',
+  TIMELOCK_IS_OUT_OF_BOUNDS = 'TimelockIsOutOfBounds',
 }
 
 export enum LightningError {
