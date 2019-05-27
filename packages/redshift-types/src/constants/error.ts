@@ -1,3 +1,7 @@
+import { KnownKeys, ValueOf } from '../lib';
+
+// tslint:disable:variable-name
+
 export enum SwapError {
   EXPECTED_OP_SHA256 = 'ExpectedOP_SHA256',
   EXPECTED_OP_EQUAL = 'ExpectedOP_EQUAL',
@@ -32,25 +36,50 @@ export enum NetworkError {
   RPC_CALL_FAILED = 'RpcCallFailed',
 }
 
-export enum ApiError {
+export enum SharedApiError {
   INTERNAL_SERVER_ERROR = 'InternalServerError',
-  INVALID_OR_MISSING_MARKETS = 'InvalidOrMissingMarkets',
-  INVALID_OR_MISSING_CREDENTIALS = 'InvalidOrMissingCredentials',
+  INVALID_ORDER_ID = 'InvalidOrderId',
+  INVALID_MARKET = 'InvalidMarket',
+  INVALID_REFUND_ADDRESS = 'InvalidRefundAddress',
+  ORDER_NOT_FOUND = 'OrderNotFound',
+}
+
+export enum UserApiError {
   INVALID_OR_MISSING_QUOTE_REQUEST_FIELDS = 'InvalidOrMissingQuoteRequestFields',
   INVALID_OR_MISSING_BROADCAST_TX_REQUEST_FIELDS = 'InvalidOrMissingBroadcastTxRequestFields',
   INVALID_INVOICE = 'InvalidInvoice',
   INVALID_INVOICE_HASH = 'InvalidInvoiceHash',
   INVALID_ONCHAIN_TICKER = 'InvalidOnchainTicker',
   INVALID_SIGNED_TX_HEX = 'InvalidSignedTxHex',
-  INVALID_ORDER_ID = 'InvalidOrderId',
-  INVALID_MARKET = 'InvalidMarket',
-  INVALID_REFUND_ADDRESS = 'InvalidRefundAddress',
   INVALID_MARKET_FOR_INVOICE = 'InvalidMarketForInvoice',
-  ORDER_NOT_FOUND = 'OrderNotFound',
   NO_QUOTES_AVAILABLE = 'NoQuotesAvailable',
   SWAP_ALREADY_IN_PROGRESS = 'SwapAlreadyInProgress',
   SWAP_HAS_ACTIVE_QUOTE_FOR_SAME_FUND_ASSET = 'SwapHasActiveQuoteForSameFundAsset',
 }
+
+export enum LiquidityProviderApiError {
+  INVALID_OR_MISSING_MARKETS = 'InvalidOrMissingMarkets',
+  INVALID_OR_MISSING_CREDENTIALS = 'InvalidOrMissingCredentials',
+  INVALID_OR_MISSING_QUOTE_FIELDS = 'InvalidOrMissingQuoteFields',
+  INVALID_REDEEM_SCRIPT = 'InvalidRedeemScript',
+  INVALID_PAYMENT_HASH = 'InvalidPaymentHash',
+  INVALID_PAY_TO_ADDRESS = 'InvalidPayToAddress',
+  INVALID_FUND_TX_VALUE = 'InvalidFundTxValue',
+  INVALID_CONTRACT_DATA = 'InvalidContractData',
+  CONTRACT_IS_NOT_WHITELISTED = 'ContractIsNotWhitelisted',
+  REDEEM_SCRIPT_PARSING_FAILED = 'RedeemScriptParsingFailed',
+  TIMELOCK_IS_OUT_OF_BOUNDS = 'TimelockIsOutOfBounds',
+  QUOTE_EXPIRY_IS_OUT_OF_BOUNDS = 'QuoteExpiryIsOutOfBounds',
+}
+
+export const ApiError = {
+  ...SharedApiError,
+  ...UserApiError,
+  ...LiquidityProviderApiError,
+};
+export type ApiError = ValueOf<
+  Pick<typeof ApiError, KnownKeys<typeof ApiError>>
+>;
 
 export enum LightningError {
   PAY_REQ_EXPIRED = 'PaymentRequestExpired',

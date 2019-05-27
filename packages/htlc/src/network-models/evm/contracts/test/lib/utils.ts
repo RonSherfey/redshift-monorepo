@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js';
  * @param weiAmount The wei amount to convert
  */
 export function weiToEther(weiAmount: BigNumber | string | number): number {
-  return new BigNumber(weiAmount).dividedBy(10e18).toNumber();
+  return new BigNumber(weiAmount).dividedBy(1e18).toNumber();
 }
 
 /**
@@ -13,5 +13,5 @@ export function weiToEther(weiAmount: BigNumber | string | number): number {
  * @param etherAmount The ether amount to convert
  */
 export function etherToWei(etherAmount: BigNumber | string | number): number {
-  return new BigNumber(etherAmount).times(10e18).toNumber();
+  return new BigNumber(etherAmount).times(1e18).toNumber();
 }
