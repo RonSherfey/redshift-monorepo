@@ -70,6 +70,7 @@ export enum LiquidityProviderApiError {
   REDEEM_SCRIPT_PARSING_FAILED = 'RedeemScriptParsingFailed',
   TIMELOCK_IS_OUT_OF_BOUNDS = 'TimelockIsOutOfBounds',
   QUOTE_EXPIRY_IS_OUT_OF_BOUNDS = 'QuoteExpiryIsOutOfBounds',
+  QUOTE_SUBMITTED_TOO_LATE = 'QuoteSubmittedTooLate',
 }
 
 export const ApiError = {
