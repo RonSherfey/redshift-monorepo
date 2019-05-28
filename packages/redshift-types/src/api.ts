@@ -86,7 +86,7 @@ export interface StateUpdate {
 
 export interface Quote {
   orderId: string;
-  details: UtxoDetails | EvmDetails;
+  details: FundDetails;
 }
 
 //#endregion
@@ -101,7 +101,6 @@ export interface AuthenticationRequest {
 export type QuoteSubscriptionRequest = Market[];
 
 export interface UtxoDetails {
-  orderId: string;
   redeemScript: string;
   amount: string;
   payToAddress: string;
@@ -121,7 +120,6 @@ export interface EvmUnsignedTx extends PartialEvmTxParams {
 }
 
 export interface EvmDetails {
-  orderId: string;
   unsignedFundingTx: EvmUnsignedTx;
 }
 
