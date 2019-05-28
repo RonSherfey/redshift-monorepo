@@ -25,6 +25,7 @@ export type OrdersResponse = OrderResponse[];
 
 export interface UtxoRefundDetails {
   refundAddress: string;
+  redeemScript: string;
   currentBlockHeight: number;
   feeTokensPerVirtualByte: number;
   utxos: TxOutput[];
@@ -100,6 +101,7 @@ export interface AuthenticationRequest {
 export type QuoteSubscriptionRequest = Market[];
 
 export interface UtxoDetails {
+  orderId: string;
   redeemScript: string;
   amount: string;
   payToAddress: string;
@@ -119,8 +121,11 @@ export interface EvmUnsignedTx extends PartialEvmTxParams {
 }
 
 export interface EvmDetails {
+  orderId: string;
   unsignedFundingTx: EvmUnsignedTx;
 }
+
+export type FundDetails = UtxoDetails | EvmDetails;
 
 export interface MakerQuoteRequest {
   orderId: string;
@@ -132,7 +137,7 @@ export interface MakerQuoteRequest {
 
 export interface MakerQuote {
   orderId: string;
-  details: UtxoDetails | EvmDetails;
+  details: FundDetails;
   quoteExpiryTimestampMs: number;
 }
 
