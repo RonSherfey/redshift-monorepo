@@ -71,6 +71,7 @@ export enum LiquidityProviderApiError {
   TIMELOCK_IS_OUT_OF_BOUNDS = 'TimelockIsOutOfBounds',
   QUOTE_EXPIRY_IS_OUT_OF_BOUNDS = 'QuoteExpiryIsOutOfBounds',
   QUOTE_SUBMITTED_TOO_LATE = 'QuoteSubmittedTooLate',
+  QUOTE_REQUEST_EXPIRY_ELAPSED = 'QuoteRequestExpiryElapsed',
 }
 
 export const ApiError = {

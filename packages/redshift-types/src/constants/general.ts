@@ -22,6 +22,7 @@ export enum InternalSwapState {
 
   FUND_WINDOW_ELAPSED = 'FundWindowElapsed', // The fund window has elapsed
   FUNDED_BY_OTHER_QUOTE = 'FundedByOtherQuote', // Another quote for the same invoice has been funded
+  RECEIVED_NO_QUOTES = 'ReceivedNoQuotes', // No quotes were received for the order
 }
 
 /**

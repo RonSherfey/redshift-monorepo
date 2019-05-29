@@ -1,6 +1,6 @@
 import { Market, OffChainTicker, OnChainTicker } from '.';
 import { TxOutput } from './blockchain';
-import { InternalSwapState, Network, Subnet, UserSwapState } from './constants';
+import { InternalSwapState, UserSwapState } from './constants';
 
 //#region HTTP
 
@@ -11,11 +11,12 @@ export type MarketsResponse = {
 }[];
 
 export interface OrderResponse {
-  network: Network;
-  subnet: Subnet;
+  id: string;
+  market: Market;
+  onchainTicker: OnChainTicker;
   createdAt: string;
   state: UserSwapState;
-  swapAddress: string;
+  payToAddress: string;
   amount: string;
   amountPaid: string;
   paymentHash: string;
@@ -86,6 +87,7 @@ export interface StateUpdate {
 
 export interface Quote {
   orderId: string;
+  expiryTimestampMs: number;
   details: FundDetails;
 }
 
