@@ -69,7 +69,7 @@ export class WebSocketClient {
    * Request a quote for the provided invoice and selected on-chain asset
    * @param request The quote request details
    */
-  public async requestQuote(request: TakerQuoteRequest): Promise<void> {
+  public async requestQuote(request: TakerQuoteRequest): Promise<Quote> {
     return new Promise((resolve, reject) => {
       if (!this._socket || !this._socket.connected) {
         return reject(WebSocketError.SOCKET_NOT_CONNECTED);
@@ -92,25 +92,14 @@ export class WebSocketClient {
       this._socket.emit(
         Ws.Event.REQUEST_QUOTE,
         request,
-        ({ success, message }: WebSocketResponse<string>) => {
+        ({ success, message }: WebSocketResponse<Quote>) => {
           if (success) {
-            return resolve();
+            return resolve(message);
           }
           return reject(message);
         },
       );
     });
-  }
-
-  /**
-   * Listen for quotes and execute the callback function when one is received
-   * @param cb The function to call when we get the event
-   */
-  public onQuoteReceived(cb: (quote: Quote) => void) {
-    if (!this._socket || !this._socket.connected) {
-      throw new Error(WebSocketError.SOCKET_NOT_CONNECTED);
-    }
-    this._socket.on(Ws.Event.MAKER_QUOTE, cb);
   }
 
   /**
@@ -195,11 +184,11 @@ export class WebSocketClient {
         {
           orderId,
         },
-        ({ success, message }: WebSocketResponse<string | RefundDetails>) => {
+        ({ success, message }: WebSocketResponse<RefundDetails>) => {
           if (success) {
-            return resolve(message as RefundDetails);
+            return resolve(message);
           }
-          return reject(message as string);
+          return reject(message);
         },
       );
     });

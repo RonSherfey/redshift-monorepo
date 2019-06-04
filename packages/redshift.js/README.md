@@ -110,16 +110,6 @@ Request a quote for the provided invoice and selected on-chain asset
 await client.requestQuote(quoteRequest);
 ```
 
-**On Quote Received**
-
-Listen for quotes and execute the callback function when one is received
-
-```typescript
-client.onQuoteReceived(quote => {
-  console.log(quote);
-});
-```
-
 **Subscribe to Order State**
 
 Subscribe to order state updates for the provided order id

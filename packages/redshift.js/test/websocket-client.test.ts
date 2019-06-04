@@ -46,6 +46,11 @@ describe('WebSocket Client', () => {
       server.on(Ws.Event.REQUEST_QUOTE, (_, cb: Function) => {
         cb({
           success: true,
+          message: {
+            orderId: fixtures.valid.orderId,
+            expiryTimestampMs: fixtures.valid.expiryTimestampMs,
+            details: {},
+          },
         });
       });
     });
@@ -86,40 +91,16 @@ describe('WebSocket Client', () => {
       ).to.be.rejectedWith(ApiError.INVALID_REFUND_ADDRESS);
     });
 
-    it('should succeed when valid params are provided', async () => {
-      await expect(
-        client.requestQuote({
-          market: fixtures.valid.market,
-          invoice: fixtures.valid.invoice,
-          refundAddress: fixtures.valid.bitcoinAddress,
-        }),
-      ).to.not.be.rejected;
-    });
-  });
-
-  describe('onQuoteReceived', () => {
-    before(() => {
-      // Stubbed websocket server success response
-      server.on(Ws.Event.REQUEST_QUOTE, () => {
-        server.emit(Ws.Event.MAKER_QUOTE, {
-          orderId: fixtures.valid.orderId,
-          quote: {},
-        });
-      });
-    });
-
-    it('should call the callback function with the quote when one is received', done => {
-      client.onQuoteReceived(quote => {
-        expect(quote).to.deep.equal({
-          orderId: fixtures.valid.orderId,
-          quote: {},
-        });
-        done();
-      });
-      client.requestQuote({
+    it('should return a quote when valid params are provided', async () => {
+      const quote = await client.requestQuote({
         market: fixtures.valid.market,
         invoice: fixtures.valid.invoice,
         refundAddress: fixtures.valid.bitcoinAddress,
+      });
+      expect(quote).to.deep.equal({
+        orderId: fixtures.valid.orderId,
+        expiryTimestampMs: fixtures.valid.expiryTimestampMs,
+        details: {},
       });
     });
   });
