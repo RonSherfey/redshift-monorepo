@@ -85,11 +85,11 @@ export interface StateUpdate {
   state: InternalSwapState;
 }
 
-export interface Quote {
+export interface Quote<D extends FundDetails = FundDetails> {
   orderId: string;
   expiryTimestampMs: number;
   amount: string;
-  details: FundDetails;
+  details: D;
 }
 
 //#endregion
