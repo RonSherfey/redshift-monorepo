@@ -54,7 +54,6 @@ export enum UserApiError {
   INVALID_MARKET_FOR_INVOICE = 'InvalidMarketForInvoice',
   NO_QUOTES_AVAILABLE = 'NoQuotesAvailable',
   SWAP_ALREADY_IN_PROGRESS = 'SwapAlreadyInProgress',
-  SWAP_HAS_ACTIVE_QUOTE_FOR_SAME_FUND_ASSET = 'SwapHasActiveQuoteForSameFundAsset',
 }
 
 export enum LiquidityProviderApiError {

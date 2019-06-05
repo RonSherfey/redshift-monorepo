@@ -1,3 +1,4 @@
+export { utils } from './utils';
 export { HttpClient } from './http-client';
 export { WebSocketClient } from './websocket-client';
-export { utils } from './utils';
+export { RedshiftClient } from './redshift-client';

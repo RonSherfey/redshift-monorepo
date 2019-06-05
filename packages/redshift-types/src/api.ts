@@ -88,6 +88,7 @@ export interface StateUpdate {
 export interface Quote {
   orderId: string;
   expiryTimestampMs: number;
+  amount: string;
   details: FundDetails;
 }
 
@@ -103,9 +104,8 @@ export interface AuthenticationRequest {
 export type QuoteSubscriptionRequest = Market[];
 
 export interface UtxoDetails {
-  redeemScript: string;
-  amount: string;
   payToAddress: string;
+  redeemScript: string;
 }
 
 export interface PartialEvmTxParams {
