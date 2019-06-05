@@ -48,10 +48,10 @@ export class WebSocketClient {
         resolve(WebSocketSuccess.SOCKET_CONNECTED);
       });
       this._socket.once('connect_error', () => {
-        reject(WebSocketError.SOCKET_CONNECT_ERROR);
+        reject(new Error(WebSocketError.SOCKET_CONNECT_ERROR));
       });
       this._socket.once('connect_timeout', () => {
-        reject(WebSocketError.SOCKET_CONNECT_TIMEOUT);
+        reject(new Error(WebSocketError.SOCKET_CONNECT_TIMEOUT));
       });
     });
   }
@@ -72,31 +72,33 @@ export class WebSocketClient {
   public async requestQuote(request: TakerQuoteRequest): Promise<Quote> {
     return new Promise((resolve, reject) => {
       if (!this._socket || !this._socket.connected) {
-        return reject(WebSocketError.SOCKET_NOT_CONNECTED);
+        return reject(new Error(WebSocketError.SOCKET_NOT_CONNECTED));
       }
       if (!request) {
-        return reject(ApiError.INVALID_OR_MISSING_QUOTE_REQUEST_FIELDS);
+        return reject(
+          new Error(ApiError.INVALID_OR_MISSING_QUOTE_REQUEST_FIELDS),
+        );
       }
       if (!utils.isValidMarket(request.market)) {
-        return reject(ApiError.INVALID_MARKET);
+        return reject(new Error(ApiError.INVALID_MARKET));
       }
       if (!utils.isValidBech32(request.invoice)) {
-        return reject(ApiError.INVALID_INVOICE);
+        return reject(new Error(ApiError.INVALID_INVOICE));
       }
       if (
         request.refundAddress &&
         !utils.isValidUtxoAddress(request.refundAddress)
       ) {
-        return reject(ApiError.INVALID_REFUND_ADDRESS);
+        return reject(new Error(ApiError.INVALID_REFUND_ADDRESS));
       }
       this._socket.emit(
         Ws.Event.REQUEST_QUOTE,
         request,
-        ({ success, message }: WebSocketResponse<Quote>) => {
+        ({ success, message }: WebSocketResponse<Quote | string>) => {
           if (success) {
-            return resolve(message);
+            return resolve(message as Quote);
           }
-          return reject(message);
+          return reject(new Error(message as string));
         },
       );
     });
@@ -109,10 +111,10 @@ export class WebSocketClient {
   public async subscribeToOrderState(orderId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!this._socket || !this._socket.connected) {
-        return reject(WebSocketError.SOCKET_NOT_CONNECTED);
+        return reject(new Error(WebSocketError.SOCKET_NOT_CONNECTED));
       }
       if (!utils.isValidUUID(orderId)) {
-        return reject(ApiError.INVALID_ORDER_ID);
+        return reject(new Error(ApiError.INVALID_ORDER_ID));
       }
       this._socket.emit(
         Ws.Event.SUBSCRIBE_TO_ORDER_STATE,
@@ -123,7 +125,7 @@ export class WebSocketClient {
           if (success) {
             return resolve();
           }
-          return reject(message);
+          return reject(new Error(message));
         },
       );
     });
@@ -147,10 +149,10 @@ export class WebSocketClient {
   public async unsubscribeFromOrderState(orderId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!this._socket || !this._socket.connected) {
-        return reject(WebSocketError.SOCKET_NOT_CONNECTED);
+        return reject(new Error(WebSocketError.SOCKET_NOT_CONNECTED));
       }
       if (!utils.isValidUUID(orderId)) {
-        return reject(ApiError.INVALID_ORDER_ID);
+        return reject(new Error(ApiError.INVALID_ORDER_ID));
       }
       this._socket.emit(
         Ws.Event.UNSUBSCRIBE_FROM_ORDER_STATE,
@@ -161,7 +163,7 @@ export class WebSocketClient {
           if (success) {
             return resolve();
           }
-          return reject(message);
+          return reject(new Error(message));
         },
       );
     });
@@ -174,21 +176,21 @@ export class WebSocketClient {
   public async requestRefundDetails(orderId: string): Promise<RefundDetails> {
     return new Promise((resolve, reject) => {
       if (!this._socket || !this._socket.connected) {
-        return reject(WebSocketError.SOCKET_NOT_CONNECTED);
+        return reject(new Error(WebSocketError.SOCKET_NOT_CONNECTED));
       }
       if (!utils.isValidUUID(orderId)) {
-        return reject(ApiError.INVALID_ORDER_ID);
+        return reject(new Error(ApiError.INVALID_ORDER_ID));
       }
       this._socket.emit(
         Ws.Event.REQUEST_REFUND_DETAILS,
         {
           orderId,
         },
-        ({ success, message }: WebSocketResponse<RefundDetails>) => {
+        ({ success, message }: WebSocketResponse<RefundDetails | string>) => {
           if (success) {
-            return resolve(message);
+            return resolve(message as RefundDetails);
           }
-          return reject(message);
+          return reject(new Error(message as string));
         },
       );
     });
@@ -203,25 +205,27 @@ export class WebSocketClient {
   ): Promise<TxResult> {
     return new Promise((resolve, reject) => {
       if (!this._socket || !this._socket.connected) {
-        return reject(WebSocketError.SOCKET_NOT_CONNECTED);
+        return reject(new Error(WebSocketError.SOCKET_NOT_CONNECTED));
       }
       if (!request) {
-        return reject(ApiError.INVALID_OR_MISSING_BROADCAST_TX_REQUEST_FIELDS);
+        return reject(
+          new Error(ApiError.INVALID_OR_MISSING_BROADCAST_TX_REQUEST_FIELDS),
+        );
       }
       if (!utils.isValidOnchainTicker(request.onchainTicker)) {
-        return reject(ApiError.INVALID_ONCHAIN_TICKER);
+        return reject(new Error(ApiError.INVALID_ONCHAIN_TICKER));
       }
       if (!utils.isValidHex(request.signedTxHex)) {
-        return reject(ApiError.INVALID_SIGNED_TX_HEX);
+        return reject(new Error(ApiError.INVALID_SIGNED_TX_HEX));
       }
       this._socket.emit(
         Ws.Event.BROADCAST_TRANSACTION,
         request,
-        ({ success, message }: WebSocketResponse<TxResult>) => {
+        ({ success, message }: WebSocketResponse<TxResult | string>) => {
           if (success) {
-            return resolve(message);
+            return resolve(message as TxResult);
           }
-          return reject(message);
+          return reject(new Error(message as string));
         },
       );
     });

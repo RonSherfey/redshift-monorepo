@@ -85,10 +85,11 @@ export interface StateUpdate {
   state: InternalSwapState;
 }
 
-export interface Quote {
+export interface Quote<D extends FundDetails = FundDetails> {
   orderId: string;
   expiryTimestampMs: number;
-  details: FundDetails;
+  amount: string;
+  details: D;
 }
 
 //#endregion
@@ -103,9 +104,8 @@ export interface AuthenticationRequest {
 export type QuoteSubscriptionRequest = Market[];
 
 export interface UtxoDetails {
-  redeemScript: string;
-  amount: string;
   payToAddress: string;
+  redeemScript: string;
 }
 
 export interface PartialEvmTxParams {

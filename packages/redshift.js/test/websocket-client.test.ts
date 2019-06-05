@@ -49,6 +49,7 @@ describe('WebSocket Client', () => {
           message: {
             orderId: fixtures.valid.orderId,
             expiryTimestampMs: fixtures.valid.expiryTimestampMs,
+            amount: fixtures.valid.amount,
             details: {},
           },
         });
@@ -100,6 +101,7 @@ describe('WebSocket Client', () => {
       expect(quote).to.deep.equal({
         orderId: fixtures.valid.orderId,
         expiryTimestampMs: fixtures.valid.expiryTimestampMs,
+        amount: fixtures.valid.amount,
         details: {},
       });
     });
