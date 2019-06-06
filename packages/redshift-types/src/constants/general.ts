@@ -192,6 +192,7 @@ export namespace Ws {
     SUBSCRIBE_TO_QUOTES = 'subscribeToQuotes',
     UNSUBSCRIBE_FROM_QUOTES = 'unsubscribeFromQuotes',
     MAKER_QUOTE = 'makerQuote',
+    PAYMENT_RESULT = 'paymentResult',
     // LIQUIDITY PROVIDER
     REQUEST_QUOTE = 'requestQuote',
   }
