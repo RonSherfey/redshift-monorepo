@@ -11,7 +11,7 @@ export enum SwapError {
   EXPECTED_OP_DROP = 'ExpectedOP_DROP',
   EXPECTED_OP_ENDIF = 'ExpectedOP_ENDIF',
   EXPECTED_OP_CHECKSIG = 'ExpectedOP_CHECKSIG',
-  EXPECTED_VALID_DESTINATION_PUBKEY = 'ExpectedValidScriptDestinationPublicKey',
+  EXPECTED_VALID_CLAIMER_PUBKEY = 'ExpectedValidScriptClaimerPublicKey',
   EXPECTED_VALID_REFUND_PUBKEY = 'ExpectedValidScriptRefundPublicKey',
   EXPECTED_OP_DUP = 'ExpectedOP_DUP',
   EXPECTED_OP_HASH160 = 'ExpectedOP_HASH160',

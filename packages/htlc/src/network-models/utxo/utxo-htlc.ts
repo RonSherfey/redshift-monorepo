@@ -82,9 +82,9 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
 
     // Add the inputs being spent to the transaction
     utxos.forEach(utxo => {
-      if (isDefined(utxo.tx_id) && isDefined(utxo.index)) {
+      if (isDefined(utxo.txId) && isDefined(utxo.index)) {
         tx.addInput(
-          toReversedByteOrderBuffer(utxo.tx_id),
+          toReversedByteOrderBuffer(utxo.txId),
           utxo.index,
           0,
           output,
@@ -95,7 +95,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     // Total spendable amount
     const tokens = utxos.reduce((t, c) => t + c.tokens, 0);
 
-    tx.addOutput(this.details.p2sh_p2wsh_address, amount);
+    tx.addOutput(this.details.p2shP2wshAddress, amount);
     tx.addOutput(address, tokens - amount - fee);
 
     // Sign the inputs
@@ -109,7 +109,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
   /**
    * Generate the claim transaction and return the raw tx hex
    * @param utxos The unspent funding tx outputs
-   * @param destinationAddress The claim destination address
+   * @param destinationAddress The address the funds will be claimed to
    * @param currentBlockHeight The current block height on the network
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
    * @param paymentSecret The payment secret
@@ -136,7 +136,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
   /**
    * Generate the refund transaction and return the raw tx hex
    * @param utxos The unspent funding tx outputs
-   * @param destinationAddress The refund destination address
+   * @param destinationAddress The address the funds will be refunded to
    * @param currentBlockHeight The current block height on the network
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
    * @param privateKey The private key WIF string
@@ -165,7 +165,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
   /**
    * Build the transaction using the provided params and return the raw tx hex
    * @param utxos The unspent funding tx outputs
-   * @param destinationAddress The destination address of the transaction
+   * @param destinationAddress The address the funds will be sent to
    * @param currentBlockHeight The current block height on the network
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
    * @param unlock Claim secret (preimage) or refund public key
@@ -185,7 +185,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     // Total the utxos
     const tokens = utxos.reduce((t, c) => t + c.tokens, 0);
 
-    // Add output containing the destination public key
+    // Add a single output containing the destination address
     tx.addOutput(
       address.toOutputScript(
         destinationAddress,
@@ -249,7 +249,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     // Add Inputs
     utxos.forEach(utxo => {
       tx.addInput(
-        toReversedByteOrderBuffer(utxo.tx_id),
+        toReversedByteOrderBuffer(utxo.txId),
         utxo.index,
         0,
         inputScript,

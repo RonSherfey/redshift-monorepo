@@ -9,12 +9,10 @@ import { UTXO } from '../../../types';
 import { getBitcoinJSNetwork } from './bitcoinjs-lib';
 
 /**
- *
- * Decompiles a redeem script and constructs a SwapDetails object
- * @param {Subnet} subnet - the network subnet the redeem script will execute on
- * @param {String} redeemScriptHex - the hex representation of the redeem script
- * @throws {Error} if the redeemScriptHex is of unknown length or contains unexpected OPs
- * @return {SwapDetails}
+ * Decompiles a redeem script and constructs a Details object
+ * @param subnet The network subnet the redeem script will execute on
+ * @param redeemScriptHex The hex representation of the redeem script
+ * @throws If the redeemScriptHex is of unknown length or contains unexpected OPs
  */
 export function getSwapRedeemScriptDetails<N extends Network>(
   network: N,
@@ -27,7 +25,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
     .toASM(script.decompile(redeemScriptBuffer))
     .split(' ');
 
-  let destinationPublicKey;
+  let claimerPublicKey;
   let paymentHash;
   let cltv;
   let refundPublicKeyHash;
@@ -41,7 +39,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           decompiledPaymentHash,
           OP_EQUAL,
           OP_IF,
-          decompiledDestinationPublicKey,
+          decompiledClaimerPublicKey,
           OP_ELSE,
           decompiledCltv,
           OP_CHECKLOCKTIMEVERIFY,
@@ -86,10 +84,10 @@ export function getSwapRedeemScriptDetails<N extends Network>(
         }
 
         if (
-          !decompiledDestinationPublicKey ||
-          decompiledDestinationPublicKey.length !== 66
+          !decompiledClaimerPublicKey ||
+          decompiledClaimerPublicKey.length !== 66
         ) {
-          throw new Error(SwapError.EXPECTED_VALID_DESTINATION_PUBKEY);
+          throw new Error(SwapError.EXPECTED_VALID_CLAIMER_PUBKEY);
         }
 
         if (
@@ -99,7 +97,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           throw new Error(SwapError.EXPECTED_VALID_REFUND_PUBKEY);
         }
 
-        destinationPublicKey = decompiledDestinationPublicKey;
+        claimerPublicKey = decompiledClaimerPublicKey;
         refundPublicKeyHash = crypto
           .hash160(Buffer.from(decompiledRefundPublicKey, 'hex'))
           .toString('hex');
@@ -118,7 +116,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           OP_EQUAL,
           OP_IF,
           OP_DROP,
-          decompiledDestinationPublicKey,
+          decompiledClaimerPublicKey,
           OP_ELSE,
           decompiledCltv,
           OP_CHECKLOCKTIMEVERIFY,
@@ -186,10 +184,10 @@ export function getSwapRedeemScriptDetails<N extends Network>(
         }
 
         if (
-          !decompiledDestinationPublicKey ||
-          decompiledDestinationPublicKey.length !== 66
+          !decompiledClaimerPublicKey ||
+          decompiledClaimerPublicKey.length !== 66
         ) {
-          throw new Error(SwapError.EXPECTED_VALID_DESTINATION_PUBKEY);
+          throw new Error(SwapError.EXPECTED_VALID_CLAIMER_PUBKEY);
         }
 
         if (
@@ -199,7 +197,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           throw new Error(SwapError.EXPECTED_VALID_REFUND_PUBKEY);
         }
 
-        destinationPublicKey = decompiledDestinationPublicKey;
+        claimerPublicKey = decompiledClaimerPublicKey;
         refundPublicKeyHash = decompiledRefundPublicKeyHash;
         cltv = decompiledCltv;
         paymentHash = decompiledPaymentHash;
@@ -250,18 +248,18 @@ export function getSwapRedeemScriptDetails<N extends Network>(
   return {
     network,
     subnet,
-    destination_public_key: destinationPublicKey,
-    payment_hash: paymentHash,
-    refund_public_key_hash: refundPublicKeyHash,
-    timelock_block_height: timelockBlockHeight,
-    p2sh_output_script: p2shOutput.toString('hex'),
-    p2sh_address: p2shAddress,
-    p2sh_p2wsh_address: p2shWrappedWitnessAddress,
-    p2sh_p2wsh_output_script: p2shWrappedWitnessOutput.toString('hex'),
-    p2wsh_address: p2wshAddress,
-    p2wsh_output_script: p2wshOutput.toString('hex'),
-    refund_p2wpkh_address: p2wpkhRefundAddress,
-    refund_p2pkh_address: p2pkhRefundAddress,
-    redeem_script: redeemScriptHex,
+    claimerPublicKey,
+    paymentHash,
+    refundPublicKeyHash,
+    timelockBlockHeight,
+    p2shAddress,
+    p2wshAddress,
+    p2shP2wshAddress: p2shWrappedWitnessAddress,
+    p2shOutputScript: p2shOutput.toString('hex'),
+    p2shP2wshOutputScript: p2shWrappedWitnessOutput.toString('hex'),
+    p2wshOutputScript: p2wshOutput.toString('hex'),
+    refundP2wpkhAddress: p2wpkhRefundAddress,
+    refundP2pkhAddress: p2pkhRefundAddress,
+    redeemScript: redeemScriptHex,
   };
 }

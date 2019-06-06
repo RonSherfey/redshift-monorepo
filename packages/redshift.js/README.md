@@ -120,11 +120,11 @@ await client.subscribeToOrderState(orderId);
 
 **On Order State Changed**
 
-Listen for order state changes and execute the callback function when one is received
+Execute the callback function when an order state update is received
 
 ```typescript
-client.onOrderStateChanged(newState => {
-  console.log(newState);
+client.onOrderStateChanged(stateUpdate => {
+  console.log(stateUpdate);
 });
 ```
 

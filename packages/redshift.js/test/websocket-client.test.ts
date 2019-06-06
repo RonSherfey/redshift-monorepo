@@ -1,8 +1,8 @@
 import {
   ApiError,
-  InternalSwapState,
   RefundDetails,
   TxResult,
+  UserSwapState,
   WebSocketResponse,
   Ws,
 } from '@radar/redshift-types';
@@ -133,13 +133,19 @@ describe('WebSocket Client', () => {
     before(() => {
       // Stubbed websocket server success response
       server.on(Ws.Event.SUBSCRIBE_TO_ORDER_STATE, () => {
-        server.emit(Ws.Event.STATE_CHANGED, InternalSwapState.FUNDED);
+        server.emit(Ws.Event.STATE_CHANGED, {
+          orderId: fixtures.valid.orderId,
+          state: UserSwapState.FUNDED,
+        });
       });
     });
 
-    it('should call the callback function with the order state when one is received', done => {
-      client.onOrderStateChanged(state => {
-        expect(state).to.equal(InternalSwapState.FUNDED);
+    it('should call the callback function with the order state update when one is received', done => {
+      client.onOrderStateChanged(stateUpdate => {
+        expect(stateUpdate).to.deep.equal({
+          orderId: fixtures.valid.orderId,
+          state: UserSwapState.FUNDED,
+        });
         done();
       });
       client.subscribeToOrderState(fixtures.valid.orderId);

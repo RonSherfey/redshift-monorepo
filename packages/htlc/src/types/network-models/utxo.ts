@@ -6,23 +6,23 @@ export namespace UTXO {
   export interface Details<N extends Network> {
     network: N;
     subnet: SubnetMap[N];
-    payment_hash: string; // payment hash hex string
-    destination_public_key: string; // claim public key hex string
-    refund_public_key_hash: string; // refund pubkey hash string
-    timelock_block_height: number; // locked until block height number
-    p2sh_output_script: string; // pay to script hash output hex string
-    p2sh_address: string; // pay to script hash base58 address
-    p2sh_p2wsh_address: string; // nested pay to witness script address
-    p2sh_p2wsh_output_script: string; // p2sh nested output script hex string
-    p2wsh_address: string; // pay to witness script hash address
-    p2wsh_output_script: string; // witness output script hex string
-    refund_p2wpkh_address: string; // refund p2wpkh address
-    refund_p2pkh_address: string; // refund p2pkh address
-    redeem_script: string; // redeem script hex string
+    paymentHash: string; // payment hash hex string
+    claimerPublicKey: string; // claim public key hex string
+    refundPublicKeyHash: string; // refund pubkey hash string
+    timelockBlockHeight: number; // locked until block height number
+    p2shOutputScript: string; // pay to script hash output hex string
+    p2shAddress: string; // pay to script hash base58 address
+    p2shP2wshAddress: string; // nested pay to witness script address
+    p2shP2wshOutputScript: string; // p2sh nested output script hex string
+    p2wshAddress: string; // pay to witness script hash address
+    p2wshOutputScript: string; // witness output script hex string
+    refundP2wpkhAddress: string; // refund p2wpkh address
+    refundP2pkhAddress: string; // refund p2pkh address
+    redeemScript: string; // redeem script hex string
   }
 
   export interface RedeemScriptArgs {
-    destinationPublicKey: string;
+    claimerPublicKey: string;
     paymentHash: string;
     refundAddress: string;
     timelockBlockHeight: number;

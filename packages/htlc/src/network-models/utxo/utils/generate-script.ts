@@ -5,12 +5,10 @@ import varuint from 'varuint-bitcoin';
 import { UTXO } from '../../../types';
 
 /**
- *
  * Convert an iterable of script elements to a hex string
- *
- * @param scriptElements - an iterable representation of a script
- * @throws on invalid script
- * @return hex representation of the scriptElements
+ * @param scriptElements An iterable representation of a script
+ * @throws On invalid script
+ * @return Hex representation of the scriptElements
  */
 function convertScriptElementsToHex(scriptElements: any): string {
   return scriptElements
@@ -51,30 +49,27 @@ function addressToPublicKeyHash(addr: string): string {
 }
 
 /**
- *
  * Generate a swap redeem script for a public key hash refund path.
- *
- * Check if the sha256 of the top item of the stack is the payment hash
- * if true push the remote pubkey on the stack
- * if false check the lock time, pubkey hash, and push the local pubkey
- * Check remote or local pubkey signed the transaction
- *
- * @param destinationPublicKey - destination public key for the hashlock
- * @param paymentHash - lightning invoice payment hash
- * @param refundAddress - refund p2pkh or p2wpkh address
- * @param timelockBlockHeight - block height at which the swap expires
- * @return the hex representation of the redeem script
+ * Check if the sha256 of the top item of the stack is the payment hash.
+ * If true, push the remote pubkey on the stack.
+ * If false, check the lock time, pubkey hash, and push the local pubkey.
+ * Check remote or local pubkey signed the transaction.
+ * @param claimerPublicKey The public key of the claimer used in the hashlock
+ * @param paymentHash Lightning invoice payment hash
+ * @param refundAddress Refund p2pkh or p2wpkh address
+ * @param timelockBlockHeight Block height at which the swap expires
+ * @return The hex representation of the redeem script
  */
 export function createSwapRedeemScript(
   scriptArgs: UTXO.RedeemScriptArgs,
 ): string {
   const refundPublicKeyHash = addressToPublicKeyHash(scriptArgs.refundAddress);
   const [
-    destinationPublicKeyBuffer,
+    claimerPublicKeyBuffer,
     paymentHashBuffer,
     refundPublicKeyHashBuffer,
   ] = [
-    scriptArgs.destinationPublicKey,
+    scriptArgs.claimerPublicKey,
     scriptArgs.paymentHash,
     refundPublicKeyHash,
   ].map(i => Buffer.from(i, 'hex'));
@@ -89,7 +84,7 @@ export function createSwapRedeemScript(
     opcodes.OP_EQUAL,
     opcodes.OP_IF,
     opcodes.OP_DROP,
-    destinationPublicKeyBuffer,
+    claimerPublicKeyBuffer,
     opcodes.OP_ELSE,
     cltvBuffer,
     opcodes.OP_CHECKLOCKTIMEVERIFY,

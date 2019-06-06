@@ -1,6 +1,6 @@
 import { Market, OffChainTicker, OnChainTicker } from '.';
 import { TxOutput } from './blockchain';
-import { InternalSwapState, UserSwapState } from './constants';
+import { UserSwapState } from './constants';
 
 //#region HTTP
 
@@ -82,7 +82,8 @@ export interface TxResult {
 }
 
 export interface StateUpdate {
-  state: InternalSwapState;
+  orderId: string;
+  state: UserSwapState;
 }
 
 export interface Quote<D extends FundDetails = FundDetails> {
