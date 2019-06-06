@@ -139,7 +139,7 @@ export interface MakerQuoteRequest {
 export interface MakerQuote<D extends FundDetails = FundDetails> {
   orderId: string;
   quoteExpiryTimestampMs: number;
-  amount: string;
+  amount?: string;
   details: D;
 }
 
