@@ -24,7 +24,7 @@ import { HTLC } from '@radar/htlc';
 
 const htlc = HTLC.construct(Network.BITCOIN, BitcoinSubnet.SIMNET, {
   paymentHash: 'fba6da3ff596b9c6fabe67d4f728474697640ef6edd9e361c2a46be345112839',
-  destinationPublicKey: '0286ab3b59ce3862515b01c8a282edb6011b4eb50c608ab298bfd70f6033f7bc65',
+  claimerPublicKey: '0286ab3b59ce3862515b01c8a282edb6011b4eb50c608ab298bfd70f6033f7bc65',
   refundAddress: 'sb1qxnqqm56ta40p3uhtsmtdxglhwuxjk3tul94mq0',
   timelockBlockHeight: 800,
 });

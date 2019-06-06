@@ -28,7 +28,7 @@ export interface BlockResult {
  * Bitcoin TXO
  */
 export interface TxOutput {
-  tx_id: string; // tx id for this output
+  txId: string; // tx id for this output
   index: number; // vout index of this output
   tokens: number; // amount of tokens in this output
   address?: string; // output address
@@ -38,11 +38,11 @@ export interface TxOutput {
 export interface KeyPair {
   network: Network;
   subnet: Subnet;
-  public_key: string;
-  public_key_hash: string;
-  private_key: string;
-  p2wpkh_address: string;
-  p2pkh_address: string;
+  publicKey: string;
+  publicKeyHash: string;
+  privateKey: string;
+  p2wpkhAddress: string;
+  p2pkhAddress: string;
   index: number;
-  key_pair: BIP32;
+  keyPair: BIP32;
 }

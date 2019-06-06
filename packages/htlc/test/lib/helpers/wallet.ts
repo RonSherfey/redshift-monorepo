@@ -30,17 +30,17 @@ export function getKeyPairFromMnemonic(
     network,
     subnet,
     index,
-    public_key_hash: keyPair.identifier.toString('hex'),
-    p2wpkh_address: payments.p2wpkh({
+    keyPair,
+    publicKeyHash: keyPair.identifier.toString('hex'),
+    p2wpkhAddress: payments.p2wpkh({
       pubkey: publicKey,
       network: networkPayload,
     }).address,
-    p2pkh_address: payments.p2pkh({
+    p2pkhAddress: payments.p2pkh({
       pubkey: publicKey,
       network: networkPayload,
     }).address,
-    private_key: keyPair.toWIF(),
-    public_key: publicKey.toString('hex'),
-    key_pair: keyPair,
+    privateKey: keyPair.toWIF(),
+    publicKey: publicKey.toString('hex'),
   };
 }

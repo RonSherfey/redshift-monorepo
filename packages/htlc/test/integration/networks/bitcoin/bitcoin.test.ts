@@ -21,7 +21,7 @@ let paymentSecret: string;
 /**
  * Create an HTLC, fund it, and set the values necessary to take action on the swap.
  */
-function setupTestSuite(refundAddress: string = refunder.p2pkh_address) {
+function setupTestSuite(refundAddress: string = refunder.p2pkhAddress) {
   before(async () => {
     await setCoinbaseUtxos();
 
@@ -30,7 +30,7 @@ function setupTestSuite(refundAddress: string = refunder.p2pkh_address) {
     htlcArgs = {
       refundAddress,
       paymentHash: random.paymentHash,
-      destinationPublicKey: claimer.public_key,
+      claimerPublicKey: claimer.publicKey,
       timelockBlockHeight: await rpcClient.getBlockCount(),
     };
     paymentSecret = random.paymentSecret;
@@ -43,7 +43,7 @@ function setupTestSuite(refundAddress: string = refunder.p2pkh_address) {
     const fundTxHex = htlc.fund(
       coinbaseUtxos,
       fundSatoshiAmount,
-      funder.private_key,
+      funder.privateKey,
     );
     const fundingTxId = await rpcClient.sendRawTransaction(fundTxHex);
 
@@ -52,7 +52,7 @@ function setupTestSuite(refundAddress: string = refunder.p2pkh_address) {
       .vout[0];
     fundingUtxos = [
       {
-        tx_id: fundingTxId,
+        txId: fundingTxId,
         index: 0,
         tokens: toSatoshi(p2shOutput.value),
       },
@@ -77,7 +77,7 @@ async function setCoinbaseUtxos() {
   const coinbaseUtxo = await rpcClient.getTxOutput(coinbaseTxId, 0);
   coinbaseUtxos = [
     {
-      tx_id: coinbaseTxId,
+      txId: coinbaseTxId,
       index: 0,
       tokens: toSatoshi(coinbaseUtxo.value),
     },
@@ -97,7 +97,7 @@ describe('UTXO HTLC - Bitcoin Network', () => {
     setupTestSuite();
 
     it('should build a valid fund transaction and return a tx id when broadcast', async () => {
-      expect(fundingUtxos[0].tx_id).to.be.a('string');
+      expect(fundingUtxos[0].txId).to.be.a('string');
     });
 
     it('should have the correct funding values when mined', async () => {
@@ -106,7 +106,7 @@ describe('UTXO HTLC - Bitcoin Network', () => {
         bestBlockHash,
       )) as BlockResult;
       const fundingTx = await rpcClient.getTransactionByHash(
-        fundingUtxos[0].tx_id,
+        fundingUtxos[0].txId,
       );
       expect(block.tx.length).to.equal(2); // Coinbase & Funding Txs
       expect(fundingTx.vout[0].value).to.equal(0.01); // Funding Ouput
@@ -124,11 +124,11 @@ describe('UTXO HTLC - Bitcoin Network', () => {
       const currentBlockHeight = await rpcClient.getBlockCount();
       const claimTxHex = htlc.claim(
         fundingUtxos,
-        claimer.p2pkh_address,
+        claimer.p2pkhAddress,
         currentBlockHeight,
         feeTokensPerVirtualByte,
         paymentSecret,
-        claimer.private_key,
+        claimer.privateKey,
       );
       claimTxId = await rpcClient.sendRawTransaction(claimTxHex);
       expect(claimTxId).to.be.a('string');
@@ -156,10 +156,10 @@ describe('UTXO HTLC - Bitcoin Network', () => {
         const currentBlockHeight = await rpcClient.getBlockCount();
         const refundTxHex = htlc.refund(
           fundingUtxos,
-          refunder.p2pkh_address,
+          refunder.p2pkhAddress,
           currentBlockHeight,
           feeTokensPerVirtualByte,
-          refunder.private_key,
+          refunder.privateKey,
         );
         refundTxId = await rpcClient.sendRawTransaction(refundTxHex);
         expect(refundTxId).to.be.a('string');
@@ -174,17 +174,17 @@ describe('UTXO HTLC - Bitcoin Network', () => {
     });
 
     describe('P2WPKH Address Refund', () => {
-      setupTestSuite(refunder.p2wpkh_address);
+      setupTestSuite(refunder.p2wpkhAddress);
 
       let refundTxId: string;
       it('should build a valid refund transaction given valid parameters', async () => {
         const currentBlockHeight = await rpcClient.getBlockCount();
         const refundTxHex = htlc.refund(
           fundingUtxos,
-          refunder.p2pkh_address,
+          refunder.p2pkhAddress,
           currentBlockHeight,
           feeTokensPerVirtualByte,
-          refunder.private_key,
+          refunder.privateKey,
         );
         refundTxId = await rpcClient.sendRawTransaction(refundTxHex);
         expect(refundTxId).to.be.a('string');
