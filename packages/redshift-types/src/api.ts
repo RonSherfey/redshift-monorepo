@@ -136,10 +136,11 @@ export interface MakerQuoteRequest {
   requestExpiryTimestampMs: number;
 }
 
-export interface MakerQuote {
+export interface MakerQuote<D extends FundDetails = FundDetails> {
   orderId: string;
-  details: FundDetails;
   quoteExpiryTimestampMs: number;
+  amount: string;
+  details: D;
 }
 
 //#endregion
