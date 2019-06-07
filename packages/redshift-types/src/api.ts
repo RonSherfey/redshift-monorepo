@@ -81,10 +81,25 @@ export interface TxResult {
   txId: string;
 }
 
-export interface StateUpdate {
+export interface GeneralStateUpdate {
   orderId: string;
   state: UserSwapState;
 }
+
+export interface TxConfirmedStateUpdate extends GeneralStateUpdate {
+  state: UserSwapState.FUNDED | UserSwapState.REFUNDED;
+  transactionId: string;
+}
+
+export interface SwapCompleteStateUpdate extends GeneralStateUpdate {
+  state: UserSwapState.COMPLETE;
+  preimage: string;
+}
+
+export type StateUpdate =
+  | GeneralStateUpdate
+  | TxConfirmedStateUpdate
+  | SwapCompleteStateUpdate;
 
 export interface Quote<D extends FundDetails = FundDetails> {
   orderId: string;
@@ -141,6 +156,12 @@ export interface MakerQuote<D extends FundDetails = FundDetails> {
   quoteExpiryTimestampMs: number;
   amount?: string;
   details: D;
+}
+
+export interface PaymentResult {
+  orderId: string;
+  success: boolean;
+  preimage?: string;
 }
 
 //#endregion
