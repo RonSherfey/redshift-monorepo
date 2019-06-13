@@ -87,7 +87,10 @@ export interface GeneralStateUpdate {
 }
 
 export interface TxConfirmedStateUpdate extends GeneralStateUpdate {
-  state: UserSwapState.FUNDED | UserSwapState.REFUNDED;
+  state:
+    | UserSwapState.PARTIALLY_FUNDED
+    | UserSwapState.FUNDED
+    | UserSwapState.REFUNDED;
   transactionId: string;
 }
 
