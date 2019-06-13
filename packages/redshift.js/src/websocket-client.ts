@@ -3,6 +3,7 @@ import {
   BroadcastTxRequest,
   Quote,
   RefundDetails,
+  RefundDetailsResponse,
   StateUpdate,
   TakerQuoteRequest,
   TxResult,
@@ -173,7 +174,9 @@ export class WebSocketClient {
    * Request refund details for a swap order
    * @param orderId The uuid of the order
    */
-  public async requestRefundDetails(orderId: string): Promise<RefundDetails> {
+  public async requestRefundDetails<D extends RefundDetails = RefundDetails>(
+    orderId: string,
+  ): Promise<RefundDetailsResponse<D>> {
     return new Promise((resolve, reject) => {
       if (!this._socket || !this._socket.connected) {
         return reject(new Error(WebSocketError.SOCKET_NOT_CONNECTED));
@@ -186,9 +189,12 @@ export class WebSocketClient {
         {
           orderId,
         },
-        ({ success, message }: WebSocketResponse<RefundDetails | string>) => {
+        ({
+          success,
+          message,
+        }: WebSocketResponse<RefundDetailsResponse<D> | string>) => {
           if (success) {
-            return resolve(message as RefundDetails);
+            return resolve(message as RefundDetailsResponse<D>);
           }
           return reject(new Error(message as string));
         },

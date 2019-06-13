@@ -89,13 +89,13 @@ export class HttpClient {
    * Get the refund details for an order
    * @param orderId The uuid of the order
    */
-  public async getOrderRefundDetails<T extends RefundDetails>(
+  public async getOrderRefundDetails<D extends RefundDetails = RefundDetails>(
     orderId: string,
-  ): Promise<RefundDetailsResponse<T>> {
+  ): Promise<RefundDetailsResponse<D>> {
     if (!utils.isValidUUID(orderId)) {
       throw new Error(ApiError.INVALID_ORDER_ID);
     }
-    const json = await axios.get<RefundDetailsResponse<T>>(
+    const json = await axios.get<RefundDetailsResponse<D>>(
       `${this._apiBase}/orders/${orderId}/refund`,
     );
     return json.data;
