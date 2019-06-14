@@ -11,6 +11,7 @@ import {
   Networks as StellarNetworks,
   Operation,
   Server,
+  TimeoutInfinite,
   Transaction,
   TransactionBuilder,
 } from 'stellar-sdk';
@@ -123,7 +124,8 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
             weight: 1,
           },
         }),
-      );
+      )
+      .setTimeout(TimeoutInfinite);
 
     // Build and sign transaction
     const tx = tb.build();
@@ -193,7 +195,8 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
           medThreshold: 2,
           highThreshold: 2,
         }),
-      );
+      )
+      .setTimeout(TimeoutInfinite);
 
     // Build and sign transaction
     const tx = tb.build();
@@ -223,11 +226,13 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     // Build claim transaction
     const tb = new TransactionBuilder(escrowAccount, {
       fee: fee || (await this._server.fetchBaseFee()),
-    }).addOperation(
-      Operation.accountMerge({
-        destination: this._serverKeyPair.publicKey(),
-      }),
-    );
+    })
+      .addOperation(
+        Operation.accountMerge({
+          destination: this._serverKeyPair.publicKey(),
+        }),
+      )
+      .setTimeout(TimeoutInfinite);
 
     // Build and sign transaction
     const tx = tb.build();
@@ -276,7 +281,8 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
         Operation.accountMerge({
           destination: userPubKey, // Merge remainder back to user
         }),
-      );
+      )
+      .setTimeout(TimeoutInfinite);
 
     // Build and sign transaction
     const tx = tb.build();
