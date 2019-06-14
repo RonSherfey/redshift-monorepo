@@ -122,12 +122,12 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     // Build and sign transaction
     const tx = tb.build();
     tx.sign(this.escrowKeyPair, this._serverKeyPair);
-    const base64Tx = tx.toEnvelope().toXDR('base64');
+    const txEnvelope = tx.toEnvelope();
 
     if (shouldBroadcast) {
-      return this._server.submitTransaction(new Transaction(base64Tx));
+      return this._server.submitTransaction(new Transaction(txEnvelope));
     }
-    return base64Tx;
+    return txEnvelope.toXDR('base64');
   }
 
   /**
@@ -188,7 +188,10 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     // Build and sign transaction
     const tx = tb.build();
     tx.sign(this._serverKeyPair);
-    return tx.toEnvelope().toXDR('base64');
+    return tx
+      .toEnvelope()
+      .toXDR('base64')
+      .toString();
   }
 
   /**
@@ -216,12 +219,12 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     const tx = tb.build();
     tx.sign(this._serverKeyPair);
     tx.signHashX(paymentSecret);
-    const base64Tx = tx.toEnvelope().toXDR('base64');
+    const txEnvelope = tx.toEnvelope();
 
     if (shouldBroadcast) {
-      return this._server.submitTransaction(new Transaction(base64Tx));
+      return this._server.submitTransaction(new Transaction(txEnvelope));
     }
-    return base64Tx;
+    return txEnvelope.toXDR('base64');
   }
 
   /**
@@ -261,6 +264,9 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
     // Build and sign transaction
     const tx = tb.build();
     tx.sign(this._serverKeyPair);
-    return tx.toEnvelope().toXDR('base64');
+    return tx
+      .toEnvelope()
+      .toXDR('base64')
+      .toString();
   }
 }
