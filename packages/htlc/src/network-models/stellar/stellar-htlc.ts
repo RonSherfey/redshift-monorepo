@@ -95,7 +95,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
   /**
    * Create a generic escrow account
    * @param shouldBroadcast Whether or not the transaction should be broadcast
-   * @param fee The base fee for the transaction. If none is provided then the base fee is fetched from the server.
+   * @param fee The base fee for the transaction (in stroops). If not provided then it's fetched from the server.
    */
   public async create(
     shouldBroadcast: boolean = true,
@@ -141,7 +141,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
    * @param userPubKey The user's public key
    * @param amount The fund amount
    * @param paymentHash The hash of the payment secret
-   * @param fee The base fee for the transaction. If none is provided then the base fee is fetched from the server.
+   * @param fee The base fee for the transaction (in stroops). If not provided then it's fetched from the server.
    */
   public async fund(
     userPubKey: string,
@@ -208,7 +208,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
    * Create claim envelope once the payment secret is revealed
    * @param paymentSecret The payment secret
    * @param shouldBroadcast Whether or not the transaction should be broadcast
-   * @param fee The base fee for the transaction. If none is provided then the base fee is fetched from the server.
+   * @param fee The base fee for the transaction (in stroops). If not provided then it's fetched from the server.
    */
   public async claim(
     paymentSecret: string,
@@ -245,7 +245,7 @@ export class StellarHtlc<N extends Network> extends BaseHtlc<N> {
    * Create refund envelope in case something goes wrong. User must sign to make valid. Can only broadcast after timelock.
    * @param userPubKey The user's public key
    * @param timelockSeconds The timelock in seconds
-   * @param fee The base fee for the transaction. If none is provided then the base fee is fetched from the server.
+   * @param fee The base fee for the transaction (in stroops). If not provided then it's fetched from the server.
    */
   public async refund(
     userPubKey: string,
