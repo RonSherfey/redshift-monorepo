@@ -1,6 +1,6 @@
 {
   "name": "@radar/htlc",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "",
   "main": "dist/cjs/index.js",
   "types": "dist/cjs/index.d.ts",
@@ -12,7 +12,7 @@
   "author": "RadarTech",
   "license": "MIT",
   "dependencies": {
-    "@radar/redshift-types": "^0.4.0",
+    "@radar/redshift-types": "^0.4.2",
     "@types/big.js": "^4.0.5",
     "@types/bip32": "^1.0.1",
     "@types/bitcoinjs-lib": "4.0.0",
