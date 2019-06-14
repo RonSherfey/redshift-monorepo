@@ -1,6 +1,7 @@
 {
   "extends": "../tsconfig.settings.json",
   "compilerOptions": {
+    "skipLibCheck": true, // Skip lib check until Stellar types issue is resolved
     "rootDir": "src",
     "outDir": "dist/cjs",
     "typeRoots": ["src/types/declarations", "node_modules/@types", "node_modules/@radar/redshift-types/declarations"],
