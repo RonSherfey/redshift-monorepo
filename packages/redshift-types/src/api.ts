@@ -1,6 +1,6 @@
 import { Market, OffChainTicker, OnChainTicker } from '.';
 import { TxOutput } from './blockchain';
-import { UserSwapState } from './constants';
+import { Network, Subnet, UserSwapState } from './constants';
 
 //#region HTTP
 
@@ -39,8 +39,11 @@ export interface EthRefundDetails {
 
 export type RefundDetails = UtxoRefundDetails | EthRefundDetails;
 
-export interface RefundDetailsResponse<T extends RefundDetails> {
-  blocksRemaining: string | number;
+export interface RefundDetailsResponse<
+  T extends RefundDetails = RefundDetails
+> {
+  blocksRemaining: number | undefined;
+  refundBlockHeight: number | undefined;
   refundBalance: string;
   details: T;
 }
@@ -66,6 +69,11 @@ export interface TakerQuoteRequest {
 
 export interface StateUpdateRequest {
   orderId: string;
+}
+
+export interface BlockHeightRequest {
+  network: Network;
+  subnet: Subnet;
 }
 
 export interface BroadcastTxRequest {
@@ -103,6 +111,12 @@ export type StateUpdate =
   | GeneralStateUpdate
   | TxConfirmedStateUpdate
   | SwapCompleteStateUpdate;
+
+export interface BlockHeightUpdate {
+  network: Network;
+  subnet: Subnet;
+  height: number;
+}
 
 export interface Quote<D extends FundDetails = FundDetails> {
   orderId: string;

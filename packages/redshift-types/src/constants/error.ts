@@ -52,6 +52,8 @@ export enum UserApiError {
   INVALID_ONCHAIN_TICKER = 'InvalidOnchainTicker',
   INVALID_SIGNED_TX_HEX = 'InvalidSignedTxHex',
   INVALID_MARKET_FOR_INVOICE = 'InvalidMarketForInvoice',
+  INVALID_NETWORK_OR_SUBNET = 'InvalidNetworkOrSubnet',
+  INACTIVE_NETWORK_OR_SUBNET = 'InactiveNetworkOrSubnet',
   NO_QUOTES_AVAILABLE = 'NoQuotesAvailable',
   SWAP_ALREADY_IN_PROGRESS = 'SwapAlreadyInProgress',
 }
