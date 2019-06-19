@@ -136,6 +136,32 @@ Unsubscribe from order state updates for the provided order id
 await client.unsubscribeFromOrderState(orderId);
 ```
 
+**Subscribe to Block Height**
+
+Subscribe to block height updates for the provided network and subnet
+
+```typescript
+await client.subscribeToBlockHeight(network, subnet);
+```
+
+**On Block Height Changed**
+
+Execute the callback function when a block height update is received
+
+```typescript
+client.onBlockHeightChanged(blockHeightUpdate => {
+  console.log(blockHeightUpdate);
+});
+```
+
+**Unsubscribe from Block Height**
+
+Unsubscribe from block height updates for the provided network and subnet
+
+```typescript
+await client.unsubscribeFromBlockHeight(network, subnet);
+```
+
 **Request Refund Details**
 
 Request refund details for a specific swap order

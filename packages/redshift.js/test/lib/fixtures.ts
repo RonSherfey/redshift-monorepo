@@ -2,12 +2,14 @@ import {
   Market,
   Network,
   OnChainTicker,
+  Subnet,
   UserSwapState,
 } from '@radar/redshift-types';
 
 export const fixtures = {
   valid: {
     network: Network.ETHEREUM,
+    subnet: Subnet.MAINNET,
     market: Market.BTC_LBTC,
     onchainTicker: OnChainTicker.ETH,
     hex: '0xdeadbeef',
@@ -16,6 +18,7 @@ export const fixtures = {
       'lntb10m1pwt5decpp5r0j4ksda7h4chpjppzg3ysk6mufq90wpnpx6auhlrpxaqrm7nrvsdqs23jhxarfdenjqw3fcqzysxqyz5vqzya5x9kdf4z078qteypj30m3l8d8de5vsmfk4qsyy8q2fmgwll69eenlwvd42xl8eq83azck2d499k4hlznhxp92jqzu7dhve53a9ycpru9g7t',
     orderId: '0553bb1a-7832-11e9-8f9e-2a86e4085a59',
     expiryTimestampMs: 3559665352525,
+    blockHeight: 7989549,
     amount: '0.01',
     markets: {
       response: [
@@ -89,6 +92,7 @@ export const fixtures = {
   },
   invalid: {
     network: 'invalid_network' as Network,
+    subnet: 'invalid_subnet' as Subnet,
     market: 'invalid_market' as Market,
     onchainTicker: 'invalid_ticker' as OnChainTicker,
     hex: 'invalid_hex',

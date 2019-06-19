@@ -1,4 +1,4 @@
-import { Market, Network, OnChainTicker } from '@radar/redshift-types';
+import { Market, Network, OnChainTicker, Subnet } from '@radar/redshift-types';
 import { decode as base58Decode } from 'base58check';
 import { decode as bech32Decode } from 'bech32';
 
@@ -87,6 +87,35 @@ export const utils = {
       new RegExp(/^(0x)?[a-f0-9]+$/i).test(s) // Valid hex
     ) {
       return true;
+    }
+    return false;
+  },
+  /**
+   * Determine if the passed network and subnet are valid
+   * @param network The chain network
+   * @param subnet The chain subnet
+   */
+  isValidNetworkAndSubnet(network: Network, subnet: Subnet) {
+    if (!network || !subnet) {
+      return false;
+    }
+    switch (network) {
+      case Network.BITCOIN:
+        switch (subnet) {
+          case Subnet.SIMNET:
+          case Subnet.TESTNET:
+          case Subnet.MAINNET:
+            return true;
+        }
+        break;
+      case Network.ETHEREUM:
+        switch (subnet) {
+          case Subnet.GANACHE_SIMNET:
+          case Subnet.KOVAN_TESTNET:
+          case Subnet.MAINNET:
+            return true;
+        }
+        break;
     }
     return false;
   },

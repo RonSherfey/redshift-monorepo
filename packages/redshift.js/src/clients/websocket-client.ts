@@ -1,10 +1,13 @@
 import {
   ApiError,
+  BlockHeightUpdate,
   BroadcastTxRequest,
+  Network,
   Quote,
   RefundDetails,
   RefundDetailsResponse,
   StateUpdate,
+  Subnet,
   TakerQuoteRequest,
   TxResult,
   WebSocketError,
@@ -13,8 +16,8 @@ import {
   Ws,
 } from '@radar/redshift-types';
 import io from 'socket.io-client';
-import { config } from './config';
-import { utils } from './utils';
+import { config } from '../config';
+import { utils } from '../utils';
 
 export class WebSocketClient {
   private _url: string;
@@ -159,6 +162,81 @@ export class WebSocketClient {
         Ws.Event.UNSUBSCRIBE_FROM_ORDER_STATE,
         {
           orderId,
+        },
+        ({ success, message }: WebSocketResponse<string>) => {
+          if (success) {
+            return resolve();
+          }
+          return reject(new Error(message));
+        },
+      );
+    });
+  }
+
+  /**
+   * Subscribe to block height updates for the provided network and subnet
+   * @param network The on-chain network
+   * @param subnet The on-chain subnet
+   */
+  public async subscribeToBlockHeight(
+    network: Network,
+    subnet: Subnet,
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!this._socket || !this._socket.connected) {
+        return reject(new Error(WebSocketError.SOCKET_NOT_CONNECTED));
+      }
+      if (!utils.isValidNetworkAndSubnet(network, subnet)) {
+        return reject(new Error(ApiError.INVALID_NETWORK_OR_SUBNET));
+      }
+      this._socket.emit(
+        Ws.Event.SUBSCRIBE_TO_BLOCK_HEIGHT,
+        {
+          network,
+          subnet,
+        },
+        ({ success, message }: WebSocketResponse<string>) => {
+          if (success) {
+            return resolve();
+          }
+          return reject(new Error(message));
+        },
+      );
+    });
+  }
+
+  /**
+   * Listen for block height changes and execute the callback function when one is received
+   * @param cb The function to call when we get the event
+   */
+  public onBlockHeightChanged(cb: (update: BlockHeightUpdate) => void) {
+    if (!this._socket || !this._socket.connected) {
+      throw new Error(WebSocketError.SOCKET_NOT_CONNECTED);
+    }
+    this._socket.on(Ws.Event.BLOCK_HEIGHT_CHANGED, cb);
+  }
+
+  /**
+   * Unsubscribe from block height updates for the provided network and subnet
+   * @param network The on-chain network
+   * @param subnet The on-chain subnet
+   */
+  public async unsubscribeFromBlockHeight(
+    network: Network,
+    subnet: Subnet,
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!this._socket || !this._socket.connected) {
+        return reject(new Error(WebSocketError.SOCKET_NOT_CONNECTED));
+      }
+      if (!utils.isValidNetworkAndSubnet(network, subnet)) {
+        return reject(new Error(ApiError.INVALID_NETWORK_OR_SUBNET));
+      }
+      this._socket.emit(
+        Ws.Event.UNSUBSCRIBE_FROM_BLOCK_HEIGHT,
+        {
+          network,
+          subnet,
         },
         ({ success, message }: WebSocketResponse<string>) => {
           if (success) {
