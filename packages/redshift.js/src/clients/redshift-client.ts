@@ -1,4 +1,4 @@
-import { config } from './config';
+import { config } from '../config';
 import { HttpClient } from './http-client';
 import { WebSocketClient } from './websocket-client';
 

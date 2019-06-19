@@ -174,6 +174,110 @@ describe('WebSocket Client', () => {
     });
   });
 
+  describe('subscribeToBlockHeight', () => {
+    before(() => {
+      // Stubbed websocket server success response
+      server.on(Ws.Event.SUBSCRIBE_TO_BLOCK_HEIGHT, (_, cb: Function) => {
+        cb({
+          success: true,
+        });
+      });
+    });
+
+    it('should throw an error if the network is invalid', async () => {
+      await expect(
+        client.subscribeToBlockHeight(
+          fixtures.invalid.network,
+          fixtures.valid.subnet,
+        ),
+      ).to.be.rejectedWith(ApiError.INVALID_NETWORK_OR_SUBNET);
+    });
+
+    it('should throw an error if the subnet is invalid', async () => {
+      await expect(
+        client.subscribeToBlockHeight(
+          fixtures.valid.network,
+          fixtures.invalid.subnet,
+        ),
+      ).to.be.rejectedWith(ApiError.INVALID_NETWORK_OR_SUBNET);
+    });
+
+    it('should succeed when valid params are provided', async () => {
+      await expect(
+        client.subscribeToBlockHeight(
+          fixtures.valid.network,
+          fixtures.valid.subnet,
+        ),
+      ).to.not.be.rejected;
+    });
+  });
+
+  describe('onBlockHeightChanged', () => {
+    before(() => {
+      // Stubbed websocket server success response
+      server.on(Ws.Event.SUBSCRIBE_TO_BLOCK_HEIGHT, () => {
+        server.emit(Ws.Event.BLOCK_HEIGHT_CHANGED, {
+          network: fixtures.valid.network,
+          subnet: fixtures.valid.subnet,
+          height: fixtures.valid.blockHeight,
+        });
+      });
+    });
+
+    it('should call the callback function with the block height update when one is received', done => {
+      client.onBlockHeightChanged(blockHeightUpdate => {
+        expect(blockHeightUpdate).to.deep.equal({
+          network: fixtures.valid.network,
+          subnet: fixtures.valid.subnet,
+          height: fixtures.valid.blockHeight,
+        });
+        done();
+      });
+      client.subscribeToBlockHeight(
+        fixtures.valid.network,
+        fixtures.valid.subnet,
+      );
+    });
+  });
+
+  describe('unsubscribeFromBlockHeight', () => {
+    before(() => {
+      // Stubbed websocket server success response
+      server.on(Ws.Event.UNSUBSCRIBE_FROM_BLOCK_HEIGHT, (_, cb: Function) => {
+        cb({
+          success: true,
+        });
+      });
+    });
+
+    it('should throw an error if the network is invalid', async () => {
+      await expect(
+        client.unsubscribeFromBlockHeight(
+          fixtures.invalid.network,
+          fixtures.valid.subnet,
+        ),
+      ).to.be.rejectedWith(ApiError.INVALID_NETWORK_OR_SUBNET);
+    });
+
+    it('should throw an error if the subnet is invalid', async () => {
+      await expect(
+        client.unsubscribeFromBlockHeight(
+          fixtures.valid.network,
+          fixtures.invalid.subnet,
+        ),
+      ).to.be.rejectedWith(ApiError.INVALID_NETWORK_OR_SUBNET);
+    });
+
+    it('should succeed when valid params are provided', async () => {
+      await expect(
+        client.unsubscribeFromBlockHeight(
+          fixtures.valid.network,
+          fixtures.valid.subnet,
+        ),
+      ).to.not.be.rejected;
+    });
+  });
+
   describe('requestRefundDetails', () => {
     const serverResponse: WebSocketResponse<RefundDetails> = {
       success: true,

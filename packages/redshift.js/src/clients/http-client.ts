@@ -10,8 +10,8 @@ import {
 } from '@radar/redshift-types';
 import axios from 'axios';
 import sha256 from 'simple-sha256';
-import { config } from './config';
-import { utils } from './utils';
+import { config } from '../config';
+import { utils } from '../utils';
 
 export class HttpClient {
   private _apiBase: string;
