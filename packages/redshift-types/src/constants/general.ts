@@ -205,11 +205,14 @@ export namespace Ws {
     REQUEST_QUOTE = 'requestQuote',
     SUBSCRIBE_TO_ORDER_STATE = 'subscribeToOrderState',
     UNSUBSCRIBE_FROM_ORDER_STATE = 'unsubscribeFromOrderState',
+    SUBSCRIBE_TO_BLOCK_HEIGHT = 'subscribeToBlockHeight',
+    UNSUBSCRIBE_FROM_BLOCK_HEIGHT = 'unsubscribeFromBlockHeight',
     BROADCAST_TRANSACTION = 'broadcastTransaction',
     REQUEST_REFUND_DETAILS = 'requestRefundDetails',
     // CLIENT
     MAKER_QUOTE = 'makerQuote',
     STATE_CHANGED = 'stateChanged',
+    BLOCK_HEIGHT_CHANGED = 'blockHeightChanged',
   }
 
   /**
