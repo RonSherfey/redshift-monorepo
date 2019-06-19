@@ -18,7 +18,7 @@ export enum SwapError {
   EXPECTED_OP_EQUALVERIFY = 'ExpectedOP_EQUALVERIFY',
   INVALID_REDEEM_SCRIPT_LENGTH = 'InvalidRedeemScriptLength',
   FAILED_COMPLETE = 'FailedCompleteSwap',
-  FEES_TOO_HIGH_TO_CLAIM = 'FeesTooHighTooClaim',
+  FEES_TOO_HIGH = 'FeesTooHigh',
   INVALID_REFUND_ADDRESS = 'InvalidRefundAddress',
 }
 

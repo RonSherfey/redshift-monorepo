@@ -214,7 +214,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     // Exit early when the ratio of the amount spent on fees would be too high
     const dustRatio = 1 / 3; // Fee exceeds one third of tx value
     if (fee > tokens || fee / (tokens - fee) > dustRatio) {
-      throw new Error(SwapError.FEES_TOO_HIGH_TO_CLAIM);
+      throw new Error(SwapError.FEES_TOO_HIGH);
     }
 
     // Reduce the final output value to give some tokens over to fees
