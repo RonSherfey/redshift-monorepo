@@ -42,6 +42,7 @@ export type RefundDetails = UtxoRefundDetails | EthRefundDetails;
 export interface RefundDetailsResponse<
   T extends RefundDetails = RefundDetails
 > {
+  market: Market;
   blocksRemaining: number | undefined;
   refundBlockHeight: number | undefined;
   refundBalance: string;
@@ -139,6 +140,7 @@ export type QuoteSubscriptionRequest = Market[];
 export interface UtxoDetails {
   payToAddress: string;
   redeemScript: string;
+  refundableAtBlockHeight: number;
 }
 
 export interface PartialEvmTxParams {
