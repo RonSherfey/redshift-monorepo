@@ -44,8 +44,8 @@ export interface RefundDetailsResponse<
 > {
   market: Market;
   blocksRemaining: number | undefined;
-  refundBlockHeight: number | undefined;
-  refundBalance: string;
+  refundableAtBlockHeight: number | undefined;
+  refundableBalance: string;
   details: T;
 }
 

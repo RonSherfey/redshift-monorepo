@@ -84,9 +84,15 @@ export const fixtures = {
     },
     orderRefund: {
       response: {
-        to: '0xf0398fad8c2aa38c476b010c269158d442730e98',
-        data:
-          '0xdfdecfaf0a822aebdb2d48a3a571d42f124d1d9600000000000000000000000000000000',
+        market: Market.ETH_LBTC,
+        blocksRemaining: 0,
+        refundableAtBlockHeight: 7989549,
+        refundableBalance: 0.001,
+        details: {
+          to: '0xf0398fad8c2aa38c476b010c269158d442730e98',
+          data:
+            '0xdfdecfaf0a822aebdb2d48a3a571d42f124d1d9600000000000000000000000000000000',
+        },
       },
     },
   },
