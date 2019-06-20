@@ -1,6 +1,6 @@
 {
   "name": "@radar/redshift.js",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Redshift HTTP & WebSocket Client SDK",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
