@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.settings.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "references": [
+    { "path": "../htlc/tsconfig.cjs.json" }
+  ],
+  "exclude": [
+    "test",
+    "dist"
+  ]
+}

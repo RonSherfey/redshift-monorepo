@@ -1,2 +1,6 @@
-export { utils } from './utils';
-export { HttpClient, RedshiftClient, WebSocketClient } from './clients';
+export {
+  HttpClient,
+  RedshiftClient,
+  WebSocketClient,
+  utils,
+} from '@radar/redshift-api-client';

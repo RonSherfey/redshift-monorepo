@@ -1,7 +1,7 @@
 {
   "name": "@radar/redshift-types",
   "version": "0.4.4",
-  "description": "redshift common types",
+  "description": "Common types used across Redshift codebases",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {},
