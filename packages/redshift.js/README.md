@@ -15,14 +15,8 @@ npm install @radar/redshift.js
 yarn add @radar/redshift.js
 ```
 
-## Usage - Redshift Client
+## Usage
 
-[]()
+[HTTP Client](../redshift-api-client#usage---http-client)
 
-## Usage - HTTP Client
-
-[]()
-
-## Usage - WebSocket Client
-
-[]()
+[WebSocket Client](../redshift-api-client#usage---websocket-client)
