@@ -82,6 +82,25 @@ describe('HTTP Client', () => {
     });
   });
 
+  describe('getOrderFundDetails', () => {
+    before(async () => {
+      nock(`${config.url}/api`)
+        .get(`/orders/${fixtures.valid.orderId}/fundDetails`)
+        .reply(200, fixtures.valid.orderFundDetails.response);
+    });
+
+    it('should return an error if the order id is invalid', async () => {
+      await expect(
+        client.getOrderState(fixtures.invalid.orderId),
+      ).to.be.rejectedWith(Error, ApiError.INVALID_ORDER_ID);
+    });
+
+    it('should return an orders fund details if the order id is valid', async () => {
+      const details = await client.getOrderFundDetails(fixtures.valid.orderId);
+      expect(details).to.deep.equal(fixtures.valid.orderFundDetails.response);
+    });
+  });
+
   describe('getOrderRefundDetails', () => {
     before(async () => {
       nock(`${config.url}/api`)
