@@ -1,5 +1,6 @@
 import {
   ApiError,
+  FundDetails,
   MarketsResponse,
   OnChainTicker,
   OrderResponse,
@@ -81,6 +82,20 @@ export class HttpClient {
     }
     const json = await axios.get<UserSwapState>(
       `${this._apiBase}/orders/${orderId}/state`,
+    );
+    return json.data;
+  }
+
+  /**
+   * Get the fund details for an order
+   * @param orderId The uuid of the order
+   */
+  public async getOrderFundDetails(orderId: string): Promise<FundDetails> {
+    if (!utils.isValidUUID(orderId)) {
+      throw new Error(ApiError.INVALID_ORDER_ID);
+    }
+    const json = await axios.get<FundDetails>(
+      `${this._apiBase}/orders/${orderId}/fundDetails`,
     );
     return json.data;
   }

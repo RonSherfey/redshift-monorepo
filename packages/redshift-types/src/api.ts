@@ -119,12 +119,14 @@ export interface BlockHeightUpdate {
   height: number;
 }
 
-export interface Quote<D extends FundDetails = FundDetails> {
+export interface Quote<D extends FundTxDetails = FundTxDetails> {
   orderId: string;
   expiryTimestampMs: number;
   amount: string;
   details: D;
 }
+
+export type FundDetails<D extends FundTxDetails = FundTxDetails> = Quote<D>;
 
 //#endregion
 
@@ -137,7 +139,7 @@ export interface AuthenticationRequest {
 
 export type QuoteSubscriptionRequest = Market[];
 
-export interface UtxoDetails {
+export interface UtxoFundTxDetails {
   payToAddress: string;
   redeemScript: string;
   refundableAtBlockHeight: number;
@@ -156,11 +158,11 @@ export interface EvmUnsignedTx extends PartialEvmTxParams {
   value?: string | number;
 }
 
-export interface EvmDetails {
+export interface EvmFundTxDetails {
   unsignedFundingTx: EvmUnsignedTx;
 }
 
-export type FundDetails = UtxoDetails | EvmDetails;
+export type FundTxDetails = UtxoFundTxDetails | EvmFundTxDetails;
 
 export interface MakerQuoteRequest {
   orderId: string;
@@ -170,7 +172,7 @@ export interface MakerQuoteRequest {
   requestExpiryTimestampMs: number;
 }
 
-export interface MakerQuote<D extends FundDetails = FundDetails> {
+export interface MakerQuote<D extends FundTxDetails = FundTxDetails> {
   orderId: string;
   quoteExpiryTimestampMs: number;
   amount?: string;
