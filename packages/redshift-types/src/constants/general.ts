@@ -44,12 +44,20 @@ export enum UserSwapState {
 }
 
 /**
- * Swap transaction types
+ * Internal swap transaction types
  */
-export enum TransactionType {
-  FUND = 0,
-  CLAIM = 1,
-  REFUND = 2,
+export enum InternalTransactionType {
+  FUND = 'FUND',
+  CLAIM = 'CLAIM',
+  REFUND = 'REFUND',
+}
+
+/**
+ * Swap transaction types that concern the user
+ */
+export enum UserTransactionType {
+  FUND = 'FUND',
+  REFUND = 'REFUND',
 }
 
 /**
