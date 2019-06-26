@@ -10,7 +10,20 @@ export type MarketsResponse = {
   market: Market;
 }[];
 
-export interface OrderResponse {
+export interface OrderDetailsResponse {
+  market: Market;
+  onchainTicker: OnChainTicker;
+  createdAt: string;
+  state: UserSwapState;
+  payToAddress: string;
+  amount: string;
+  amountPaid: string;
+  invoice: string;
+  paymentHash: string;
+  paymentPreimage: string;
+}
+
+export interface Order {
   id: string;
   market: Market;
   onchainTicker: OnChainTicker;
@@ -19,10 +32,9 @@ export interface OrderResponse {
   payToAddress: string;
   amount: string;
   amountPaid: string;
-  paymentHash: string;
 }
 
-export type OrdersResponse = OrderResponse[];
+export type OrdersResponse = Order[];
 
 export interface UtxoRefundDetails {
   refundAddress: string;
