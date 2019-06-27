@@ -97,6 +97,15 @@ export const fixtures = {
         },
       },
     },
+    orderTransactions: {
+      response: [
+        {
+          type: 'FUND',
+          id:
+            '0x309ac513f00910fa2820f48cfc3169f26a659e352a104b386dae7c48c93b49c4',
+        },
+      ],
+    },
     orderRefund: {
       response: {
         market: Market.ETH_LBTC,

@@ -7,6 +7,7 @@ import {
   OrdersResponse,
   RefundDetails,
   RefundDetailsResponse,
+  TransactionsResponse,
   UserSwapState,
 } from '@radar/redshift-types';
 import axios from 'axios';
@@ -96,6 +97,22 @@ export class HttpClient {
     }
     const json = await axios.get<FundDetails>(
       `${this._apiBase}/orders/${orderId}/fundDetails`,
+    );
+    return json.data;
+  }
+
+  /**
+   * Get the transactions relating to an order
+   * @param orderId The uuid of the order
+   */
+  public async getOrderTransactions(
+    orderId: string,
+  ): Promise<TransactionsResponse> {
+    if (!utils.isValidUUID(orderId)) {
+      throw new Error(ApiError.INVALID_ORDER_ID);
+    }
+    const json = await axios.get<TransactionsResponse>(
+      `${this._apiBase}/orders/${orderId}/transactions`,
     );
     return json.data;
   }
