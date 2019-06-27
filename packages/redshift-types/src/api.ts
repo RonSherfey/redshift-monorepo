@@ -41,10 +41,12 @@ export interface Order {
 
 export type OrdersResponse = Order[];
 
-export interface TransactionsResponse {
+export interface Transaction {
   type: UserTransactionType;
   id: string;
 }
+
+export type TransactionsResponse = Transaction[];
 
 export interface UtxoRefundDetails {
   refundAddress: string;
