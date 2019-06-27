@@ -1,6 +1,11 @@
 import { Market, OffChainTicker, OnChainTicker } from '.';
 import { TxOutput } from './blockchain';
-import { Network, Subnet, UserSwapState } from './constants';
+import {
+  Network,
+  Subnet,
+  UserSwapState,
+  UserTransactionType,
+} from './constants';
 
 //#region HTTP
 
@@ -35,6 +40,11 @@ export interface Order {
 }
 
 export type OrdersResponse = Order[];
+
+export interface TransactionsResponse {
+  type: UserTransactionType;
+  id: string;
+}
 
 export interface UtxoRefundDetails {
   refundAddress: string;
