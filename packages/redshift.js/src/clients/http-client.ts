@@ -3,7 +3,7 @@ import {
   FundDetails,
   MarketsResponse,
   OnChainTicker,
-  OrderResponse,
+  OrderDetailsResponse,
   OrdersResponse,
   RefundDetails,
   RefundDetailsResponse,
@@ -34,7 +34,7 @@ export class HttpClient {
   }
 
   /**
-   * Get all swap orders for a specific invoice
+   * Get all general information about all swap orders for a specific invoice
    * @param invoice The invoice that will be payed by the swap provider
    * @param onchainTicker The optional ticker of the on-chain asset used to fund the swap
    */
@@ -59,14 +59,14 @@ export class HttpClient {
   }
 
   /**
-   * Get a swap order
+   * Get the details for a single swap order
    * @param orderId The uuid of the order
    */
-  public async getOrder(orderId: string): Promise<OrderResponse> {
+  public async getOrder(orderId: string): Promise<OrderDetailsResponse> {
     if (!utils.isValidUUID(orderId)) {
       throw new Error(ApiError.INVALID_ORDER_ID);
     }
-    const json = await axios.get<OrderResponse>(
+    const json = await axios.get<OrderDetailsResponse>(
       `${this._apiBase}/orders/${orderId}`,
     );
     return json.data;

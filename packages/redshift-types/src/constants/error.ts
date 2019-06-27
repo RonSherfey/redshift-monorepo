@@ -56,6 +56,7 @@ export enum UserApiError {
   INACTIVE_NETWORK_OR_SUBNET = 'InactiveNetworkOrSubnet',
   NO_QUOTES_AVAILABLE = 'NoQuotesAvailable',
   SWAP_ALREADY_IN_PROGRESS = 'SwapAlreadyInProgress',
+  ORDERS_NOT_FOUND = 'OrdersNotFound',
 }
 
 export enum LiquidityProviderApiError {
