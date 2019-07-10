@@ -32,10 +32,6 @@ workflows:
     jobs:
     - node/install-modules:
         node-version: "8.12"
-    - node/build:
-        node-version: "8.12"
-        requires:
-          - node/install-modules
     - node/lint:
         node-version: "8.12"
         requires:
