@@ -1,7 +1,8 @@
-version: '3'
+version: '3.7'
+
 services:
   test-btcd:
-    image: gcr.io/radar-layer2/btcd-integration:latest
+    image: gcr.io/radar-layer2/btcd-integration:v1.1.0
     environment:
     - MINING_ADDRESS=sb1qh2fmgnufmuzyu8lzknum4tn3pm28yut92rj0zk
     ports:
@@ -10,7 +11,7 @@ services:
     entrypoint: ["./start-btcd.sh"]
 
   test-btcctl:
-    image: gcr.io/radar-layer2/btcd-integration:latest
+    image: gcr.io/radar-layer2/btcd-integration:v1.1.0
     links:
     - "test-btcd:rpcserver"
     entrypoint: ["./start-btcctl.sh"]
