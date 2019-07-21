@@ -8,10 +8,10 @@ import {
   RefundDetailsResponse,
   UserSwapState,
 } from '@radar/redshift-types';
+import { validator } from '@radar/redshift-utils';
 import axios from 'axios';
 import sha256 from 'simple-sha256';
 import { config } from '../config';
-import { utils } from '../utils';
 
 export class HttpClient {
   private _apiBase: string;
@@ -41,10 +41,10 @@ export class HttpClient {
     invoice: string,
     onchainTicker?: OnChainTicker,
   ): Promise<OrdersResponse> {
-    if (!utils.isValidBech32(invoice)) {
+    if (!validator.isValidBech32(invoice)) {
       throw new Error(ApiError.INVALID_INVOICE);
     }
-    if (onchainTicker && !utils.isValidOnchainTicker(onchainTicker)) {
+    if (onchainTicker && !validator.isValidOnchainTicker(onchainTicker)) {
       throw new Error(ApiError.INVALID_ONCHAIN_TICKER);
     }
     const invoiceHash = await sha256(invoice);
@@ -62,7 +62,7 @@ export class HttpClient {
    * @param orderId The uuid of the order
    */
   public async getOrder(orderId: string): Promise<OrderResponse> {
-    if (!utils.isValidUUID(orderId)) {
+    if (!validator.isValidUUID(orderId)) {
       throw new Error(ApiError.INVALID_ORDER_ID);
     }
     const json = await axios.get<OrderResponse>(
@@ -76,7 +76,7 @@ export class HttpClient {
    * @param orderId The uuid of the order
    */
   public async getOrderState(orderId: string): Promise<UserSwapState> {
-    if (!utils.isValidUUID(orderId)) {
+    if (!validator.isValidUUID(orderId)) {
       throw new Error(ApiError.INVALID_ORDER_ID);
     }
     const json = await axios.get<UserSwapState>(
@@ -92,7 +92,7 @@ export class HttpClient {
   public async getOrderRefundDetails<D extends RefundDetails = RefundDetails>(
     orderId: string,
   ): Promise<RefundDetailsResponse<D>> {
-    if (!utils.isValidUUID(orderId)) {
+    if (!validator.isValidUUID(orderId)) {
       throw new Error(ApiError.INVALID_ORDER_ID);
     }
     const json = await axios.get<RefundDetailsResponse<D>>(

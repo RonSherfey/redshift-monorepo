@@ -5,7 +5,8 @@
     "outDir": "dist"
   },
   "references": [
-    { "path": "../htlc/tsconfig.cjs.json" }
+    { "path": "../redshift-utils" },
+    { "path": "../redshift-api-client" }
   ],
   "exclude": [
     "test",

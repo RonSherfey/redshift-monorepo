@@ -2,5 +2,5 @@ export {
   HttpClient,
   RedshiftClient,
   WebSocketClient,
-  utils,
 } from '@radar/redshift-api-client';
+export { validator } from '@radar/redshift-utils';

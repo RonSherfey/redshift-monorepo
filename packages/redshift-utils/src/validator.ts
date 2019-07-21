@@ -2,7 +2,7 @@ import { Market, Network, OnChainTicker, Subnet } from '@radar/redshift-types';
 import { decode as base58Decode } from 'base58check';
 import { decode as bech32Decode } from 'bech32';
 
-export const utils = {
+export const validator = {
   /**
    * Determine if the passed network is valid
    */
@@ -11,11 +11,11 @@ export const utils = {
   },
 
   /**
-   * Determine if the passed onchain-ticker is valid
+   * Determine if the passed on-chain ticker is valid
    * @param ticker The on-chain ticker
    */
   isValidOnchainTicker(ticker: OnChainTicker) {
-    return (ticker && !!OnChainTicker[ticker.toUpperCase()]) || false;
+    return !!ticker && !!OnChainTicker[ticker.toUpperCase()];
   },
 
   /**
@@ -23,7 +23,7 @@ export const utils = {
    * @param ticker The market
    */
   isValidMarket(market: Market) {
-    return (market && !!Market[market.toUpperCase()]) || false;
+    return !!market && !!Market[market.toUpperCase()];
   },
 
   /**
@@ -42,10 +42,10 @@ export const utils = {
   },
 
   /**
-   * Determine if the passed string is valid base58
+   * Determine if the passed string is valid base58check
    * @param s The string to validate
    */
-  isValidBase58(s: string): boolean {
+  isValidBase58Check(s: string): boolean {
     try {
       base58Decode(s);
       return true;
@@ -68,11 +68,12 @@ export const utils = {
   },
 
   /**
-   * Determine if the passed address is valid
-   * @param address The address to validate
+   * Determine if the passed string is valid base58check or bech32
+   * This is used as simple address validation
+   * @param s The string to validate
    */
-  isValidUtxoAddress(address: string) {
-    if (this.isValidBase58(address) || this.isValidBech32(address)) {
+  isValidBase58CheckOrBech32(s: string) {
+    if (this.isValidBase58Check(s) || this.isValidBech32(s)) {
       return true;
     }
     return false;
@@ -96,9 +97,6 @@ export const utils = {
    * @param subnet The chain subnet
    */
   isValidNetworkAndSubnet(network: Network, subnet: Subnet) {
-    if (!network || !subnet) {
-      return false;
-    }
     switch (network) {
       case Network.BITCOIN:
         switch (subnet) {

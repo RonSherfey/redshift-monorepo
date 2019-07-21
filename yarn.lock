@@ -66,6 +66,15 @@
   resolved "https://registry.yarnpkg.com/@nodelib/fs.stat/-/fs.stat-1.1.3.tgz#2b5a3ab3f918cca48a8c754c08168e3f03eba61b"
   integrity sha512-shAmDyaQC4H92APFoIaVDHCx5bStIocgvbwQyxPRrbUY20V1EYTbSDchWbuwlMG3V17cprZhA6+78JfB+3DTPw==
 
+"@radar/redshift-types@^0.5.2":
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/@radar/redshift-types/-/redshift-types-0.5.2.tgz#79980c28b3fb7f539040e23c60c4934ab84193a0"
+  integrity sha512-W+EnnK4lUnWaVCs3yVYr8XStUm77dyu1ZMPXMWcmsLxTeAG4eL8d2Nj3pae3J4qqqPxi8enbRNHs6gQ7hTrhgg==
+  dependencies:
+    "@types/bip32" "^1.0.1"
+    "@types/bitcoinjs-lib" "4.0.0"
+    "@types/web3" "^1.0.18"
+
 "@radarrelay/tslint-config@^5.0.0":
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/@radarrelay/tslint-config/-/tslint-config-5.0.0.tgz#c1bbb7daa780a609293c6d8e32b38d9af0459f72"
