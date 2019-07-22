@@ -1,6 +1,11 @@
 import { Market, OffChainTicker, OnChainTicker } from '.';
 import { TxOutput } from './blockchain';
-import { Network, Subnet, UserSwapState } from './constants';
+import {
+  Network,
+  Subnet,
+  UserSwapState,
+  UserTransactionType,
+} from './constants';
 
 //#region HTTP
 
@@ -10,7 +15,20 @@ export type MarketsResponse = {
   market: Market;
 }[];
 
-export interface OrderResponse {
+export interface OrderDetailsResponse {
+  market: Market;
+  onchainTicker: OnChainTicker;
+  createdAt: string;
+  state: UserSwapState;
+  payToAddress: string;
+  amount: string;
+  amountPaid: string;
+  invoice: string;
+  paymentHash: string;
+  paymentPreimage: string;
+}
+
+export interface Order {
   id: string;
   market: Market;
   onchainTicker: OnChainTicker;
@@ -19,10 +37,16 @@ export interface OrderResponse {
   payToAddress: string;
   amount: string;
   amountPaid: string;
-  paymentHash: string;
 }
 
-export type OrdersResponse = OrderResponse[];
+export type OrdersResponse = Order[];
+
+export interface Transaction {
+  type: UserTransactionType;
+  id: string;
+}
+
+export type TransactionsResponse = Transaction[];
 
 export interface UtxoRefundDetails {
   refundAddress: string;
@@ -119,12 +143,14 @@ export interface BlockHeightUpdate {
   height: number;
 }
 
-export interface Quote<D extends FundDetails = FundDetails> {
+export interface Quote<D extends FundTxDetails = FundTxDetails> {
   orderId: string;
   expiryTimestampMs: number;
   amount: string;
   details: D;
 }
+
+export type FundDetails<D extends FundTxDetails = FundTxDetails> = Quote<D>;
 
 //#endregion
 
@@ -137,7 +163,7 @@ export interface AuthenticationRequest {
 
 export type QuoteSubscriptionRequest = Market[];
 
-export interface UtxoDetails {
+export interface UtxoFundTxDetails {
   payToAddress: string;
   redeemScript: string;
   refundableAtBlockHeight: number;
@@ -156,11 +182,11 @@ export interface EvmUnsignedTx extends PartialEvmTxParams {
   value?: string | number;
 }
 
-export interface EvmDetails {
+export interface EvmFundTxDetails {
   unsignedFundingTx: EvmUnsignedTx;
 }
 
-export type FundDetails = UtxoDetails | EvmDetails;
+export type FundTxDetails = UtxoFundTxDetails | EvmFundTxDetails;
 
 export interface MakerQuoteRequest {
   orderId: string;
@@ -170,7 +196,7 @@ export interface MakerQuoteRequest {
   requestExpiryTimestampMs: number;
 }
 
-export interface MakerQuote<D extends FundDetails = FundDetails> {
+export interface MakerQuote<D extends FundTxDetails = FundTxDetails> {
   orderId: string;
   quoteExpiryTimestampMs: number;
   amount?: string;

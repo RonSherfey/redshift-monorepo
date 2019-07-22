@@ -82,6 +82,44 @@ describe('HTTP Client', () => {
     });
   });
 
+  describe('getOrderFundDetails', () => {
+    before(async () => {
+      nock(`${config.url}/api`)
+        .get(`/orders/${fixtures.valid.orderId}/fundDetails`)
+        .reply(200, fixtures.valid.orderFundDetails.response);
+    });
+
+    it('should return an error if the order id is invalid', async () => {
+      await expect(
+        client.getOrderFundDetails(fixtures.invalid.orderId),
+      ).to.be.rejectedWith(Error, ApiError.INVALID_ORDER_ID);
+    });
+
+    it('should return an orders fund details if the order id is valid', async () => {
+      const details = await client.getOrderFundDetails(fixtures.valid.orderId);
+      expect(details).to.deep.equal(fixtures.valid.orderFundDetails.response);
+    });
+  });
+
+  describe('getOrderTransactions', () => {
+    before(async () => {
+      nock(`${config.url}/api`)
+        .get(`/orders/${fixtures.valid.orderId}/transactions`)
+        .reply(200, fixtures.valid.orderTransactions.response);
+    });
+
+    it('should return an error if the order id is invalid', async () => {
+      await expect(
+        client.getOrderTransactions(fixtures.invalid.orderId),
+      ).to.be.rejectedWith(Error, ApiError.INVALID_ORDER_ID);
+    });
+
+    it('should return an orders transactions if the order id is valid', async () => {
+      const details = await client.getOrderTransactions(fixtures.valid.orderId);
+      expect(details).to.deep.equal(fixtures.valid.orderTransactions.response);
+    });
+  });
+
   describe('getOrderRefundDetails', () => {
     before(async () => {
       nock(`${config.url}/api`)

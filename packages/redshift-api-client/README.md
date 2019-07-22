@@ -64,6 +64,22 @@ Get the state of a single order
 const state = await client.getOrderState(orderId);
 ```
 
+**Get Order Fund Details**
+
+Get the fund details for an order
+
+```typescript
+const state = await client.getOrderFundDetails(orderId);
+```
+
+**Get Order Transactions**
+
+Get the transactions relating to an order
+
+```typescript
+const state = await client.getOrderTransactions(orderId);
+```
+
 **Get Order Refund Details**
 
 Get the refund details for a single order

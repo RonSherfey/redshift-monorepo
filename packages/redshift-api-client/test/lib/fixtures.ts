@@ -82,6 +82,30 @@ export const fixtures = {
     orderState: {
       response: UserSwapState.COMPLETE,
     },
+    orderFundDetails: {
+      response: {
+        orderId: '2ff04c99-1a31-4f53-b7c4-b42b2b8b2097',
+        expiryTimestampMs: 1561574646588,
+        amount: '0.499500000000000000',
+        details: {
+          unsignedFundingTx: {
+            to: '0xf0398fad8c2aa38c476b010c269158d442730e98',
+            data:
+              '0x3fdcdd1e2ff04c991a314f53b7c4b42b2b8b2097000000000000000000000000000000001bd14acfe723078352665a184410aa0c828e3f273b3a185bddab97dac6c2c846',
+            value: '499500000000000000',
+          },
+        },
+      },
+    },
+    orderTransactions: {
+      response: [
+        {
+          type: 'FUND',
+          id:
+            '0x309ac513f00910fa2820f48cfc3169f26a659e352a104b386dae7c48c93b49c4',
+        },
+      ],
+    },
     orderRefund: {
       response: {
         market: Market.ETH_LBTC,

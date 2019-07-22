@@ -1,11 +1,13 @@
 import {
   ApiError,
+  FundDetails,
   MarketsResponse,
   OnChainTicker,
-  OrderResponse,
+  OrderDetailsResponse,
   OrdersResponse,
   RefundDetails,
   RefundDetailsResponse,
+  TransactionsResponse,
   UserSwapState,
 } from '@radar/redshift-types';
 import { validator } from '@radar/redshift-utils';
@@ -33,7 +35,7 @@ export class HttpClient {
   }
 
   /**
-   * Get all swap orders for a specific invoice
+   * Get all general information about all swap orders for a specific invoice
    * @param invoice The invoice that will be payed by the swap provider
    * @param onchainTicker The optional ticker of the on-chain asset used to fund the swap
    */
@@ -58,14 +60,14 @@ export class HttpClient {
   }
 
   /**
-   * Get a swap order
+   * Get the details for a single swap order
    * @param orderId The uuid of the order
    */
-  public async getOrder(orderId: string): Promise<OrderResponse> {
+  public async getOrder(orderId: string): Promise<OrderDetailsResponse> {
     if (!validator.isValidUUID(orderId)) {
       throw new Error(ApiError.INVALID_ORDER_ID);
     }
-    const json = await axios.get<OrderResponse>(
+    const json = await axios.get<OrderDetailsResponse>(
       `${this._apiBase}/orders/${orderId}`,
     );
     return json.data;
@@ -81,6 +83,36 @@ export class HttpClient {
     }
     const json = await axios.get<UserSwapState>(
       `${this._apiBase}/orders/${orderId}/state`,
+    );
+    return json.data;
+  }
+
+  /**
+   * Get the fund details for an order
+   * @param orderId The uuid of the order
+   */
+  public async getOrderFundDetails(orderId: string): Promise<FundDetails> {
+    if (!validator.isValidUUID(orderId)) {
+      throw new Error(ApiError.INVALID_ORDER_ID);
+    }
+    const json = await axios.get<FundDetails>(
+      `${this._apiBase}/orders/${orderId}/fundDetails`,
+    );
+    return json.data;
+  }
+
+  /**
+   * Get the transactions relating to an order
+   * @param orderId The uuid of the order
+   */
+  public async getOrderTransactions(
+    orderId: string,
+  ): Promise<TransactionsResponse> {
+    if (!validator.isValidUUID(orderId)) {
+      throw new Error(ApiError.INVALID_ORDER_ID);
+    }
+    const json = await axios.get<TransactionsResponse>(
+      `${this._apiBase}/orders/${orderId}/transactions`,
     );
     return json.data;
   }

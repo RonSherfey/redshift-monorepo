@@ -1,6 +1,6 @@
 {
   "name": "@radar/redshift.js",
-  "version": "0.2.4",
+  "version": "0.2.6",
   "description": "Redshift Javascript SDK",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
