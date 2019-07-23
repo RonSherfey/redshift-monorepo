@@ -2,6 +2,8 @@
     "files": [],
     "references": [
         { "path": "redshift-types" },
+        { "path": "redshift-utils" },
+        { "path": "redshift-api-client" },
         { "path": "redshift.js" },
         { "path": "htlc/tsconfig.cjs.json" }
     ]

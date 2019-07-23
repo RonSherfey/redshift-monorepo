@@ -15,9 +15,9 @@ import {
   WebSocketSuccess,
   Ws,
 } from '@radar/redshift-types';
+import { validator } from '@radar/redshift-utils';
 import io from 'socket.io-client';
 import { config } from '../config';
-import { utils } from '../utils';
 
 export class WebSocketClient {
   private _url: string;
@@ -83,15 +83,15 @@ export class WebSocketClient {
           new Error(ApiError.INVALID_OR_MISSING_QUOTE_REQUEST_FIELDS),
         );
       }
-      if (!utils.isValidMarket(request.market)) {
+      if (!validator.isValidMarket(request.market)) {
         return reject(new Error(ApiError.INVALID_MARKET));
       }
-      if (!utils.isValidBech32(request.invoice)) {
+      if (!validator.isValidBech32(request.invoice)) {
         return reject(new Error(ApiError.INVALID_INVOICE));
       }
       if (
         request.refundAddress &&
-        !utils.isValidUtxoAddress(request.refundAddress)
+        !validator.isValidBase58CheckOrBech32(request.refundAddress)
       ) {
         return reject(new Error(ApiError.INVALID_REFUND_ADDRESS));
       }
@@ -117,7 +117,7 @@ export class WebSocketClient {
       if (!this._socket || !this._socket.connected) {
         return reject(new Error(WebSocketError.SOCKET_NOT_CONNECTED));
       }
-      if (!utils.isValidUUID(orderId)) {
+      if (!validator.isValidUUID(orderId)) {
         return reject(new Error(ApiError.INVALID_ORDER_ID));
       }
       this._socket.emit(
@@ -155,7 +155,7 @@ export class WebSocketClient {
       if (!this._socket || !this._socket.connected) {
         return reject(new Error(WebSocketError.SOCKET_NOT_CONNECTED));
       }
-      if (!utils.isValidUUID(orderId)) {
+      if (!validator.isValidUUID(orderId)) {
         return reject(new Error(ApiError.INVALID_ORDER_ID));
       }
       this._socket.emit(
@@ -186,7 +186,7 @@ export class WebSocketClient {
       if (!this._socket || !this._socket.connected) {
         return reject(new Error(WebSocketError.SOCKET_NOT_CONNECTED));
       }
-      if (!utils.isValidNetworkAndSubnet(network, subnet)) {
+      if (!validator.isValidNetworkAndSubnet(network, subnet)) {
         return reject(new Error(ApiError.INVALID_NETWORK_OR_SUBNET));
       }
       this._socket.emit(
@@ -229,7 +229,7 @@ export class WebSocketClient {
       if (!this._socket || !this._socket.connected) {
         return reject(new Error(WebSocketError.SOCKET_NOT_CONNECTED));
       }
-      if (!utils.isValidNetworkAndSubnet(network, subnet)) {
+      if (!validator.isValidNetworkAndSubnet(network, subnet)) {
         return reject(new Error(ApiError.INVALID_NETWORK_OR_SUBNET));
       }
       this._socket.emit(
@@ -259,7 +259,7 @@ export class WebSocketClient {
       if (!this._socket || !this._socket.connected) {
         return reject(new Error(WebSocketError.SOCKET_NOT_CONNECTED));
       }
-      if (!utils.isValidUUID(orderId)) {
+      if (!validator.isValidUUID(orderId)) {
         return reject(new Error(ApiError.INVALID_ORDER_ID));
       }
       this._socket.emit(
@@ -296,10 +296,10 @@ export class WebSocketClient {
           new Error(ApiError.INVALID_OR_MISSING_BROADCAST_TX_REQUEST_FIELDS),
         );
       }
-      if (!utils.isValidOnchainTicker(request.onchainTicker)) {
+      if (!validator.isValidOnchainTicker(request.onchainTicker)) {
         return reject(new Error(ApiError.INVALID_ONCHAIN_TICKER));
       }
-      if (!utils.isValidHex(request.signedTxHex)) {
+      if (!validator.isValidHex(request.signedTxHex)) {
         return reject(new Error(ApiError.INVALID_SIGNED_TX_HEX));
       }
       this._socket.emit(

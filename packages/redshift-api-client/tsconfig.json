@@ -5,8 +5,7 @@
     "outDir": "dist"
   },
   "references": [
-    { "path": "../redshift-utils" },
-    { "path": "../redshift-api-client" }
+    { "path": "../redshift-utils" }
   ],
   "exclude": [
     "test",

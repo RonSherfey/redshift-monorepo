@@ -127,9 +127,9 @@
     source-map-support "^0.5.9"
 
 "@ts-tools/robotrix@^0.7.2":
-  version "0.7.2"
-  resolved "https://registry.yarnpkg.com/@ts-tools/robotrix/-/robotrix-0.7.2.tgz#e585023053b1a4bcaa3cde574eff2be99d0d6a6f"
-  integrity sha512-VOo7thS2WRT9Pxe8GKWXv0U2flgqykaphtBO2wVOysRs4v2/AQ3g9TwtVZgHxxhCCmx4AFkYSgiU3c5EymLyDA==
+  version "0.7.5"
+  resolved "https://registry.yarnpkg.com/@ts-tools/robotrix/-/robotrix-0.7.5.tgz#b7410643805b0f149b8106dba40472e2ea0d505e"
+  integrity sha512-x8JpibobUkOYbUYEOOLK01WRa7rzQwlrb2F/qNX26GSY+CWUgVEb5TJrC9nRJnqgaDeSutIMyvUqCN3WIdu7JA==
 
 "@ts-tools/service@^0.9.3":
   version "0.9.3"
@@ -9273,10 +9273,18 @@ source-map-support@^0.4.15:
   dependencies:
     source-map "^0.5.6"
 
-source-map-support@^0.5.3, source-map-support@^0.5.6, source-map-support@^0.5.9:
+source-map-support@^0.5.3, source-map-support@^0.5.6:
   version "0.5.9"
   resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.5.9.tgz#41bc953b2534267ea2d605bccfa7bfa3111ced5f"
   integrity sha512-gR6Rw4MvUlYy83vP0vxoVNzM6t8MUXqNuRsuBmBHQDu1Fh6X015FrLdgoDKcNdkwGubozq0P4N0Q37UyFVr1EA==
+  dependencies:
+    buffer-from "^1.0.0"
+    source-map "^0.6.0"
+
+source-map-support@^0.5.9:
+  version "0.5.12"
+  resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.5.12.tgz#b4f3b10d51857a5af0138d3ce8003b201613d599"
+  integrity sha512-4h2Pbvyy15EE02G+JOZpUCmqWJuqrs+sEkzewTm++BPi7Hvn/HwcqLAcNxYAyI0x13CpPPn+kMjl+hplXMHITQ==
   dependencies:
     buffer-from "^1.0.0"
     source-map "^0.6.0"
