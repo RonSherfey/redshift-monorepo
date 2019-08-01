@@ -1,6 +1,6 @@
 {
   "name": "@radar/htlc",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "description": "A library used to construct and interact with HTLCs across multiple networks & network models",
   "main": "dist/cjs/index.js",
   "types": "dist/cjs/index.d.ts",
