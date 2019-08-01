@@ -6,6 +6,10 @@ export interface ContractAddresses {
 }
 
 const subnetToAddresses: { [subnet: string]: ContractAddresses } = {
+  [EthereumSubnet.MAINNET]: {
+    etherSwap: '0xfA2c720305c11655350134185a3d10d2B2b1CaC0',
+    erc20Swap: '0xF7A5c9bfA0A02a70AE17E993A508978989306aAa',
+  },
   [EthereumSubnet.KOVAN_TESTNET]: {
     etherSwap: '0x5F4200bB489318C0Ea7A59FBE2241dF0FB1C8f8B',
     erc20Swap: '0xdcE79992251CD3646DCDC69F9B55D14d0eEFd997',
