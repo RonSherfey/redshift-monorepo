@@ -201,6 +201,7 @@ export namespace Ws {
     UNSUBSCRIBE_FROM_QUOTES = 'unsubscribeFromQuotes',
     MAKER_QUOTE = 'makerQuote',
     PAYMENT_RESULT = 'paymentResult',
+    ACTIVE_CONFIGURATION = 'activeConfiguration',
     // LIQUIDITY PROVIDER
     REQUEST_QUOTE = 'requestQuote',
   }

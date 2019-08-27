@@ -55,6 +55,7 @@ export enum UserApiError {
   INVALID_NETWORK_OR_SUBNET = 'InvalidNetworkOrSubnet',
   INACTIVE_NETWORK_OR_SUBNET = 'InactiveNetworkOrSubnet',
   NO_QUOTES_AVAILABLE = 'NoQuotesAvailable',
+  NO_QUOTE_PROVIDERS_FOR_THE_REQUESTED_MARKET = 'NoQuoteProvidersForTheRequestedMarket',
   SWAP_ALREADY_IN_PROGRESS = 'SwapAlreadyInProgress',
   ORDERS_NOT_FOUND = 'OrdersNotFound',
 }
@@ -62,6 +63,7 @@ export enum UserApiError {
 export enum LiquidityProviderApiError {
   INVALID_OR_MISSING_MARKETS = 'InvalidOrMissingMarkets',
   INVALID_OR_MISSING_CREDENTIALS = 'InvalidOrMissingCredentials',
+  INVALID_OR_MISSING_ACTIVE_CONFIGURATION_FIELDS = 'InvalidOrMissingActiveConfigurationFields',
   INVALID_OR_MISSING_QUOTE_FIELDS = 'InvalidOrMissingQuoteFields',
   INVALID_REDEEM_SCRIPT = 'InvalidRedeemScript',
   INVALID_PAYMENT_HASH = 'InvalidPaymentHash',
