@@ -161,6 +161,17 @@ export interface AuthenticationRequest {
   secretKey: string;
 }
 
+export interface PayReqConfiguration {
+  minExpirationSeconds: string;
+  minBaseUnits: string;
+  maxBaseUnits: string;
+}
+
+export interface ActiveConfigurationRequest {
+  markets: Market[];
+  payReq: PayReqConfiguration;
+}
+
 export type QuoteSubscriptionRequest = Market[];
 
 export interface UtxoFundTxDetails {
