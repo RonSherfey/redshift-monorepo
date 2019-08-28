@@ -9,7 +9,7 @@ import {
 
 //#region Shared
 
-export type QuoteRequestRequirements = {
+export type MarketRequirements = {
   [M in Market]?: {
     payReq: PayReqConfiguration;
   }
