@@ -218,6 +218,7 @@ export namespace Ws {
     UNSUBSCRIBE_FROM_BLOCK_HEIGHT = 'unsubscribeFromBlockHeight',
     BROADCAST_TRANSACTION = 'broadcastTransaction',
     REQUEST_REFUND_DETAILS = 'requestRefundDetails',
+    REQUEST_QUOTE_REQUEST_REQUIREMENTS = 'requestQuoteRequestRequirements',
     // CLIENT
     MAKER_QUOTE = 'makerQuote',
     STATE_CHANGED = 'stateChanged',

@@ -56,6 +56,7 @@ export enum UserApiError {
   INACTIVE_NETWORK_OR_SUBNET = 'InactiveNetworkOrSubnet',
   NO_QUOTES_AVAILABLE = 'NoQuotesAvailable',
   NO_QUOTE_PROVIDERS_FOR_THE_REQUESTED_MARKET = 'NoQuoteProvidersForTheRequestedMarket',
+  NO_QUOTE_PROVIDERS_AVAILABLE = 'NoQuoteProvidersAvailable',
   SWAP_ALREADY_IN_PROGRESS = 'SwapAlreadyInProgress',
   ORDERS_NOT_FOUND = 'OrdersNotFound',
 }

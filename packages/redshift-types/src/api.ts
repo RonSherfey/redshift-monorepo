@@ -7,6 +7,16 @@ import {
   UserTransactionType,
 } from './constants';
 
+//#region Shared
+
+export type QuoteRequestRequirements = {
+  [M in Market]?: {
+    payReq: PayReqConfiguration;
+  }
+};
+
+//#endregion
+
 //#region HTTP
 
 export type MarketsResponse = {
