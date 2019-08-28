@@ -9,11 +9,12 @@ import {
 
 //#region Shared
 
-export type MarketRequirements = {
-  [M in Market]?: {
-    payReq: PayReqConfiguration;
-  }
-};
+export interface MarketRequirement {
+  market: Market;
+  payReq: PayReqConfiguration;
+}
+
+export type MarketRequirements = MarketRequirement[];
 
 //#endregion
 
