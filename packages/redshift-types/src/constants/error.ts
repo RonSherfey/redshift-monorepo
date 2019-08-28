@@ -59,6 +59,10 @@ export enum UserApiError {
   NO_QUOTE_PROVIDERS_AVAILABLE = 'NoQuoteProvidersAvailable',
   SWAP_ALREADY_IN_PROGRESS = 'SwapAlreadyInProgress',
   ORDERS_NOT_FOUND = 'OrdersNotFound',
+  INVOICE_EXPIRES_TOO_SOON = 'InvoiceExpiresTooSoon',
+  INVOICE_AMOUNT_BELOW_MINIMUM = 'InvoiceAmountBelowMinimum',
+  INVOICE_AMOUNT_ABOVE_MAXIMUM = 'InvoiceAmountAboveMaximum',
+  INVOICE_PAYMENT_NOT_ROUTABLE = 'InvoicePaymentNotRoutable',
 }
 
 export enum LiquidityProviderApiError {
