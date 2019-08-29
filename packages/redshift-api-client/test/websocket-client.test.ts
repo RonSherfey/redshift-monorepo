@@ -1,5 +1,6 @@
 import {
   ApiError,
+  MarketRequirements,
   RefundDetails,
   TxResult,
   UserSwapState,
@@ -300,8 +301,8 @@ describe('WebSocket Client', () => {
     });
 
     it('should succeed when valid params are provided', async () => {
-      await expect(client.requestRefundDetails(fixtures.valid.orderId)).to.to
-        .not.be.rejected;
+      await expect(client.requestRefundDetails(fixtures.valid.orderId)).to.not
+        .be.rejected;
     });
   });
 
@@ -349,6 +350,23 @@ describe('WebSocket Client', () => {
         signedTxHex: fixtures.valid.hex,
       });
       expect(response).to.deep.equal(serverResponse.message);
+    });
+  });
+
+  describe('requestMarketRequirements', () => {
+    const serverResponse: WebSocketResponse<MarketRequirements> = {
+      success: true,
+      message: fixtures.valid.allMarketRequirements.response,
+    };
+    before(() => {
+      // Stubbed websocket server success response
+      server.on(Ws.Event.REQUEST_MARKET_REQUIREMENTS, (_, cb: Function) => {
+        cb(serverResponse);
+      });
+    });
+
+    it('should return the requirements for all markets', async () => {
+      await expect(client.requestMarketRequirements()).to.to.not.be.rejected;
     });
   });
 });

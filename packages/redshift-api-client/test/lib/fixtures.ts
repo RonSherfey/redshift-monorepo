@@ -36,7 +36,7 @@ export const fixtures = {
     },
     singleMarketRequirements: {
       response: {
-        market: 'BTC_LBTC',
+        market: Market.BTC_LBTC,
         payReq: {
           minExpirationSeconds: '3650',
           minBaseUnits: '1000',
@@ -47,7 +47,7 @@ export const fixtures = {
     allMarketRequirements: {
       response: [
         {
-          market: 'BTC_LBTC',
+          market: Market.BTC_LBTC,
           payReq: {
             minExpirationSeconds: '3650',
             minBaseUnits: '1000',
@@ -55,7 +55,7 @@ export const fixtures = {
           },
         },
         {
-          market: 'ETH_LBTC',
+          market: Market.ETH_LBTC,
           payReq: {
             minExpirationSeconds: '3650',
             minBaseUnits: '1000',
