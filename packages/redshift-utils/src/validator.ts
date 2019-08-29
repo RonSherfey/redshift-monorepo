@@ -91,6 +91,7 @@ export const validator = {
     }
     return false;
   },
+
   /**
    * Determine if the passed network and subnet are valid
    * @param network The chain network
@@ -114,6 +115,18 @@ export const validator = {
             return true;
         }
         break;
+    }
+    return false;
+  },
+
+  /**
+   * Validate a WIF private key. Return true if valid
+   * @param key The private key
+   */
+  isValidWifPrivateKey(key: string) {
+    // Regex - Contains only base58 characters with length of 52
+    if (!!key && new RegExp(/^[a-km-zA-HJ-NP-Z1-9]{52}$/i).test(key)) {
+      return true;
     }
     return false;
   },
