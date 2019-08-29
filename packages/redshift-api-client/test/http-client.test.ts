@@ -24,6 +24,42 @@ describe('HTTP Client', () => {
     });
   });
 
+  describe('getMarketRequirements', () => {
+    before(async () => {
+      //  All market requirements
+      nock(`${config.url}/api`)
+        .get(`/markets/requirements`)
+        .reply(200, fixtures.valid.allMarketRequirements.response);
+
+      //  Single market requirements
+      nock(`${config.url}/api`)
+        .get(`/markets/${fixtures.valid.market}/requirements`)
+        .reply(200, fixtures.valid.singleMarketRequirements.response);
+    });
+
+    it('should return an error if the market is invalid', async () => {
+      await expect(
+        client.getMarketRequirements(fixtures.invalid.market),
+      ).to.be.rejectedWith(Error, ApiError.INVALID_MARKET);
+    });
+
+    it('should return requirements for a single market if the market is valid', async () => {
+      const requirements = await client.getMarketRequirements(
+        fixtures.valid.market,
+      );
+      expect(requirements).to.deep.equal(
+        fixtures.valid.singleMarketRequirements.response,
+      );
+    });
+
+    it('should return requirements for all markets', async () => {
+      const requirements = await client.getMarketRequirements();
+      expect(requirements).to.deep.equal(
+        fixtures.valid.allMarketRequirements.response,
+      );
+    });
+  });
+
   describe('getOrders', () => {
     before(async () => {
       nock(`${config.url}/api`)

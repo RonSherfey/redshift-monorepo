@@ -34,6 +34,36 @@ export const fixtures = {
         },
       ],
     },
+    singleMarketRequirements: {
+      response: {
+        market: 'BTC_LBTC',
+        payReq: {
+          minExpirationSeconds: '3650',
+          minBaseUnits: '1000',
+          maxBaseUnits: '100000',
+        },
+      },
+    },
+    allMarketRequirements: {
+      response: [
+        {
+          market: 'BTC_LBTC',
+          payReq: {
+            minExpirationSeconds: '3650',
+            minBaseUnits: '1000',
+            maxBaseUnits: '100000',
+          },
+        },
+        {
+          market: 'ETH_LBTC',
+          payReq: {
+            minExpirationSeconds: '3650',
+            minBaseUnits: '1000',
+            maxBaseUnits: '100000',
+          },
+        },
+      ],
+    },
     orders: {
       response: [
         {

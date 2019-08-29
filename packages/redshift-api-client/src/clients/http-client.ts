@@ -1,12 +1,14 @@
 import {
   ApiError,
   FundDetails,
+  Market,
   MarketsResponse,
   OnChainTicker,
   OrderDetailsResponse,
   OrdersResponse,
   RefundDetails,
   RefundDetailsResponse,
+  Requirements,
   TransactionsResponse,
   UserSwapState,
 } from '@radar/redshift-types';
@@ -31,6 +33,29 @@ export class HttpClient {
    */
   public async getMarkets(): Promise<MarketsResponse> {
     const json = await axios.get<MarketsResponse>(`${this._apiBase}/markets`);
+    return json.data;
+  }
+
+  /**
+   * Get the quote request requirements for one or all markets
+   * @param market The optional market to fetch requirements for
+   */
+  public async getMarketRequirements<M extends Market | undefined = undefined>(
+    market?: M,
+  ): Promise<Requirements<M>> {
+    if (market) {
+      if (!validator.isValidMarket(market as Market)) {
+        throw new Error(ApiError.INVALID_MARKET);
+      }
+      const json = await axios.get<Requirements<M>>(
+        `${this._apiBase}/markets/${market}/requirements`,
+      );
+      return json.data;
+    }
+
+    const json = await axios.get<Requirements<M>>(
+      `${this._apiBase}/markets/requirements`,
+    );
     return json.data;
   }
 
