@@ -16,6 +16,12 @@ export interface MarketRequirement {
 
 export type MarketRequirements = MarketRequirement[];
 
+export type Requirements<M> = M extends undefined | null
+  ? MarketRequirement
+  : M extends Market
+  ? MarketRequirements
+  : never;
+
 //#endregion
 
 //#region HTTP

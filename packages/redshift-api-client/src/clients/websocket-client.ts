@@ -2,6 +2,7 @@ import {
   ApiError,
   BlockHeightUpdate,
   BroadcastTxRequest,
+  MarketRequirements,
   Network,
   Quote,
   RefundDetails,
@@ -308,6 +309,30 @@ export class WebSocketClient {
         ({ success, message }: WebSocketResponse<TxResult | string>) => {
           if (success) {
             return resolve(message as TxResult);
+          }
+          return reject(new Error(message as string));
+        },
+      );
+    });
+  }
+
+  /**
+   * Request the quote request requirements for all markets
+   */
+  public async requestMarketRequirements(): Promise<MarketRequirements> {
+    return new Promise((resolve, reject) => {
+      if (!this._socket || !this._socket.connected) {
+        return reject(new Error(WebSocketError.SOCKET_NOT_CONNECTED));
+      }
+      this._socket.emit(
+        Ws.Event.REQUEST_MARKET_REQUIREMENTS,
+        null,
+        ({
+          success,
+          message,
+        }: WebSocketResponse<MarketRequirements | string>) => {
+          if (success) {
+            return resolve(message as MarketRequirements);
           }
           return reject(new Error(message as string));
         },
