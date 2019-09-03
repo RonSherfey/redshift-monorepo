@@ -9,7 +9,7 @@
     "typechain": "typechain --target truffle '../contract-artifacts/**/*.json'",
     "trim-artifacts": "node scripts/trim-artifacts.js",
     "prepare": "yarn generate",
-    "postinstall":"yarn typechain",
+    "postinstall": "yarn typechain",
     "test": "truffle test && yarn tsc",
     "deploy": "truffle migrate --network dev",
     "tsc": "tsc --noEmit",
@@ -23,15 +23,16 @@
     "@types/chai-as-promised": "^7.1.0",
     "bignumber.js": "^8.0.1",
     "chai-as-promised": "^7.1.1",
-    "truffle-core": "^4.1.14",
-    "truffle-hdwallet-provider": "^0.0.6",
-    "truffle-test-utils": "^0.1.0",
-    "truffle-typings": "^1.0.5",
+    "chai-shallow-deep-equal": "^1.4.6",
+    "truffle-core": "^5.0.34",
+    "truffle-environment": "^0.1.10",
+    "truffle-hdwallet-provider": "^1.0.17",
+    "truffle-typings": "^1.0.8",
     "ts-generator": "^0.0.8",
     "ts-node": "^7.0.1",
-    "typechain": "^0.3.8"
+    "typechain": "^0.3.20"
   },
   "dependencies": {
-    "truffle": "^4.1.14"
+    "truffle": "^5.0.34"
   }
 }

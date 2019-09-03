@@ -1,15 +1,14 @@
-import { init } from 'truffle-test-utils';
 import { EtherSwapInstance } from '../types/truffle-contracts';
 import { config, etherToWei } from './lib';
 
 // tslint:disable:variable-name
 const Swap = artifacts.require('EtherSwap');
+Swap.numberFormat = 'String';
 
 contract('EtherSwap - Funding', accounts => {
   const [{ orderUUID, hash, refundDelay }] = config.valid;
   let swapInstance: EtherSwapInstance;
   before(async () => {
-    init();
     swapInstance = await Swap.deployed();
   });
 
@@ -18,19 +17,17 @@ contract('EtherSwap - Funding', accounts => {
       from: accounts[1],
       value: etherToWei(0.01),
     });
-    assert.web3Event(
-      res,
+    expect(res.logs).to.shallowDeepEqual([
       {
         event: 'OrderFundingReceived',
         args: {
           orderUUID,
           onchainAmount: etherToWei(0.01),
           paymentHash: hash,
-          refundBlockHeight: res.receipt.blockNumber + refundDelay,
+          refundBlockHeight: String(res.receipt.blockNumber + refundDelay),
         },
       },
-      'OrderFundingReceived was emitted with the correct args',
-    );
+    ]);
   });
 
   it('should increment the on chain amount when a second valid funding payment is received', async () => {
@@ -38,18 +35,16 @@ contract('EtherSwap - Funding', accounts => {
       from: accounts[1],
       value: etherToWei(0.01),
     });
-    assert.web3Event(
-      res,
+    expect(res.logs).to.shallowDeepEqual([
       {
         event: 'OrderFundingReceived',
         args: {
           orderUUID,
           onchainAmount: etherToWei(0.01 * 2),
           paymentHash: hash,
-          refundBlockHeight: res.receipt.blockNumber + refundDelay - 1, // because 1 function call: fund
+          refundBlockHeight: String(res.receipt.blockNumber + refundDelay - 1), // because 1 function call: fund
         },
       },
-      'OrderFundingReceived was emitted with the incremented amount',
-    );
+    ]);
   });
 });

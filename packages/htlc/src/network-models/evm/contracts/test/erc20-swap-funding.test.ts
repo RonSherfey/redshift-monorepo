@@ -1,4 +1,3 @@
-import { init } from 'truffle-test-utils';
 import {
   ERC20SwapInstance,
   ERC20TokenInstance,
@@ -8,6 +7,7 @@ import { config } from './lib';
 // tslint:disable:variable-name
 const ERC20Token = artifacts.require('ERC20Token');
 const ERC20Swap = artifacts.require('ERC20Swap');
+ERC20Swap.numberFormat = 'String';
 
 contract('ERC20Swap - Funding', accounts => {
   const [{ orderUUID, hash, tokenAmount, refundDelay }] = config.valid;
@@ -15,7 +15,6 @@ contract('ERC20Swap - Funding', accounts => {
   let erc20SwapInstance: ERC20SwapInstance;
 
   before(async () => {
-    init();
     // deploy test erc20 token
     erc20TokenInstance = await ERC20Token.deployed();
     // deploy erc20 swap contract
@@ -32,20 +31,18 @@ contract('ERC20Swap - Funding', accounts => {
       erc20TokenInstance.address,
       tokenAmount,
     );
-    assert.web3Event(
-      res,
+    expect(res.logs).to.shallowDeepEqual([
       {
         event: 'OrderErc20FundingReceived',
         args: {
           orderUUID,
-          onchainAmount: tokenAmount,
+          onchainAmount: tokenAmount.toString(),
           paymentHash: hash,
-          refundBlockHeight: res.receipt.blockNumber + refundDelay,
+          refundBlockHeight: String(res.receipt.blockNumber + refundDelay),
           tokenContractAddress: erc20TokenInstance.address,
         },
       },
-      'OrderErc20FundingReceived was emitted with the correct args',
-    );
+    ]);
   });
 
   it('should increment the on chain amount when a second valid funding payment is received', async () => {
@@ -58,19 +55,17 @@ contract('ERC20Swap - Funding', accounts => {
       erc20TokenInstance.address,
       tokenAmount,
     );
-    assert.web3Event(
-      res,
+    expect(res.logs).to.shallowDeepEqual([
       {
         event: 'OrderErc20FundingReceived',
         args: {
           orderUUID,
-          onchainAmount: tokenAmount * 2,
+          onchainAmount: String(tokenAmount * 2),
           paymentHash: hash,
-          refundBlockHeight: res.receipt.blockNumber + refundDelay - 2, // because 2 function calls: approve and fund
+          refundBlockHeight: String(res.receipt.blockNumber + refundDelay - 2), // because 2 function calls: approve and fund
           tokenContractAddress: erc20TokenInstance.address,
         },
       },
-      'OrderErc20FundingReceived was emitted with the incremented amount',
-    );
+    ]);
   });
 });

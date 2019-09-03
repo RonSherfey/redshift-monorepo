@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.8;
 
 import "./Swap.sol";
 import "./ERC20Interface.sol";
@@ -50,7 +50,7 @@ contract ERC20Swap is Swap {
         // one token type per order
         require(order.tokenContractAddress == tokenContractAddress, "Incorrect token.");
         // fund token to this contract
-        require(ERC20Interface(tokenContractAddress).transferFrom(msg.sender, this, tokenAmount), "Unable to transfer token.");
+        require(ERC20Interface(tokenContractAddress).transferFrom(msg.sender, address(this), tokenAmount), "Unable to transfer token.");
 
         order.onchainAmount += tokenAmount;
 

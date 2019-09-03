@@ -1,8 +1,8 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.8;
 
 contract Owned {
     constructor() public { owner = msg.sender; }
-    address public owner;
+    address payable public owner;
 
     modifier onlyOwner {
         require(

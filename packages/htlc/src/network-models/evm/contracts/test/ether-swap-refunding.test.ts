@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-import { init } from 'truffle-test-utils';
 import { EtherSwapInstance } from '../types/truffle-contracts';
 import { config, etherToWei } from './lib';
 
@@ -7,12 +6,10 @@ import { config, etherToWei } from './lib';
 const Swap = artifacts.require('EtherSwap');
 
 contract('EtherSwap - Refunding', accounts => {
-  const recipient = accounts[1];
   const [validArgs] = config.valid;
   const invalidArgs = config.invalid;
   let swapInstance: EtherSwapInstance;
   before(async () => {
-    init();
     swapInstance = await Swap.deployed();
     await swapInstance.fund(validArgs.orderUUID, validArgs.hash, {
       from: accounts[1],
@@ -46,15 +43,13 @@ contract('EtherSwap - Refunding', accounts => {
       value: etherToWei(0.01),
     });
     const res = await swapInstance.refund(moreValidArgs.orderUUID);
-    assert.web3Event(
-      res,
+    expect(res.logs).to.shallowDeepEqual([
       {
         event: 'OrderRefunded',
         args: {
           orderUUID: moreValidArgs.orderUUID,
         },
       },
-      'OrderRefunded was emitted',
-    );
+    ]);
   });
 });

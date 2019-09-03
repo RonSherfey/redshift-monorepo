@@ -1,11 +1,11 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.8;
 
 import "./Owned.sol";
 
 contract Swap is Owned {
     // Refund delay. Default: 4 hours
     uint public refundDelay = 4 * 60 * 4;
-    
+
     // Max possible refund delay: 5 days
     uint constant MAX_REFUND_DELAY = 60 * 60 * 2 * 4;
 
