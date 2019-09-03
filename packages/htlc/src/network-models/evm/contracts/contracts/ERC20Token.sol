@@ -98,7 +98,7 @@ contract Owned {
 // ERC20 Token, with the addition of symbol, name and decimals and a
 // fixed supply
 // ----------------------------------------------------------------------------
-contract FixedSupplyToken is ERC20Interface, Owned {
+contract ERC20Token is ERC20Interface, Owned {
     using SafeMath for uint;
 
     string public symbol;
