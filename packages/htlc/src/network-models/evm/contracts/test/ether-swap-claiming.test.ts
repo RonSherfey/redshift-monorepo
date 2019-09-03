@@ -34,7 +34,7 @@ contract('EtherSwap - Claiming', accounts => {
       validArgs.orderUUID,
       validArgs.preimage,
     );
-    expect(res.logs).to.containSubset([
+    expect(res.logs).to.shallowDeepEqual([
       {
         event: 'OrderClaimed',
         args: {

@@ -17,7 +17,7 @@ contract('EtherSwap - Funding', accounts => {
       from: accounts[1],
       value: etherToWei(0.01),
     });
-    expect(res.logs).to.containSubset([
+    expect(res.logs).to.shallowDeepEqual([
       {
         event: 'OrderFundingReceived',
         args: {
@@ -35,7 +35,7 @@ contract('EtherSwap - Funding', accounts => {
       from: accounts[1],
       value: etherToWei(0.01),
     });
-    expect(res.logs).to.containSubset([
+    expect(res.logs).to.shallowDeepEqual([
       {
         event: 'OrderFundingReceived',
         args: {

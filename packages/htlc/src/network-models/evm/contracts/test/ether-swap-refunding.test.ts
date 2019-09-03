@@ -43,7 +43,7 @@ contract('EtherSwap - Refunding', accounts => {
       value: etherToWei(0.01),
     });
     const res = await swapInstance.refund(moreValidArgs.orderUUID);
-    expect(res.logs).to.containSubset([
+    expect(res.logs).to.shallowDeepEqual([
       {
         event: 'OrderRefunded',
         args: {

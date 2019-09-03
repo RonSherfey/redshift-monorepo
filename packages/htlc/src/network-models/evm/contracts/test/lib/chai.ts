@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import chaiSubset from 'chai-subset';
+import chaiShallowDeepEqual from 'chai-shallow-deep-equal';
 
 chai.use(chaiAsPromised);
-chai.use(chaiSubset);
+chai.use(chaiShallowDeepEqual);

@@ -31,7 +31,7 @@ contract('ERC20Swap - Funding', accounts => {
       erc20TokenInstance.address,
       tokenAmount,
     );
-    expect(res.logs).to.containSubset([
+    expect(res.logs).to.shallowDeepEqual([
       {
         event: 'OrderErc20FundingReceived',
         args: {
@@ -55,7 +55,7 @@ contract('ERC20Swap - Funding', accounts => {
       erc20TokenInstance.address,
       tokenAmount,
     );
-    expect(res.logs).to.containSubset([
+    expect(res.logs).to.shallowDeepEqual([
       {
         event: 'OrderErc20FundingReceived',
         args: {

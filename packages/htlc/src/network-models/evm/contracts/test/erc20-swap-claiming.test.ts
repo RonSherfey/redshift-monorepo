@@ -60,7 +60,7 @@ contract('ERC20Swap - Claiming', accounts => {
       erc20TokenInstance.address,
       validArgs.preimage,
     );
-    expect(res.logs).to.containSubset([
+    expect(res.logs).to.shallowDeepEqual([
       {
         event: 'OrderErc20Claimed',
         args: {

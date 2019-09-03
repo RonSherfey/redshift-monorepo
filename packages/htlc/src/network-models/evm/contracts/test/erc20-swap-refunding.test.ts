@@ -66,7 +66,7 @@ contract('ERC20Swap - Refunding', accounts => {
       orderUUID,
       erc20TokenInstance.address,
     );
-    expect(res.logs).to.containSubset([
+    expect(res.logs).to.shallowDeepEqual([
       {
         event: 'OrderErc20Refunded',
         args: {
