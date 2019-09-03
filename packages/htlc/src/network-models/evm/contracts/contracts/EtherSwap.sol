@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.8;
 
 import "./Swap.sol";
 
@@ -6,7 +6,7 @@ contract EtherSwap is Swap {
     enum OrderState { HasFundingBalance, Claimed, Refunded }
 
     struct SwapOrder {
-        address user;
+        address payable user;
         bytes32 paymentHash;
         bytes32 preimage;
         uint onchainAmount;

@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-import { init } from 'truffle-test-utils';
 import {
   ERC20SwapInstance,
   ERC20TokenInstance,
@@ -17,7 +16,6 @@ contract('ERC20Swap - Refunding', accounts => {
   let erc20SwapInstance: ERC20SwapInstance;
 
   before(async () => {
-    init();
     // deploy test erc20 token
     erc20TokenInstance = await ERC20Token.deployed();
     // deploy erc20 swap contract
@@ -68,15 +66,13 @@ contract('ERC20Swap - Refunding', accounts => {
       orderUUID,
       erc20TokenInstance.address,
     );
-    assert.web3Event(
-      res,
+    expect(res.logs).to.containSubset([
       {
         event: 'OrderErc20Refunded',
         args: {
           orderUUID,
         },
       },
-      'OrderErc20Refunded was emitted',
-    );
+    ]);
   });
 });

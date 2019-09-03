@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-import { init } from 'truffle-test-utils';
 import { EtherSwapInstance } from '../types/truffle-contracts';
 import { config, etherToWei } from './lib';
 
@@ -11,7 +10,6 @@ contract('EtherSwap - Claiming', accounts => {
   const invalidArgs = config.invalid;
   let swapInstance: EtherSwapInstance;
   before(async () => {
-    init();
     swapInstance = await Swap.deployed();
     await swapInstance.fund(validArgs.orderUUID, validArgs.hash, {
       from: accounts[1],
@@ -36,15 +34,13 @@ contract('EtherSwap - Claiming', accounts => {
       validArgs.orderUUID,
       validArgs.preimage,
     );
-    assert.web3Event(
-      res,
+    expect(res.logs).to.containSubset([
       {
         event: 'OrderClaimed',
         args: {
           orderUUID: validArgs.orderUUID,
         },
       },
-      'OrderClaimed was emitted',
-    );
+    ]);
   });
 });

@@ -1,9 +1,9 @@
 declare module Chai {
-  export interface AssertStatic {
-    web3Event(
-      response: Truffle.TransactionResponse,
-      eventArgs: any,
-      message?: string,
-    ): void;
+  export type ChaiPlugin = (chai: any, utils: any) => void;
+}
+
+declare module Truffle {
+  export interface Contract<T> extends ContractNew<any[]> {
+    numberFormat: 'BigNumber' | 'BN' | 'String';
   }
 }

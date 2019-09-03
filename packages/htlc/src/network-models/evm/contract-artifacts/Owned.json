@@ -22,11 +22,11 @@
       "type": "constructor"
     }
   ],
-  "bytecode": "0x608060405234801561001057600080fd5b50336000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555060e98061005f6000396000f300608060405260043610603f576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680638da5cb5b146044575b600080fd5b348015604f57600080fd5b5060566098565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff16815600a165627a7a723058206ca57bd5f2fe31ed63e947e1ca6c0e1b68e33d25db890f7c7dc01ead636feec20029",
-  "source": "pragma solidity ^0.4.24;\n\ncontract Owned {\n    constructor() public { owner = msg.sender; }\n    address public owner;\n\n    modifier onlyOwner {\n        require(\n            msg.sender == owner,\n            \"Only owner can call this function.\"\n        );\n        _;\n    }\n}\n",
+  "bytecode": "0x608060405234801561001057600080fd5b50336000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555060c68061005f6000396000f3fe6080604052348015600f57600080fd5b506004361060285760003560e01c80638da5cb5b14602d575b600080fd5b60336075565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff168156fea165627a7a7230582016d75edcdde977fcb0f3ff0eb5013b7bdab236023d8dfaa99c6ef31054bf9cb80029",
+  "source": "pragma solidity ^0.5.8;\n\ncontract Owned {\n    constructor() public { owner = msg.sender; }\n    address payable public owner;\n\n    modifier onlyOwner {\n        require(\n            msg.sender == owner,\n            \"Only owner can call this function.\"\n        );\n        _;\n    }\n}\n",
   "compiler": {
     "name": "solc",
-    "version": "0.4.24+commit.e67f0147.Emscripten.clang"
+    "version": "0.5.8+commit.23d335f2.Emscripten.clang"
   },
-  "updatedAt": "2019-05-14T18:14:46.026Z"
+  "updatedAt": "2019-09-03T21:27:58.367Z"
 }
