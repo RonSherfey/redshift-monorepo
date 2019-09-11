@@ -11,8 +11,9 @@
   "author": "RadarTech",
   "license": "MIT",
   "dependencies": {
-    "@radar/redshift-api-client": "0.1.1",
-    "@radar/redshift-utils": "0.1.2"
+    "@radar/redshift-api-client": "^0.1.1",
+    "@radar/redshift-types": "^0.5.6",
+    "@radar/redshift-utils": "^0.1.2"
   },
   "devDependencies": {}
 }
