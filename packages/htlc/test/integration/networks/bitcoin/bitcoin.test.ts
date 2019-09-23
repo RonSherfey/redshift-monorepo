@@ -32,7 +32,6 @@ function setupTestSuite(refundAddress: string = refunder.p2pkhAddress) {
       refundAddress,
       paymentHash: random.paymentHash,
       claimerPublicKey: claimer.publicKey,
-      // timelockBlockHeight: await rpcClient.getBlockCount(),
       nSequence: 20,
     };
     paymentSecret = random.paymentSecret;
