@@ -77,7 +77,7 @@ const networkSpecificConfigs = {
               paymentHash:
                 'e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d',
               refundPublicKeyHash: '3f1857b3db895b4d481a46e5a0129cb2b04781c8',
-              nSequence: 3041,
+              timelockBlockHeight: 3041,
               p2shOutputScript:
                 'a9145a53e89d2db880a0dcaa627693b021344d15fdcf87',
               p2shAddress: 'rdooShNdwHvAX73aXvu7kG2sqfE93RRshs',

@@ -28,6 +28,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
   let claimerPublicKey;
   let paymentHash;
   let nSequence;
+  let cltv;
   let refundPublicKeyHash;
 
   switch (scriptAssembly.length) {
@@ -41,7 +42,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           OP_IF,
           decompiledClaimerPublicKey,
           OP_ELSE,
-          decompiledNSequence,
+          decompiledTimeLockValue,
           OP_TIMELOCKMETHOD, // should be either OP_CHECKSEQUENCEVERIFY or OP_CHECKLOCKTIMEVERIFY
           OP_DROP,
           decompiledRefundPublicKey,
@@ -102,7 +103,18 @@ export function getSwapRedeemScriptDetails<N extends Network>(
         refundPublicKeyHash = crypto
           .hash160(Buffer.from(decompiledRefundPublicKey, 'hex'))
           .toString('hex');
-        nSequence = decompiledNSequence;
+
+        if (OP_TIMELOCKMETHOD === DecompiledOpCode.OP_CHECKSEQUENCEVERIFY) {
+          nSequence = Buffer.from(decompiledTimeLockValue, 'hex').readUIntLE(
+            0,
+            decompiledTimeLockValue.length / 2,
+          );
+        } else {
+          cltv = Buffer.from(decompiledTimeLockValue, 'hex').readUIntLE(
+            0,
+            decompiledTimeLockValue.length / 2,
+          );
+        }
         paymentHash = decompiledPaymentHash;
       }
       break;
@@ -119,7 +131,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           OP_DROP,
           decompiledClaimerPublicKey,
           OP_ELSE,
-          decompiledNSequence,
+          decompiledTimeLockValue,
           OP_TIMELOCKMETHOD,
           OP_DROP2,
           OP_DUP2,
@@ -201,7 +213,19 @@ export function getSwapRedeemScriptDetails<N extends Network>(
 
         claimerPublicKey = decompiledClaimerPublicKey;
         refundPublicKeyHash = decompiledRefundPublicKeyHash;
-        nSequence = decompiledNSequence;
+
+        if (OP_TIMELOCKMETHOD === DecompiledOpCode.OP_CHECKSEQUENCEVERIFY) {
+          nSequence = Buffer.from(decompiledTimeLockValue, 'hex').readUIntLE(
+            0,
+            decompiledTimeLockValue.length / 2,
+          );
+        } else {
+          cltv = Buffer.from(decompiledTimeLockValue, 'hex').readUIntLE(
+            0,
+            decompiledTimeLockValue.length / 2,
+          );
+        }
+
         paymentHash = decompiledPaymentHash;
       }
       break;
@@ -242,22 +266,16 @@ export function getSwapRedeemScriptDetails<N extends Network>(
     hash: refundPublicKeyHashBuffer,
   }).address;
 
-  console.log('nSequence: ', nSequence, nSequence.length);
-
-  const timelockRelativeBlockHeight = Buffer.from(nSequence, 'hex').readUIntLE(
-    0,
-    nSequence.length / 2,
-  );
-
   return {
     network,
     subnet,
     claimerPublicKey,
     paymentHash,
     refundPublicKeyHash,
+    ...(nSequence && { nSequence }),
+    ...(cltv && { timelockBlockHeight: cltv }),
     p2shAddress: p2shAddress || '',
     p2wshAddress: p2wshAddress || '',
-    nSequence: timelockRelativeBlockHeight,
     p2shP2wshAddress: p2shWrappedWitnessAddress || '',
     p2shOutputScript: (p2shOutput || '').toString('hex'),
     p2shP2wshOutputScript: (p2shWrappedWitnessOutput || '').toString('hex'),
