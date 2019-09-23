@@ -72,9 +72,6 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     const networkPayload = getBitcoinJSNetwork(this._network, this._subnet);
     const tx = new TransactionBuilder(networkPayload);
 
-    // TODO: remove or make dynamic
-    // tx.setLockTime(54);
-
     // The signing key
     const signingKey = ECPair.fromWIF(privateKey, networkPayload);
 
@@ -197,9 +194,6 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
       ),
       tokens,
     );
-
-    // Set version to 2 for segwit
-    tx.version = 2;
 
     // Set transaction locktime
     tx.locktime = bip68.encode({
