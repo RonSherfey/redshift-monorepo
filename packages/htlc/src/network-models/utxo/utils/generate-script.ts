@@ -1,5 +1,5 @@
 import { SwapError } from '@radar/redshift-types';
-import bip65 from 'bip65';
+import bip68 from 'bip68';
 import { address, opcodes, script } from 'bitcoinjs-lib';
 import varuint from 'varuint-bitcoin';
 import { UTXO } from '../../../types';
@@ -58,6 +58,7 @@ function addressToPublicKeyHash(addr: string): string {
  * @param paymentHash Lightning invoice payment hash
  * @param refundAddress Refund p2pkh or p2wpkh address
  * @param timelockBlockHeight Block height at which the swap expires
+ * @param nSequence relative timelock at which swap expires
  * @return The hex representation of the redeem script
  */
 export function createSwapRedeemScript(
@@ -73,21 +74,21 @@ export function createSwapRedeemScript(
     scriptArgs.paymentHash,
     refundPublicKeyHash,
   ].map(i => Buffer.from(i, 'hex'));
-  const cltvBuffer = script.number.encode(
-    bip65.encode({ blocks: scriptArgs.timelockBlockHeight }),
+  const nSequenceBuffer = script.number.encode(
+    bip68.encode({ blocks: scriptArgs.nSequence }), // TODO: should this be by blocks or minutes?
   );
 
   const swapScript = [
     opcodes.OP_DUP,
-    opcodes.OP_SHA256,
+    opcodes.OP_SHA256, // TODO: Should this actualy be SHA256 or should it be HASH160?
     paymentHashBuffer,
     opcodes.OP_EQUAL,
     opcodes.OP_IF,
     opcodes.OP_DROP,
     claimerPublicKeyBuffer,
     opcodes.OP_ELSE,
-    cltvBuffer,
-    opcodes.OP_CHECKLOCKTIMEVERIFY,
+    nSequenceBuffer,
+    178, // opcodes.OP_CHECKSEQUENCEVERIFY,
     opcodes.OP_DROP,
     opcodes.OP_DUP,
     opcodes.OP_HASH160,

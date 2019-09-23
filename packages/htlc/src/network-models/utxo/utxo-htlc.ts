@@ -1,5 +1,5 @@
 import { Network, SubnetMap, SwapError, TxOutput } from '@radar/redshift-types';
-import bip65 from 'bip65';
+import bip68 from 'bip68';
 import {
   address,
   crypto,
@@ -67,9 +67,13 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     amount: number,
     privateKey: string,
     fee: number = 0,
+    nSequence: number,
   ): string {
     const networkPayload = getBitcoinJSNetwork(this._network, this._subnet);
     const tx = new TransactionBuilder(networkPayload);
+
+    // TODO: remove or make dynamic
+    tx.setLockTime(54);
 
     // The signing key
     const signingKey = ECPair.fromWIF(privateKey, networkPayload);
@@ -86,7 +90,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
         tx.addInput(
           toReversedByteOrderBuffer(utxo.txId),
           utxo.index,
-          0,
+          nSequence,
           output,
         );
       }
@@ -110,7 +114,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * Generate the claim transaction and return the raw tx hex
    * @param utxos The unspent funding tx outputs
    * @param destinationAddress The address the funds will be claimed to
-   * @param currentBlockHeight The current block height on the network
+   * @param nSequence The nSequence number (for relative timelocks)
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
    * @param paymentSecret The payment secret
    * @param privateKey The private key WIF string
@@ -118,7 +122,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
   public claim(
     utxos: TxOutput[],
     destinationAddress: string,
-    currentBlockHeight: number,
+    nSequence: number,
     feeTokensPerVirtualByte: number,
     paymentSecret: string,
     privateKey: string,
@@ -126,7 +130,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     return this.buildTransaction(
       utxos,
       destinationAddress,
-      currentBlockHeight,
+      nSequence,
       feeTokensPerVirtualByte,
       paymentSecret,
       privateKey,
@@ -137,14 +141,14 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * Generate the refund transaction and return the raw tx hex
    * @param utxos The unspent funding tx outputs
    * @param destinationAddress The address the funds will be refunded to
-   * @param currentBlockHeight The current block height on the network
+   * @param nSequence The nSequence number (for relative timelocks)
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
    * @param privateKey The private key WIF string
    */
   public refund(
     utxos: TxOutput[],
     destinationAddress: string,
-    currentBlockHeight: number,
+    nSequence: number,
     feeTokensPerVirtualByte: number,
     privateKey: string,
   ): string {
@@ -155,7 +159,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     return this.buildTransaction(
       utxos,
       destinationAddress,
-      currentBlockHeight,
+      nSequence,
       feeTokensPerVirtualByte,
       publicKey.toString('hex'),
       privateKey,
@@ -166,7 +170,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * Build the transaction using the provided params and return the raw tx hex
    * @param utxos The unspent funding tx outputs
    * @param destinationAddress The address the funds will be sent to
-   * @param currentBlockHeight The current block height on the network
+   * @param nSequence The nSequence (for relative timelocks)
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
    * @param unlock Claim secret (preimage) or refund public key
    * @param privateKey The private key WIF string
@@ -174,7 +178,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
   private buildTransaction(
     utxos: TxOutput[],
     destinationAddress: string,
-    currentBlockHeight: number,
+    nSequence: number,
     feeTokensPerVirtualByte: number,
     unlock: string,
     privateKey: string,
@@ -194,13 +198,16 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
       tokens,
     );
 
+    // Set version to 2 for segwit
+    tx.version = 2;
+
     // Set transaction locktime
-    tx.locktime = bip65.encode({
-      blocks: currentBlockHeight,
+    tx.locktime = bip68.encode({
+      blocks: nSequence,
     });
 
     // Add the inputs being spent to the transaction
-    this.addInputs(utxos, tx, this.generateInputScript());
+    this.addInputs(utxos, tx, nSequence, this.generateInputScript());
 
     // Estimate the tx fee
     const fee = estimateFee(
@@ -245,13 +252,18 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * @param tx The tx instance
    * @param inputScript The input unlock script
    */
-  private addInputs(utxos: TxOutput[], tx: Transaction, inputScript?: Buffer) {
+  private addInputs(
+    utxos: TxOutput[],
+    tx: Transaction,
+    nSequence: number,
+    inputScript?: Buffer,
+  ) {
     // Add Inputs
     utxos.forEach(utxo => {
       tx.addInput(
         toReversedByteOrderBuffer(utxo.txId),
         utxo.index,
-        0,
+        nSequence,
         inputScript,
       );
     });

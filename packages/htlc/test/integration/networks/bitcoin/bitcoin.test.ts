@@ -4,6 +4,7 @@ import {
   Network,
   TxOutput,
 } from '@radar/redshift-types';
+import bip68 from 'bip68';
 import { expect } from 'chai';
 import { HTLC, UTXO, UtxoHtlc } from '../../../../src';
 import { config, toSatoshi, UtxoRpcClient } from '../../../lib/helpers';
@@ -31,7 +32,8 @@ function setupTestSuite(refundAddress: string = refunder.p2pkhAddress) {
       refundAddress,
       paymentHash: random.paymentHash,
       claimerPublicKey: claimer.publicKey,
-      timelockBlockHeight: await rpcClient.getBlockCount(),
+      // timelockBlockHeight: await rpcClient.getBlockCount(),
+      nSequence: 20,
     };
     paymentSecret = random.paymentSecret;
 
@@ -44,6 +46,8 @@ function setupTestSuite(refundAddress: string = refunder.p2pkhAddress) {
       coinbaseUtxos,
       fundSatoshiAmount,
       funder.privateKey,
+      0,
+      htlcArgs.nSequence,
     );
     const fundingTxId = await rpcClient.sendRawTransaction(fundTxHex);
 
@@ -116,16 +120,16 @@ describe('UTXO HTLC - Bitcoin Network', () => {
     });
   });
 
-  describe('Claim', () => {
+  describe('Claim', async () => {
     setupTestSuite();
+    await mineBlocks(19); // to ensure nSequence is met
 
     let claimTxId: string;
     it('should build a valid claim transaction given valid parameters', async () => {
-      const currentBlockHeight = await rpcClient.getBlockCount();
       const claimTxHex = htlc.claim(
         fundingUtxos,
         claimer.p2pkhAddress,
-        currentBlockHeight,
+        htlcArgs.nSequence,
         feeTokensPerVirtualByte,
         paymentSecret,
         claimer.privateKey,
@@ -148,16 +152,16 @@ describe('UTXO HTLC - Bitcoin Network', () => {
   });
 
   describe('Refund', () => {
-    describe('P2PKH Address Refund', () => {
+    describe('P2PKH Address Refund', async () => {
       setupTestSuite();
+      await mineBlocks(19); // to ensure nSequence is met
 
       let refundTxId: string;
       it('should build a valid refund transaction given valid parameters', async () => {
-        const currentBlockHeight = await rpcClient.getBlockCount();
         const refundTxHex = htlc.refund(
           fundingUtxos,
           refunder.p2pkhAddress,
-          currentBlockHeight,
+          htlcArgs.nSequence,
           feeTokensPerVirtualByte,
           refunder.privateKey,
         );
@@ -173,16 +177,17 @@ describe('UTXO HTLC - Bitcoin Network', () => {
       });
     });
 
-    describe('P2WPKH Address Refund', () => {
+    describe('P2WPKH Address Refund', async () => {
       setupTestSuite(refunder.p2wpkhAddress);
+      await mineBlocks(19); // to ensure nSequence is met
 
       let refundTxId: string;
       it('should build a valid refund transaction given valid parameters', async () => {
-        const currentBlockHeight = await rpcClient.getBlockCount();
+        // const currentBlockHeight = await rpcClient.getBlockCount();
         const refundTxHex = htlc.refund(
           fundingUtxos,
           refunder.p2pkhAddress,
-          currentBlockHeight,
+          htlcArgs.nSequence,
           feeTokensPerVirtualByte,
           refunder.privateKey,
         );
@@ -196,6 +201,19 @@ describe('UTXO HTLC - Bitcoin Network', () => {
           .to.be.above(0.009)
           .and.below(0.01); // Refund Output less tx fee
       });
+    });
+  });
+  describe('BIP68 Library', () => {
+    it('should produce the correct output for seconds input', () => {
+      const bip68Encoded = bip68.encode({ seconds: 2048 });
+      expect(bip68Encoded).to.equal(0x00400004);
+      expect(bip68Encoded).to.equal(4194308);
+    });
+
+    it('should produce the correct output for block input', () => {
+      const bip68Encoded = bip68.encode({ blocks: 54 });
+      expect(bip68Encoded).to.equal(0x00000036);
+      expect(bip68Encoded).to.equal(54);
     });
   });
 });
