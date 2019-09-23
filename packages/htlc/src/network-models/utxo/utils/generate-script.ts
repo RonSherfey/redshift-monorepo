@@ -55,11 +55,8 @@ function addressToPublicKeyHash(addr: string): string {
  * If true, push the remote pubkey on the stack.
  * If false, check the lock time, pubkey hash, and push the local pubkey.
  * Check remote or local pubkey signed the transaction.
- * @param claimerPublicKey The public key of the claimer used in the hashlock
- * @param paymentHash Lightning invoice payment hash
- * @param refundAddress Refund p2pkh or p2wpkh address
- * @param timelockBlockHeight Block height at which the swap expires
- * @param nSequence relative timelock at which swap expires
+ * @param scriptArgs The script arguements for creating a swap redeem script
+ * claimerPublicKey, paymentHash, refundAddress, timelock
  * @return The hex representation of the redeem script
  */
 export function createSwapRedeemScript(
