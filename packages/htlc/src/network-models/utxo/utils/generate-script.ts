@@ -1,4 +1,5 @@
 import { SwapError } from '@radar/redshift-types';
+import bip65 from 'bip65';
 import bip68 from 'bip68';
 import { address, opcodes, script } from 'bitcoinjs-lib';
 import varuint from 'varuint-bitcoin';
@@ -74,28 +75,60 @@ export function createSwapRedeemScript(
     scriptArgs.paymentHash,
     refundPublicKeyHash,
   ].map(i => Buffer.from(i, 'hex'));
-  const nSequenceBuffer = script.number.encode(
-    bip68.encode({ blocks: scriptArgs.nSequence }),
-  );
 
-  const swapScript = [
-    opcodes.OP_DUP,
-    opcodes.OP_SHA256, // TODO: Should this actualy be SHA256 or should it be HASH160?
-    paymentHashBuffer,
-    opcodes.OP_EQUAL,
-    opcodes.OP_IF,
-    opcodes.OP_DROP,
-    claimerPublicKeyBuffer,
-    opcodes.OP_ELSE,
-    nSequenceBuffer,
-    opcodes.OP_CHECKSEQUENCEVERIFY,
-    opcodes.OP_DROP,
-    opcodes.OP_DUP,
-    opcodes.OP_HASH160,
-    refundPublicKeyHashBuffer,
-    opcodes.OP_EQUALVERIFY,
-    opcodes.OP_ENDIF,
-    opcodes.OP_CHECKSIG,
-  ];
+  // if timelock = relative
+  let swapScript;
+  if (scriptArgs.timelock.type === UTXO.LockType.RELATIVE) {
+    const nSequenceBuffer = script.number.encode(
+      bip68.encode({ blocks: scriptArgs.timelock.blockBuffer }),
+    );
+
+    swapScript = [
+      opcodes.OP_DUP,
+      opcodes.OP_SHA256, // TODO: Should this actualy be SHA256 or should it be HASH160?
+      paymentHashBuffer,
+      opcodes.OP_EQUAL,
+      opcodes.OP_IF,
+      opcodes.OP_DROP,
+      claimerPublicKeyBuffer,
+      opcodes.OP_ELSE,
+      nSequenceBuffer,
+      opcodes.OP_CHECKSEQUENCEVERIFY,
+      opcodes.OP_DROP,
+      opcodes.OP_DUP,
+      opcodes.OP_HASH160,
+      refundPublicKeyHashBuffer,
+      opcodes.OP_EQUALVERIFY,
+      opcodes.OP_ENDIF,
+      opcodes.OP_CHECKSIG,
+    ];
+  } else if (scriptArgs.timelock.type === UTXO.LockType.ABSOLUTE) {
+    const cltvBuffer = script.number.encode(
+      bip65.encode({ blocks: scriptArgs.timelock.blockHeight }),
+    );
+
+    swapScript = [
+      opcodes.OP_DUP,
+      opcodes.OP_SHA256, // TODO: Should this actualy be SHA256 or should it be HASH160?
+      paymentHashBuffer,
+      opcodes.OP_EQUAL,
+      opcodes.OP_IF,
+      opcodes.OP_DROP,
+      claimerPublicKeyBuffer,
+      opcodes.OP_ELSE,
+      cltvBuffer,
+      opcodes.OP_CHECKLOCKTIMEVERIFY,
+      opcodes.OP_DROP,
+      opcodes.OP_DUP,
+      opcodes.OP_HASH160,
+      refundPublicKeyHashBuffer,
+      opcodes.OP_EQUALVERIFY,
+      opcodes.OP_ENDIF,
+      opcodes.OP_CHECKSIG,
+    ];
+  } else {
+    throw new Error('Invalid Timelock Type (createSwapRedeemScript)');
+  }
+
   return convertScriptElementsToHex(swapScript);
 }

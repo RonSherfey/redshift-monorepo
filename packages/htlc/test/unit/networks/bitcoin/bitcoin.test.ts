@@ -5,23 +5,42 @@ import { config, expect } from '../../../lib/helpers';
 describe('UTXO HTLC - Bitcoin Network', () => {
   const { valid, invalid } = config.bitcoin.unit;
   describe('General', () => {
-    it('should decompile the redeem script when a valid redeem script is passed in the constructor', () => {
+    it('should decompile the redeem script when a valid relative timelock redeem script is passed in the constructor', () => {
       const htlc = HTLC.construct(
         Network.BITCOIN,
         BitcoinSubnet.SIMNET,
-        config.bitcoin.unit.valid.redeemScript,
+        valid.relativeTimeLock.redeemScript,
       );
-      expect(htlc.details).to.deep.equal(valid.htlc.details);
+      expect(htlc.details).to.deep.equal(valid.relativeTimeLock.htlc.details);
     });
 
-    it('should compile the redeem script when valid htlc args are passed in the constructor', () => {
+    it('should compile the relative timelock redeem script when valid htlc args are passed in the constructor', () => {
       const htlc = HTLC.construct(
         Network.BITCOIN,
         BitcoinSubnet.SIMNET,
-        valid.htlc.args,
+        valid.relativeTimeLock.htlc.args,
       );
-      expect(htlc.redeemScript).to.equal(valid.redeemScript);
-      expect(htlc.details).to.deep.equal(valid.htlc.details);
+      expect(htlc.redeemScript).to.equal(valid.relativeTimeLock.redeemScript);
+      expect(htlc.details).to.deep.equal(valid.relativeTimeLock.htlc.details);
+    });
+
+    it('should decompile the redeem script when a valid absolute timelock redeem script is passed in the constructor', () => {
+      const htlc = HTLC.construct(
+        Network.BITCOIN,
+        BitcoinSubnet.SIMNET,
+        valid.absoluteTimeLock.redeemScript,
+      );
+      expect(htlc.details).to.deep.equal(valid.absoluteTimeLock.htlc.details);
+    });
+
+    it('should compile the absolute timelock redeem script when valid htlc args are passed in the constructor', () => {
+      const htlc = HTLC.construct(
+        Network.BITCOIN,
+        BitcoinSubnet.SIMNET,
+        valid.absoluteTimeLock.htlc.args,
+      );
+      expect(htlc.redeemScript).to.equal(valid.absoluteTimeLock.redeemScript);
+      expect(htlc.details).to.deep.equal(valid.absoluteTimeLock.htlc.details);
     });
 
     it('should throw an InvalidRedeemScriptLength error when an arg with an invalid length is passed', () => {

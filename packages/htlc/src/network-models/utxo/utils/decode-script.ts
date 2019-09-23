@@ -42,7 +42,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           decompiledClaimerPublicKey,
           OP_ELSE,
           decompiledNSequence,
-          OP_CHECKSEQUENCEVERIFY,
+          OP_TIMELOCKMETHOD, // should be either OP_CHECKSEQUENCEVERIFY or OP_CHECKLOCKTIMEVERIFY
           OP_DROP,
           decompiledRefundPublicKey,
           OP_ENDIF,
@@ -66,9 +66,10 @@ export function getSwapRedeemScriptDetails<N extends Network>(
         }
 
         if (
-          OP_CHECKSEQUENCEVERIFY !== DecompiledOpCode.OP_CHECKSEQUENCEVERIFY
+          OP_TIMELOCKMETHOD !== DecompiledOpCode.OP_CHECKSEQUENCEVERIFY &&
+          OP_TIMELOCKMETHOD !== DecompiledOpCode.OP_CHECKLOCKTIMEVERIFY
         ) {
-          throw new Error(SwapError.EXPECTED_OP_CHECKSEQUENCEVERIFY);
+          throw new Error(SwapError.EXPECTED_OP_TIMELOCKMETHOD);
         }
 
         if (OP_DROP !== DecompiledOpCode.OP_DROP) {
@@ -119,7 +120,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           decompiledClaimerPublicKey,
           OP_ELSE,
           decompiledNSequence,
-          OP_CHECKSEQUENCEVERIFY,
+          OP_TIMELOCKMETHOD,
           OP_DROP2,
           OP_DUP2,
           OP_HASH160,
@@ -154,9 +155,10 @@ export function getSwapRedeemScriptDetails<N extends Network>(
         }
 
         if (
-          OP_CHECKSEQUENCEVERIFY !== DecompiledOpCode.OP_CHECKSEQUENCEVERIFY
+          OP_TIMELOCKMETHOD !== DecompiledOpCode.OP_CHECKSEQUENCEVERIFY &&
+          OP_TIMELOCKMETHOD !== DecompiledOpCode.OP_CHECKLOCKTIMEVERIFY
         ) {
-          throw new Error(SwapError.EXPECTED_OP_CHECKSEQUENCEVERIFY);
+          throw new Error(SwapError.EXPECTED_OP_TIMELOCKMETHOD);
         }
 
         if (OP_DROP2 !== DecompiledOpCode.OP_DROP) {

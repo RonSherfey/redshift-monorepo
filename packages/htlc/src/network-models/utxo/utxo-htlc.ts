@@ -1,5 +1,5 @@
 import { Network, SubnetMap, SwapError, TxOutput } from '@radar/redshift-types';
-import bip68 from 'bip68';
+import bip65 from 'bip65';
 import {
   address,
   crypto,
@@ -67,7 +67,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     amount: number,
     privateKey: string,
     fee: number = 0,
-    nSequence: number,
+    timelock: UTXO.TimeLock,
   ): string {
     const networkPayload = getBitcoinJSNetwork(this._network, this._subnet);
     const tx = new TransactionBuilder(networkPayload);
@@ -87,7 +87,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
         tx.addInput(
           toReversedByteOrderBuffer(utxo.txId),
           utxo.index,
-          nSequence,
+          timelock.type === UTXO.LockType.RELATIVE ? timelock.blockBuffer : 0,
           output,
         );
       }
@@ -119,7 +119,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
   public claim(
     utxos: TxOutput[],
     destinationAddress: string,
-    nSequence: number,
+    timelock: UTXO.TimeLock,
     feeTokensPerVirtualByte: number,
     paymentSecret: string,
     privateKey: string,
@@ -127,7 +127,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     return this.buildTransaction(
       utxos,
       destinationAddress,
-      nSequence,
+      timelock,
       feeTokensPerVirtualByte,
       paymentSecret,
       privateKey,
@@ -145,7 +145,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
   public refund(
     utxos: TxOutput[],
     destinationAddress: string,
-    nSequence: number,
+    timelock: UTXO.TimeLock,
     feeTokensPerVirtualByte: number,
     privateKey: string,
   ): string {
@@ -156,7 +156,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     return this.buildTransaction(
       utxos,
       destinationAddress,
-      nSequence,
+      timelock,
       feeTokensPerVirtualByte,
       publicKey.toString('hex'),
       privateKey,
@@ -175,7 +175,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
   private buildTransaction(
     utxos: TxOutput[],
     destinationAddress: string,
-    nSequence: number,
+    timelock: UTXO.TimeLock,
     feeTokensPerVirtualByte: number,
     unlock: string,
     privateKey: string,
@@ -196,12 +196,19 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     );
 
     // Set transaction locktime
-    tx.locktime = bip68.encode({
-      blocks: nSequence,
-    });
+    if (timelock.type === UTXO.LockType.ABSOLUTE) {
+      tx.locktime = bip65.encode({
+        blocks: timelock.blockHeight,
+      });
+    }
 
     // Add the inputs being spent to the transaction
-    this.addInputs(utxos, tx, nSequence, this.generateInputScript());
+    this.addInputs(
+      utxos,
+      tx,
+      timelock.type === UTXO.LockType.RELATIVE ? timelock.blockBuffer : 0,
+      this.generateInputScript(),
+    );
 
     // Estimate the tx fee
     const fee = estimateFee(
@@ -245,6 +252,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * Add the transaction inputs.
    * @param utxos The utxos we're spending
    * @param tx The tx instance
+   * @param nSequence The nSequence number (for relative timelocks)
    * @param inputScript The input unlock script
    */
   private addInputs(

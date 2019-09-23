@@ -32,7 +32,10 @@ function setupTestSuite(refundAddress: string = refunder.p2pkhAddress) {
       refundAddress,
       paymentHash: random.paymentHash,
       claimerPublicKey: claimer.publicKey,
-      nSequence: 20,
+      timelock: {
+        type: UTXO.LockType.RELATIVE,
+        blockBuffer: 20,
+      },
     };
     paymentSecret = random.paymentSecret;
 
@@ -46,7 +49,7 @@ function setupTestSuite(refundAddress: string = refunder.p2pkhAddress) {
       fundSatoshiAmount,
       funder.privateKey,
       0,
-      htlcArgs.nSequence,
+      htlcArgs.timelock,
     );
     const fundingTxId = await rpcClient.sendRawTransaction(fundTxHex);
 
@@ -87,7 +90,7 @@ async function setCoinbaseUtxos() {
   ];
 }
 
-describe('UTXO HTLC - Bitcoin Network', () => {
+describe('UTXO BIP68 HTLC - Bitcoin Network', () => {
   before(async () => {
     // Mine 400 blocks ahead of the coinbase transaction. Segwit activates around 300.
     await mineBlocks(400);
@@ -128,7 +131,7 @@ describe('UTXO HTLC - Bitcoin Network', () => {
       const claimTxHex = htlc.claim(
         fundingUtxos,
         claimer.p2pkhAddress,
-        htlcArgs.nSequence,
+        htlcArgs.timelock,
         feeTokensPerVirtualByte,
         paymentSecret,
         claimer.privateKey,
@@ -160,7 +163,7 @@ describe('UTXO HTLC - Bitcoin Network', () => {
         const refundTxHex = htlc.refund(
           fundingUtxos,
           refunder.p2pkhAddress,
-          htlcArgs.nSequence,
+          htlcArgs.timelock,
           feeTokensPerVirtualByte,
           refunder.privateKey,
         );
@@ -182,11 +185,10 @@ describe('UTXO HTLC - Bitcoin Network', () => {
 
       let refundTxId: string;
       it('should build a valid refund transaction given valid parameters', async () => {
-        // const currentBlockHeight = await rpcClient.getBlockCount();
         const refundTxHex = htlc.refund(
           fundingUtxos,
           refunder.p2pkhAddress,
-          htlcArgs.nSequence,
+          htlcArgs.timelock,
           feeTokensPerVirtualByte,
           refunder.privateKey,
         );

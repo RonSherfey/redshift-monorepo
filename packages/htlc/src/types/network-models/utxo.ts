@@ -2,7 +2,6 @@ import { Network, SubnetMap } from '@radar/redshift-types';
 
 export namespace UTXO {
   export type Config = string | RedeemScriptArgs;
-
   export interface Details<N extends Network> {
     network: N;
     subnet: SubnetMap[N];
@@ -26,7 +25,23 @@ export namespace UTXO {
     claimerPublicKey: string;
     paymentHash: string;
     refundAddress: string;
-    timelockBlockHeight?: number;
-    nSequence?: number;
+    timelock: AbsoluteTimeLock | RelativeTimeLock;
+  }
+
+  export type TimeLock = AbsoluteTimeLock | RelativeTimeLock;
+
+  export enum LockType {
+    RELATIVE = 'relative',
+    ABSOLUTE = 'absolute',
+  }
+
+  export interface AbsoluteTimeLock {
+    type: LockType.ABSOLUTE;
+    blockHeight: number;
+  }
+
+  export interface RelativeTimeLock {
+    type: LockType.RELATIVE;
+    blockBuffer: number;
   }
 }
