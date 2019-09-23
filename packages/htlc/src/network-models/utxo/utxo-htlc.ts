@@ -111,7 +111,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * Generate the claim transaction and return the raw tx hex
    * @param utxos The unspent funding tx outputs
    * @param destinationAddress The address the funds will be claimed to
-   * @param nSequence The nSequence number (for relative timelocks)
+   * @param timelock The timelock information
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
    * @param paymentSecret The payment secret
    * @param privateKey The private key WIF string
@@ -138,7 +138,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * Generate the refund transaction and return the raw tx hex
    * @param utxos The unspent funding tx outputs
    * @param destinationAddress The address the funds will be refunded to
-   * @param nSequence The nSequence number (for relative timelocks)
+   * @param timelock The timelock information
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
    * @param privateKey The private key WIF string
    */
@@ -167,7 +167,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * Build the transaction using the provided params and return the raw tx hex
    * @param utxos The unspent funding tx outputs
    * @param destinationAddress The address the funds will be sent to
-   * @param nSequence The nSequence (for relative timelocks)
+   * @param timelock The timelock information
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
    * @param unlock Claim secret (preimage) or refund public key
    * @param privateKey The private key WIF string
@@ -252,7 +252,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * Add the transaction inputs.
    * @param utxos The utxos we're spending
    * @param tx The tx instance
-   * @param nSequence The nSequence number (for relative timelocks)
+   * @param timelock The timelock information
    * @param inputScript The input unlock script
    */
   private addInputs(
