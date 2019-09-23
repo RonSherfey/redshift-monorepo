@@ -73,7 +73,6 @@ export function createSwapRedeemScript(
     refundPublicKeyHash,
   ].map(i => Buffer.from(i, 'hex'));
 
-  // if timelock = relative
   let swapScript;
   if (scriptArgs.timelock.type === UTXO.LockType.RELATIVE) {
     const nSequenceBuffer = script.number.encode(

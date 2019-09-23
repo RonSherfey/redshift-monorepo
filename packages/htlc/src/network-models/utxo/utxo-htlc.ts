@@ -252,7 +252,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * Add the transaction inputs.
    * @param utxos The utxos we're spending
    * @param tx The tx instance
-   * @param timelock The timelock information
+   * @param nSequence The nSequence number
    * @param inputScript The input unlock script
    */
   private addInputs(
