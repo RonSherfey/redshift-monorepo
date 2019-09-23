@@ -121,7 +121,7 @@ describe('UTXO HTLC - Bitcoin Network', () => {
 
   describe('Claim', async () => {
     setupTestSuite();
-    await mineBlocks(19); // to ensure nSequence is met
+    await mineBlocks(3); // to ensure nSequence is met
 
     let claimTxId: string;
     it('should build a valid claim transaction given valid parameters', async () => {
@@ -153,7 +153,7 @@ describe('UTXO HTLC - Bitcoin Network', () => {
   describe('Refund', () => {
     describe('P2PKH Address Refund', async () => {
       setupTestSuite();
-      await mineBlocks(19); // to ensure nSequence is met
+      await mineBlocks(3); // to ensure nSequence is met
 
       let refundTxId: string;
       it('should build a valid refund transaction given valid parameters', async () => {
@@ -178,7 +178,7 @@ describe('UTXO HTLC - Bitcoin Network', () => {
 
     describe('P2WPKH Address Refund', async () => {
       setupTestSuite(refunder.p2wpkhAddress);
-      await mineBlocks(19); // to ensure nSequence is met
+      await mineBlocks(3); // to ensure nSequence is met
 
       let refundTxId: string;
       it('should build a valid refund transaction given valid parameters', async () => {

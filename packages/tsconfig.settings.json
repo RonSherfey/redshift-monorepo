@@ -10,6 +10,7 @@
     "esModuleInterop": true,
     "preserveConstEnums": true,
     "resolveJsonModule": true,
-    "suppressImplicitAnyIndexErrors": true
+    "suppressImplicitAnyIndexErrors": true,
+    "lib": [ "es2015" ]
   }
 }

@@ -73,7 +73,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     const tx = new TransactionBuilder(networkPayload);
 
     // TODO: remove or make dynamic
-    tx.setLockTime(54);
+    // tx.setLockTime(54);
 
     // The signing key
     const signingKey = ECPair.fromWIF(privateKey, networkPayload);
@@ -100,7 +100,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     const tokens = utxos.reduce((t, c) => t + c.tokens, 0);
 
     tx.addOutput(this.details.p2shP2wshAddress, amount);
-    tx.addOutput(address, tokens - amount - fee);
+    tx.addOutput(address || '', tokens - amount - fee);
 
     // Sign the inputs
     utxos.forEach((output, i) => {
@@ -226,6 +226,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
 
     // Reduce the final output value to give some tokens over to fees
     const [out] = tx.outs;
+    // @ts-ignore - for some reason typescript doesn't recognize that value is a valid param
     out.value -= fee;
 
     // Set the signed witnesses

@@ -22,7 +22,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
   const networkPayload = getBitcoinJSNetwork(network, subnet);
   const redeemScriptBuffer = Buffer.from(redeemScriptHex, 'hex');
   const scriptAssembly = script
-    .toASM(script.decompile(redeemScriptBuffer))
+    .toASM(script.decompile(redeemScriptBuffer) || new Buffer(''))
     .split(' ');
 
   let claimerPublicKey;
@@ -65,9 +65,10 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           throw new Error(SwapError.EXPECTED_OP_ELSE);
         }
 
-        // TODO: replace with constants
-        if (OP_CHECKSEQUENCEVERIFY !== 'OP_CHECKSEQUENCEVERIFY') {
-          throw new Error('ExpectedOP_CHECKSEQUENCEVERIFY');
+        if (
+          OP_CHECKSEQUENCEVERIFY !== DecompiledOpCode.OP_CHECKSEQUENCEVERIFY
+        ) {
+          throw new Error(SwapError.EXPECTED_OP_CHECKSEQUENCEVERIFY);
         }
 
         if (OP_DROP !== DecompiledOpCode.OP_DROP) {
@@ -151,9 +152,11 @@ export function getSwapRedeemScriptDetails<N extends Network>(
         if (OP_ELSE !== DecompiledOpCode.OP_ELSE) {
           throw new Error(SwapError.EXPECTED_OP_ELSE);
         }
-        // TODO: replace with constants
-        if (OP_CHECKSEQUENCEVERIFY !== 'OP_CHECKSEQUENCEVERIFY') {
-          throw new Error('ExpectedOP_CHECKSEQUENCEVERIFY');
+
+        if (
+          OP_CHECKSEQUENCEVERIFY !== DecompiledOpCode.OP_CHECKSEQUENCEVERIFY
+        ) {
+          throw new Error(SwapError.EXPECTED_OP_CHECKSEQUENCEVERIFY);
         }
 
         if (OP_DROP2 !== DecompiledOpCode.OP_DROP) {
@@ -237,6 +240,8 @@ export function getSwapRedeemScriptDetails<N extends Network>(
     hash: refundPublicKeyHashBuffer,
   }).address;
 
+  console.log('nSequence: ', nSequence, nSequence.length);
+
   const timelockRelativeBlockHeight = Buffer.from(nSequence, 'hex').readUIntLE(
     0,
     nSequence.length / 2,
@@ -248,15 +253,15 @@ export function getSwapRedeemScriptDetails<N extends Network>(
     claimerPublicKey,
     paymentHash,
     refundPublicKeyHash,
-    p2shAddress,
-    p2wshAddress,
+    p2shAddress: p2shAddress || '',
+    p2wshAddress: p2wshAddress || '',
     nSequence: timelockRelativeBlockHeight,
-    p2shP2wshAddress: p2shWrappedWitnessAddress,
-    p2shOutputScript: p2shOutput.toString('hex'),
-    p2shP2wshOutputScript: p2shWrappedWitnessOutput.toString('hex'),
-    p2wshOutputScript: p2wshOutput.toString('hex'),
-    refundP2wpkhAddress: p2wpkhRefundAddress,
-    refundP2pkhAddress: p2pkhRefundAddress,
-    redeemScript: redeemScriptHex,
+    p2shP2wshAddress: p2shWrappedWitnessAddress || '',
+    p2shOutputScript: (p2shOutput || '').toString('hex'),
+    p2shP2wshOutputScript: (p2shWrappedWitnessOutput || '').toString('hex'),
+    p2wshOutputScript: (p2wshOutput || '').toString('hex'),
+    refundP2wpkhAddress: p2wpkhRefundAddress || '',
+    refundP2pkhAddress: p2pkhRefundAddress || '',
+    redeemScript: redeemScriptHex || '',
   };
 }

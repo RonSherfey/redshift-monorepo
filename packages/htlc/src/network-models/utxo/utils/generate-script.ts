@@ -75,7 +75,7 @@ export function createSwapRedeemScript(
     refundPublicKeyHash,
   ].map(i => Buffer.from(i, 'hex'));
   const nSequenceBuffer = script.number.encode(
-    bip68.encode({ blocks: scriptArgs.nSequence }), // TODO: should this be by blocks or minutes?
+    bip68.encode({ blocks: scriptArgs.nSequence }),
   );
 
   const swapScript = [
@@ -88,7 +88,7 @@ export function createSwapRedeemScript(
     claimerPublicKeyBuffer,
     opcodes.OP_ELSE,
     nSequenceBuffer,
-    178, // opcodes.OP_CHECKSEQUENCEVERIFY,
+    opcodes.OP_CHECKSEQUENCEVERIFY,
     opcodes.OP_DROP,
     opcodes.OP_DUP,
     opcodes.OP_HASH160,
