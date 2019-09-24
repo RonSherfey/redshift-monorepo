@@ -9,6 +9,7 @@ import {
   Transaction,
   TransactionBuilder,
 } from 'bitcoinjs-lib';
+import { Output } from 'bitcoinjs-lib/types/transaction';
 import { isString } from 'util';
 import { UTXO } from '../../types';
 import { isDefined } from '../../utils';
@@ -97,7 +98,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     const tokens = utxos.reduce((t, c) => t + c.tokens, 0);
 
     tx.addOutput(this.details.p2shP2wshAddress, amount);
-    tx.addOutput(address || '', tokens - amount - fee);
+    tx.addOutput(address, tokens - amount - fee);
 
     // Sign the inputs
     utxos.forEach((output, i) => {
@@ -226,8 +227,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     }
 
     // Reduce the final output value to give some tokens over to fees
-    const [out] = tx.outs;
-    // @ts-ignore - for some reason typescript doesn't recognize that value is a valid param
+    const [out] = tx.outs as Output[];
     out.value -= fee;
 
     // Set the signed witnesses
