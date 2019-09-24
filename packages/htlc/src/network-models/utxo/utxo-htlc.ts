@@ -97,6 +97,10 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     // Total spendable amount
     const tokens = utxos.reduce((t, c) => t + c.tokens, 0);
 
+    if (!address) {
+      throw new Error('No address provided for output (fund)');
+    }
+
     tx.addOutput(this.details.p2shP2wshAddress, amount);
     tx.addOutput(address, tokens - amount - fee);
 
