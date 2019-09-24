@@ -36,7 +36,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
       {
         // public key redeem swap script
         const [
-          OP_SHA256,
+          OP_HASH160,
           decompiledPaymentHash,
           OP_EQUAL,
           OP_IF,
@@ -50,8 +50,8 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           OP_CHECKSIG,
         ] = scriptAssembly;
 
-        if (OP_SHA256 !== DecompiledOpCode.OP_SHA256) {
-          throw new Error(SwapError.EXPECTED_OP_SHA256);
+        if (OP_HASH160 !== DecompiledOpCode.OP_HASH160) {
+          throw new Error(SwapError.EXPECTED_OP_HASH160);
         }
 
         if (OP_EQUAL !== DecompiledOpCode.OP_EQUAL) {
@@ -124,7 +124,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
         // public key hash redeem swap script
         const [
           OP_DUP,
-          OP_SHA256,
+          OP_HASH160,
           decompiledPaymentHash,
           OP_EQUAL,
           OP_IF,
@@ -135,7 +135,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           OP_TIMELOCKMETHOD,
           OP_DROP2,
           OP_DUP2,
-          OP_HASH160,
+          OP_HASH1602,
           decompiledRefundPublicKeyHash,
           OP_EQUALVERIFY,
           OP_ENDIF,
@@ -146,8 +146,8 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           throw new Error(SwapError.EXPECTED_OP_DUP);
         }
 
-        if (OP_SHA256 !== DecompiledOpCode.OP_SHA256) {
-          throw new Error(SwapError.EXPECTED_OP_SHA256);
+        if (OP_HASH160 !== DecompiledOpCode.OP_HASH160) {
+          throw new Error(SwapError.EXPECTED_OP_HASH160);
         }
 
         if (OP_EQUAL !== DecompiledOpCode.OP_EQUAL) {
@@ -181,7 +181,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           throw new Error(SwapError.EXPECTED_OP_DUP);
         }
 
-        if (OP_HASH160 !== DecompiledOpCode.OP_HASH160) {
+        if (OP_HASH1602 !== DecompiledOpCode.OP_HASH160) {
           throw new Error(SwapError.EXPECTED_OP_HASH160);
         }
 

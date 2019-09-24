@@ -31,7 +31,8 @@ function sha256Hash(str: string) {
 function generateRandomIdSecretAndHashValues(prefixHex: boolean) {
   const orderUUID = uuidv4();
   let paymentSecret = sha256Hash(generateRandomHexString());
-  let paymentHash = sha256Hash(paymentSecret);
+  // let paymentHash = sha256Hash(paymentSecret);
+  let paymentHash = paymentSecret;
 
   if (prefixHex) {
     paymentSecret = addHexPrefix(paymentSecret);
@@ -56,7 +57,7 @@ const networkSpecificConfigs = {
       valid: {
         absoluteTimeLock: {
           redeemScript:
-            '76a820e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256702e10bb17576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
+            '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256702e10bb17576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
           htlc: {
             args: {
               claimerPublicKey:
@@ -74,30 +75,29 @@ const networkSpecificConfigs = {
               subnet: 'simnet',
               claimerPublicKey:
                 '0398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25',
-              paymentHash:
-                'e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d',
+              paymentHash: 'c15949a2e2a414b5c641f32c4c2ee07be644e165',
               refundPublicKeyHash: '3f1857b3db895b4d481a46e5a0129cb2b04781c8',
               timelockBlockHeight: 3041,
               p2shOutputScript:
-                'a9145a53e89d2db880a0dcaa627693b021344d15fdcf87',
-              p2shAddress: 'rdooShNdwHvAX73aXvu7kG2sqfE93RRshs',
-              p2shP2wshAddress: 'rWD48icLn4KwfPCWECVqRkfYD8rXmo6zdD',
+                'a914c62820678cf19902ad2be6905fb7ea87a4bc81ed87',
+              p2shAddress: 'rodwyPBBTFooEpUoWnVYSeAX2PNbESEfcj',
+              p2shP2wshAddress: 'rpY9hikYMcsrwnb8fAPMLMunNk2Ck6rbmH',
               p2shP2wshOutputScript:
-                'a91406f8bb6bbc7e0932d010e2242ba7f1c37208682587',
+                'a914d0078c5b4b93ef5ef598ad2bb7a4dffc9c9b9db587',
               p2wshAddress:
-                'sb1qg69sz0pa3xj5sfftq0lrtt6c3pl9ry0vd547he6j3sn55x6kujlsdtpk2y',
+                'sb1qe60gt270wluxfy0epq4dgg3sxv67eqede7ym5w4yt62mwu2l0u7syfcpqg',
               p2wshOutputScript:
-                '0020468b013c3d89a548252b03fe35af58887e5191ec6d2bebe7528c274a1b56e4bf',
+                '0020ce9e85abcf77f86491f9082ad422303335ec832dcf89ba3aa45e95b7715f7f3d',
               refundP2wpkhAddress: 'sb1q8uv90v7m39d56jq6gmj6qy5uk2cy0qwgfu40g6',
               refundP2pkhAddress: 'ST3cmHBZSa5KsDrbgFMmDaj78DhDa9US3J',
               redeemScript:
-                '76a820e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256702e10bb17576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
+                '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256702e10bb17576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
             },
           },
         },
         relativeTimeLock: {
           redeemScript:
-            '76a820e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25670114b27576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
+            '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25670114b27576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
           htlc: {
             args: {
               claimerPublicKey:
@@ -115,24 +115,23 @@ const networkSpecificConfigs = {
               subnet: 'simnet',
               claimerPublicKey:
                 '0398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25',
-              paymentHash:
-                'e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d',
+              paymentHash: 'c15949a2e2a414b5c641f32c4c2ee07be644e165',
               refundPublicKeyHash: '3f1857b3db895b4d481a46e5a0129cb2b04781c8',
               nSequence: 20,
               p2shOutputScript:
-                'a914102db4b60d31c96283b39a7d3c865844b0fdf30387',
-              p2shAddress: 'rX3jg8PPqP93MQehGUnZpPxfdXdFNw3pfJ',
-              p2shP2wshAddress: 'rdRHR7EJgmZnfaV8SrvZpM54kLLfpgBJrR',
+                'a914abbe2fd62eca9b6f4fcac561b1dd20f9e2499e1787',
+              p2shAddress: 'rmEHVaJE1SKHNzVZjye1Nq6vcSJn9k4d7Z',
+              p2shP2wshAddress: 'raHc4bACRGaoxMSTEeExXupKLaZitzAQJW',
               p2shP2wshOutputScript:
-                'a9145611b11f6367e110baefbb71f0d932690680d49b87',
+                'a91433b58d4b5f5ef4bed6c35afeaf817d880146703787',
               p2wshAddress:
-                'sb1qpwj0n8tpt6s0mfjjy59ml3kvn70tfdgu4uyj76779lu6w9aa2ylsec4gp0',
+                'sb1qxlce8hcm59dpgp5v0yn8ydh3t6q6namkfaxmuce8pdmaj4d5l7ts0u9ch3',
               p2wshOutputScript:
-                '00200ba4f99d615ea0fda652250bbfc6cc9f9eb4b51caf092f6bde2ff9a717bd513f',
+                '002037f193df1ba15a14068c79267236f15e81a9f7764f4dbe63270b77d955b4ff97',
               refundP2wpkhAddress: 'sb1q8uv90v7m39d56jq6gmj6qy5uk2cy0qwgfu40g6',
               refundP2pkhAddress: 'ST3cmHBZSa5KsDrbgFMmDaj78DhDa9US3J',
               redeemScript:
-                '76a820e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25670114b27576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
+                '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25670114b27576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
             },
           },
         },

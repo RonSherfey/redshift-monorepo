@@ -1,7 +1,7 @@
 import { SwapError } from '@radar/redshift-types';
 import bip65 from 'bip65';
 import bip68 from 'bip68';
-import { address, opcodes, script } from 'bitcoinjs-lib';
+import { address, crypto, opcodes, script } from 'bitcoinjs-lib';
 import varuint from 'varuint-bitcoin';
 import { UTXO } from '../../../types';
 
@@ -73,6 +73,8 @@ export function createSwapRedeemScript(
     refundPublicKeyHash,
   ].map(i => Buffer.from(i, 'hex'));
 
+  const paymentHashBufferRipeMd160 = crypto.ripemd160(paymentHashBuffer);
+
   let swapScript;
   if (scriptArgs.timelock.type === UTXO.LockType.RELATIVE) {
     const nSequenceBuffer = script.number.encode(
@@ -81,8 +83,8 @@ export function createSwapRedeemScript(
 
     swapScript = [
       opcodes.OP_DUP,
-      opcodes.OP_SHA256, // TODO: Should this actualy be SHA256 or should it be HASH160?
-      paymentHashBuffer,
+      opcodes.OP_HASH160,
+      paymentHashBufferRipeMd160,
       opcodes.OP_EQUAL,
       opcodes.OP_IF,
       opcodes.OP_DROP,
@@ -105,8 +107,8 @@ export function createSwapRedeemScript(
 
     swapScript = [
       opcodes.OP_DUP,
-      opcodes.OP_SHA256, // TODO: Should this actualy be SHA256 or should it be HASH160?
-      paymentHashBuffer,
+      opcodes.OP_HASH160,
+      paymentHashBufferRipeMd160,
       opcodes.OP_EQUAL,
       opcodes.OP_IF,
       opcodes.OP_DROP,
