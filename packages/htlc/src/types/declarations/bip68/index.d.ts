@@ -3,18 +3,18 @@ declare module 'bip68' {
     hexNumber: any,
   ):
     | {
-        seconds: number | undefined;
+        seconds?: number | undefined;
       }
     | {
-        blocks: number | undefined;
+        blocks?: number | undefined;
       };
   export function encode(
     obj:
       | {
-          seconds: number | undefined;
+          seconds?: number | undefined;
         }
       | {
-          blocks: number | undefined;
+          blocks?: number | undefined;
         },
   ): any;
 }

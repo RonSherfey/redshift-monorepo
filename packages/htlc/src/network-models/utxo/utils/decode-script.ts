@@ -27,8 +27,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
 
   let claimerPublicKey;
   let paymentHash;
-  let nSequence;
-  let cltv;
+  let timelock;
   let refundPublicKeyHash;
 
   switch (scriptAssembly.length) {
@@ -103,19 +102,24 @@ export function getSwapRedeemScriptDetails<N extends Network>(
         refundPublicKeyHash = crypto
           .hash160(Buffer.from(decompiledRefundPublicKey, 'hex'))
           .toString('hex');
-
-        if (OP_TIMELOCKMETHOD === DecompiledOpCode.OP_CHECKSEQUENCEVERIFY) {
-          nSequence = Buffer.from(decompiledTimeLockValue, 'hex').readUIntLE(
-            0,
-            decompiledTimeLockValue.length / 2,
-          );
-        } else {
-          cltv = Buffer.from(decompiledTimeLockValue, 'hex').readUIntLE(
-            0,
-            decompiledTimeLockValue.length / 2,
-          );
-        }
         paymentHash = decompiledPaymentHash;
+        if (OP_TIMELOCKMETHOD === DecompiledOpCode.OP_CHECKSEQUENCEVERIFY) {
+          timelock = {
+            type: UTXO.LockType.RELATIVE,
+            blockBuffer: Buffer.from(decompiledTimeLockValue, 'hex').readUIntLE(
+              0,
+              decompiledTimeLockValue.length / 2,
+            ),
+          } as UTXO.RelativeTimeLock;
+        } else {
+          timelock = {
+            type: UTXO.LockType.ABSOLUTE,
+            blockHeight: Buffer.from(decompiledTimeLockValue, 'hex').readUIntLE(
+              0,
+              decompiledTimeLockValue.length / 2,
+            ),
+          } as UTXO.AbsoluteTimeLock;
+        }
       }
       break;
 
@@ -213,20 +217,25 @@ export function getSwapRedeemScriptDetails<N extends Network>(
 
         claimerPublicKey = decompiledClaimerPublicKey;
         refundPublicKeyHash = decompiledRefundPublicKeyHash;
+        paymentHash = decompiledPaymentHash;
 
         if (OP_TIMELOCKMETHOD === DecompiledOpCode.OP_CHECKSEQUENCEVERIFY) {
-          nSequence = Buffer.from(decompiledTimeLockValue, 'hex').readUIntLE(
-            0,
-            decompiledTimeLockValue.length / 2,
-          );
+          timelock = {
+            type: UTXO.LockType.RELATIVE,
+            blockBuffer: Buffer.from(decompiledTimeLockValue, 'hex').readUIntLE(
+              0,
+              Math.round(decompiledTimeLockValue.length / 2),
+            ),
+          } as UTXO.RelativeTimeLock;
         } else {
-          cltv = Buffer.from(decompiledTimeLockValue, 'hex').readUIntLE(
-            0,
-            decompiledTimeLockValue.length / 2,
-          );
+          timelock = {
+            type: UTXO.LockType.ABSOLUTE,
+            blockHeight: Buffer.from(decompiledTimeLockValue, 'hex').readUIntLE(
+              0,
+              Math.round(decompiledTimeLockValue.length / 2),
+            ),
+          } as UTXO.AbsoluteTimeLock;
         }
-
-        paymentHash = decompiledPaymentHash;
       }
       break;
 
@@ -272,8 +281,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
     claimerPublicKey,
     paymentHash,
     refundPublicKeyHash,
-    ...(nSequence && { nSequence }),
-    ...(cltv && { timelockBlockHeight: cltv }),
+    timelock,
     p2shAddress: p2shAddress || '',
     p2wshAddress: p2wshAddress || '',
     p2shP2wshAddress: p2shWrappedWitnessAddress || '',

@@ -8,8 +8,7 @@ export namespace UTXO {
     paymentHash: string; // payment hash hex string
     claimerPublicKey: string; // claim public key hex string
     refundPublicKeyHash: string; // refund pubkey hash string
-    timelockBlockHeight?: number; // locked until block height number
-    nSequence?: number; // number of blocks to lock transaction for after confirmation (relative timelock)
+    timelock: UTXO.TimeLock;
     p2shOutputScript: string; // pay to script hash output hex string
     p2shAddress: string; // pay to script hash base58 address
     p2shP2wshAddress: string; // nested pay to witness script address
