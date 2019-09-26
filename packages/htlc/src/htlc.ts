@@ -1,4 +1,4 @@
-import { Network, SubnetMap } from '@radar/redshift-types';
+import { Network, NetworkError, SubnetMap } from '@radar/redshift-types';
 import { EvmHtlc, StellarHtlc, UtxoHtlc } from './network-models';
 import { Config, EVM, NetworkModelMap, Stellar, UTXO } from './types';
 
@@ -12,18 +12,18 @@ export namespace HTLC {
    * @param subnet The network subnet
    * @param config Config options used to construct or interact with the HTLC
    */
-  export function construct<N extends keyof NetworkModelMap<N>>(
-    network: N,
-    subnet: SubnetMap[N],
-    config: Config[N],
-  ): NetworkModelMap<N>[N] {
+  export function construct<N extends Network>(network: N, subnet: SubnetMap[N], config: Config[N]): NetworkModelMap<N>[N]; // tslint:disable-line:prettier
+  export function construct<N extends Network>(network: N, subnet: SubnetMap[N], config: Config[N]): NetworkModelMap<N>[Network] { // tslint:disable-line:prettier
     switch (network) {
       case Network.ETHEREUM:
         return new EvmHtlc(network, subnet, config as EVM.Config);
       case Network.STELLAR:
         return new StellarHtlc(network, subnet, config as Stellar.Config);
-      default:
+      case Network.BITCOIN:
+      case Network.LITECOIN:
         return new UtxoHtlc(network, subnet, config as UTXO.Config);
+      default:
+        throw new Error(NetworkError.INVALID_NETWORK);
     }
   }
 }
