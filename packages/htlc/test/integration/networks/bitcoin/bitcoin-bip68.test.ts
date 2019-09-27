@@ -94,7 +94,7 @@ async function setCoinbaseUtxos() {
   ];
 }
 
-describe.only('UTXO BIP68 HTLC - Bitcoin Network', () => {
+describe('UTXO BIP68 HTLC - Bitcoin Network', () => {
   before(async () => {
     // Mine 400 blocks ahead of the coinbase transaction. Segwit activates around 300.
     await mineBlocks(400);

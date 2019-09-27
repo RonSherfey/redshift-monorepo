@@ -106,11 +106,25 @@ export function getSwapRedeemScriptDetails<N extends Network>(
         if (OP_TIMELOCKMETHOD === DecompiledOpCode.OP_CHECKSEQUENCEVERIFY) {
           timelock = {
             type: UTXO.LockType.RELATIVE,
-            blockBuffer: Buffer.from(decompiledTimeLockValue, 'hex').readUIntLE(
-              0,
-              decompiledTimeLockValue.length / 2,
-            ),
-          } as UTXO.RelativeTimeLock;
+          };
+          // if the timelock is < 17, the decode script thinks its an OP Code.
+          // this checks for that and gives it an actual number
+          // https://github.com/bitcoinjs/bitcoinjs-lib/issues/1485
+          if (decompiledTimeLockValue.startsWith('OP_')) {
+            timelock.blockBuffer = parseInt(
+              decompiledTimeLockValue.substring(
+                3,
+                decompiledTimeLockValue.length,
+              ),
+              10,
+            );
+            timelock;
+          } else {
+            timelock.blockBuffer = Buffer.from(
+              decompiledTimeLockValue,
+              'hex',
+            ).readUIntLE(0, Math.round(decompiledTimeLockValue.length / 2));
+          }
         } else {
           timelock = {
             type: UTXO.LockType.ABSOLUTE,
@@ -222,17 +236,31 @@ export function getSwapRedeemScriptDetails<N extends Network>(
         if (OP_TIMELOCKMETHOD === DecompiledOpCode.OP_CHECKSEQUENCEVERIFY) {
           timelock = {
             type: UTXO.LockType.RELATIVE,
-            blockBuffer: Buffer.from(decompiledTimeLockValue, 'hex').readUIntLE(
-              0,
-              Math.round(decompiledTimeLockValue.length / 2),
-            ),
-          } as UTXO.RelativeTimeLock;
+          };
+          // if the timelock is < 17, the decode script thinks its an OP Code.
+          // this checks for that and gives it an actual number
+          // https://github.com/bitcoinjs/bitcoinjs-lib/issues/1485
+          if (decompiledTimeLockValue.startsWith('OP_')) {
+            timelock.blockBuffer = parseInt(
+              decompiledTimeLockValue.substring(
+                3,
+                decompiledTimeLockValue.length,
+              ),
+              10,
+            );
+            timelock;
+          } else {
+            timelock.blockBuffer = Buffer.from(
+              decompiledTimeLockValue,
+              'hex',
+            ).readUIntLE(0, Math.round(decompiledTimeLockValue.length / 2));
+          }
         } else {
           timelock = {
             type: UTXO.LockType.ABSOLUTE,
             blockHeight: Buffer.from(decompiledTimeLockValue, 'hex').readUIntLE(
               0,
-              Math.round(decompiledTimeLockValue.length / 2),
+              decompiledTimeLockValue.length / 2,
             ),
           } as UTXO.AbsoluteTimeLock;
         }
