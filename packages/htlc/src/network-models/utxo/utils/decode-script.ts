@@ -27,7 +27,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
 
   let claimerPublicKey;
   let paymentHash;
-  let timelock;
+  let timelock: UTXO.TimeLock;
   let refundPublicKeyHash;
 
   switch (scriptAssembly.length) {
@@ -106,7 +106,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
         if (OP_TIMELOCKMETHOD === DecompiledOpCode.OP_CHECKSEQUENCEVERIFY) {
           timelock = {
             type: UTXO.LockType.RELATIVE,
-          };
+          } as UTXO.RelativeTimeLock;
           // if the timelock is < 17, the decode script thinks its an OP Code.
           // this checks for that and gives it an actual number
           // https://github.com/bitcoinjs/bitcoinjs-lib/issues/1485
@@ -118,7 +118,6 @@ export function getSwapRedeemScriptDetails<N extends Network>(
               ),
               10,
             );
-            timelock;
           } else {
             timelock.blockBuffer = Buffer.from(
               decompiledTimeLockValue,
@@ -236,7 +235,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
         if (OP_TIMELOCKMETHOD === DecompiledOpCode.OP_CHECKSEQUENCEVERIFY) {
           timelock = {
             type: UTXO.LockType.RELATIVE,
-          };
+          } as UTXO.RelativeTimeLock;
           // if the timelock is < 17, the decode script thinks its an OP Code.
           // this checks for that and gives it an actual number
           // https://github.com/bitcoinjs/bitcoinjs-lib/issues/1485
