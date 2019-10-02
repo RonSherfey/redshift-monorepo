@@ -1,6 +1,30 @@
-# Redshift Monorepo
+# <img width="160" src="https://user-images.githubusercontent.com/20102664/66014847-9f8f4880-e48d-11e9-94ac-1def62896ad5.png" />
 
-Your bridge to the Lightning Network
+**Your bridge to the Lightning Network**
+
+## About
+
+REDSHIFT enables wallet-to-wallet cross-blockchain trading and payments for the Lightning Network. This is accomplished through the use of [submarine swaps](https://wiki.ion.radar.tech/tech/research/submarine-swap), and more specifically, [HTLCs](https://wiki.ion.radar.tech/tech/bitcoin/hltc).
+
+This repository is a monorepo, which includes the HTLC logic that powers REDSHIFT, an SDK that can be used to integrate submarine swaps into any application, and other utilities.
+
+### Supported On-Chain Assets
+
+| Asset | Testnet | Mainnet |
+| ----------- | ----------- | ----------- |
+| BTC | :heavy_check_mark: | :heavy_check_mark: |
+| ETH | :heavy_check_mark: | :heavy_check_mark: |
+
+### Supported Swap Types
+
+The initial release of REDSHIFT supports unidirectional swaps as detailed below:
+
+1. The user provides a Lightning invoice to REDSHIFT
+2. REDSHIFT returns a quote to the user, which contains the information necessary to fund the on-chain escrow (HTLC)
+3. The user sends funds to the escrow
+4. Once the the user's payment confirms, REDSHIFT pays the invoice, and sweeps the on-chain funds from the escrow
+
+This type of swap can be used to top up your Lightning balance in seconds, make off-chain purchases with on-chain funds, or simply swap assets.
 
 ## Packages
 
@@ -24,9 +48,9 @@ yarn
 yarn build
 ```
 
-### Build container services for tests
+### Start simnet services for tests 
 ```sh
-docker-compose up
+docker-compose up -d
 ```
 
 ### Run tests
