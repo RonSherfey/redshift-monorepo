@@ -1,3 +1,4 @@
+// Typescript compiler configuration for targeting CommonJS
 {
   "extends": "../tsconfig.settings.json",
   "compilerOptions": {

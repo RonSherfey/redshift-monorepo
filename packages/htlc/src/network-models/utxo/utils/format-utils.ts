@@ -27,7 +27,7 @@ export function toReversedByteOrderHexString(string: string) {
  * @param input - The hex input
  */
 export function makeHexEven(input: string): string {
-  if (!input) return undefined;
+  if (!input) return input;
 
   let output: string;
   if (input.length % 2 !== 0) {

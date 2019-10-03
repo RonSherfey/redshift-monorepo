@@ -8,7 +8,7 @@ import bip65 from 'bip65';
 import { expect } from 'chai';
 import { HTLC, UTXO, UtxoHtlc } from '../../../../src';
 import { config, toSatoshi, UtxoRpcClient } from '../../../lib/helpers';
-import { mineBlocks, mineBlocksWithDelay } from '../../../lib/helpers/btccli';
+import { mineBlocks } from '../../../lib/helpers/btccli';
 
 const { funder, claimer, refunder } = config.bitcoin.integration;
 const feeTokensPerVirtualByte = 1;

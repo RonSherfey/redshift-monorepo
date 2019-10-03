@@ -32,7 +32,6 @@ function generateRandomIdSecretAndHashValues(prefixHex: boolean) {
   const orderUUID = uuidv4();
   let paymentSecret = sha256Hash(generateRandomHexString());
   let paymentHash = sha256Hash(paymentSecret);
-  // let paymentHash = paymentSecret;
 
   if (prefixHex) {
     paymentSecret = addHexPrefix(paymentSecret);

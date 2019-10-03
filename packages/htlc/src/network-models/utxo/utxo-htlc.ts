@@ -82,6 +82,9 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
       pubkey: signingKey.publicKey,
       network: networkPayload,
     });
+    if (!address) {
+      throw new Error(SwapError.EXPECTED_ADDRESS);
+    }
 
     // Add the inputs being spent to the transaction
     utxos.forEach(utxo => {

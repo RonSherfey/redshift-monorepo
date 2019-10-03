@@ -18,6 +18,7 @@ export enum SwapError {
   EXPECTED_OP_DUP = 'ExpectedOP_DUP',
   EXPECTED_OP_HASH160 = 'ExpectedOP_HASH160',
   EXPECTED_OP_EQUALVERIFY = 'ExpectedOP_EQUALVERIFY',
+  EXPECTED_ADDRESS = 'ExpectedAddress',
   INVALID_REDEEM_SCRIPT_LENGTH = 'InvalidRedeemScriptLength',
   FAILED_COMPLETE = 'FailedCompleteSwap',
   FEES_TOO_HIGH = 'FeesTooHigh',
