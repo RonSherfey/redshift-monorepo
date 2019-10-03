@@ -28,7 +28,7 @@ const htlc = HTLC.construct(Network.BITCOIN, BitcoinSubnet.SIMNET, {
   refundAddress: 'sb1qxnqqm56ta40p3uhtsmtdxglhwuxjk3tul94mq0',
   timelock: {
     type: UTXO.LockType.ABSOLUTE,
-    blockBuffer: 597732,
+    blockHeight: 597732,
   },
 });
 ```
