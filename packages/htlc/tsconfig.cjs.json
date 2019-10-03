@@ -15,5 +15,5 @@
     "test",
     "dist",
     "src/network-models/evm/contracts"
-  ],
+  ]
 }

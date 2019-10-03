@@ -17,19 +17,35 @@ yarn add @radar/htlc
 
 ## Usage - Bitcoin
 
-### Construct a new Bitcoin HTLC:
+### Construct a new Bitcoin HTLC with an absolute timelock:
 
 ```typescript
-import { HTLC } from '@radar/htlc';
+import { HTLC, UTXO } from '@radar/htlc';
 
 const htlc = HTLC.construct(Network.BITCOIN, BitcoinSubnet.SIMNET, {
   paymentHash: 'fba6da3ff596b9c6fabe67d4f728474697640ef6edd9e361c2a46be345112839',
   claimerPublicKey: '0286ab3b59ce3862515b01c8a282edb6011b4eb50c608ab298bfd70f6033f7bc65',
   refundAddress: 'sb1qxnqqm56ta40p3uhtsmtdxglhwuxjk3tul94mq0',
   timelock: {
-    type: 'relative',
-    blockBuffer: 50
-  }
+    type: UTXO.LockType.ABSOLUTE,
+    blockBuffer: 597732,
+  },
+});
+```
+
+### Construct a new Bitcoin HTLC with a relative timelock:
+
+```typescript
+import { HTLC, UTXO } from '@radar/htlc';
+
+const htlc = HTLC.construct(Network.BITCOIN, BitcoinSubnet.SIMNET, {
+  paymentHash: 'fba6da3ff596b9c6fabe67d4f728474697640ef6edd9e361c2a46be345112839',
+  claimerPublicKey: '0286ab3b59ce3862515b01c8a282edb6011b4eb50c608ab298bfd70f6033f7bc65',
+  refundAddress: 'sb1qxnqqm56ta40p3uhtsmtdxglhwuxjk3tul94mq0',
+  timelock: {
+    type: UTXO.LockType.RELATIVE,
+    blockBuffer: 50,
+  },
 });
 ```
 
@@ -67,7 +83,7 @@ Generate the claim transaction. You can now broadcast it using `sendrawtransacti
 const claimTxHex = htlc.claim(
   utxos,
   destinationAddress,
-  timelock,
+  currentBlockHeight,
   feeTokensPerVirtualByte,
   paymentSecret,
   privateKey,
@@ -79,7 +95,7 @@ Generate the refund transaction. You can now broadcast it using `sendrawtransact
 const refundTxHex = htlc.refund(
   utxos,
   destinationAddress,
-  timelock,
+  currentBlockHeight,
   feeTokensPerVirtualByte,
   privateKey,
 );

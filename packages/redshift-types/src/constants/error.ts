@@ -22,6 +22,7 @@ export enum SwapError {
   FAILED_COMPLETE = 'FailedCompleteSwap',
   FEES_TOO_HIGH = 'FeesTooHigh',
   INVALID_REFUND_ADDRESS = 'InvalidRefundAddress',
+  INVALID_TIMELOCK_METHOD = 'InvalidTimelockMethod',
 }
 
 export enum WeightEstimationError {

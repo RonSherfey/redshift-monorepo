@@ -9,6 +9,38 @@ import { UTXO } from '../../../types';
 import { getBitcoinJSNetwork } from './bitcoinjs-lib';
 
 /**
+ * Build the timelock object using the decompiled timelock opcode and value
+ * @param timelockOpcode The timelock opcode
+ * @param timelockValue The timelock value
+ */
+function getTimeLockObjectFromDecompiledOpcode(
+  timelockOpcode: DecompiledOpCode,
+  timelockValue: string,
+): UTXO.TimeLock {
+  switch (timelockOpcode) {
+    case DecompiledOpCode.OP_CHECKSEQUENCEVERIFY:
+      const sanitizedTimeLockValue = timelockValue.replace('OP_', ''); // https://github.com/bitcoinjs/bitcoinjs-lib/issues/1485
+      return {
+        type: UTXO.LockType.RELATIVE,
+        blockBuffer: Buffer.from(sanitizedTimeLockValue, 'hex').readUIntLE(
+          0,
+          sanitizedTimeLockValue.length / 2,
+        ),
+      };
+    case DecompiledOpCode.OP_CHECKLOCKTIMEVERIFY:
+      return {
+        type: UTXO.LockType.ABSOLUTE,
+        blockHeight: Buffer.from(timelockValue, 'hex').readUIntLE(
+          0,
+          timelockValue.length / 2,
+        ),
+      };
+    default:
+      throw new Error(SwapError.INVALID_TIMELOCK_METHOD);
+  }
+}
+
+/**
  * Decompiles a redeem script and constructs a Details object
  * @param subnet The network subnet the redeem script will execute on
  * @param redeemScriptHex The hex representation of the redeem script
@@ -25,10 +57,10 @@ export function getSwapRedeemScriptDetails<N extends Network>(
     .toASM(script.decompile(redeemScriptBuffer) || new Buffer(''))
     .split(' ');
 
-  let claimerPublicKey;
-  let paymentHash;
+  let claimerPublicKey: string;
+  let paymentHash: string;
   let timelock: UTXO.TimeLock;
-  let refundPublicKeyHash;
+  let refundPublicKeyHash: string;
 
   switch (scriptAssembly.length) {
     case 12:
@@ -103,36 +135,11 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           .hash160(Buffer.from(decompiledRefundPublicKey, 'hex'))
           .toString('hex');
         paymentHash = decompiledPaymentHash;
-        if (OP_TIMELOCKMETHOD === DecompiledOpCode.OP_CHECKSEQUENCEVERIFY) {
-          timelock = {
-            type: UTXO.LockType.RELATIVE,
-          } as UTXO.RelativeTimeLock;
-          // if the timelock is < 17, the decode script thinks its an OP Code.
-          // this checks for that and gives it an actual number
-          // https://github.com/bitcoinjs/bitcoinjs-lib/issues/1485
-          if (decompiledTimeLockValue.startsWith('OP_')) {
-            timelock.blockBuffer = parseInt(
-              decompiledTimeLockValue.substring(
-                3,
-                decompiledTimeLockValue.length,
-              ),
-              10,
-            );
-          } else {
-            timelock.blockBuffer = Buffer.from(
-              decompiledTimeLockValue,
-              'hex',
-            ).readUIntLE(0, Math.round(decompiledTimeLockValue.length / 2));
-          }
-        } else {
-          timelock = {
-            type: UTXO.LockType.ABSOLUTE,
-            blockHeight: Buffer.from(decompiledTimeLockValue, 'hex').readUIntLE(
-              0,
-              decompiledTimeLockValue.length / 2,
-            ),
-          } as UTXO.AbsoluteTimeLock;
-        }
+
+        timelock = getTimeLockObjectFromDecompiledOpcode(
+          OP_TIMELOCKMETHOD,
+          decompiledTimeLockValue,
+        );
       }
       break;
 
@@ -232,37 +239,10 @@ export function getSwapRedeemScriptDetails<N extends Network>(
         refundPublicKeyHash = decompiledRefundPublicKeyHash;
         paymentHash = decompiledPaymentHash;
 
-        if (OP_TIMELOCKMETHOD === DecompiledOpCode.OP_CHECKSEQUENCEVERIFY) {
-          timelock = {
-            type: UTXO.LockType.RELATIVE,
-          } as UTXO.RelativeTimeLock;
-          // if the timelock is < 17, the decode script thinks its an OP Code.
-          // this checks for that and gives it an actual number
-          // https://github.com/bitcoinjs/bitcoinjs-lib/issues/1485
-          if (decompiledTimeLockValue.startsWith('OP_')) {
-            timelock.blockBuffer = parseInt(
-              decompiledTimeLockValue.substring(
-                3,
-                decompiledTimeLockValue.length,
-              ),
-              10,
-            );
-            timelock;
-          } else {
-            timelock.blockBuffer = Buffer.from(
-              decompiledTimeLockValue,
-              'hex',
-            ).readUIntLE(0, Math.round(decompiledTimeLockValue.length / 2));
-          }
-        } else {
-          timelock = {
-            type: UTXO.LockType.ABSOLUTE,
-            blockHeight: Buffer.from(decompiledTimeLockValue, 'hex').readUIntLE(
-              0,
-              decompiledTimeLockValue.length / 2,
-            ),
-          } as UTXO.AbsoluteTimeLock;
-        }
+        timelock = getTimeLockObjectFromDecompiledOpcode(
+          OP_TIMELOCKMETHOD,
+          decompiledTimeLockValue,
+        );
       }
       break;
 

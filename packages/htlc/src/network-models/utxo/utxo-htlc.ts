@@ -117,7 +117,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * Generate the claim transaction and return the raw tx hex
    * @param utxos The unspent funding tx outputs
    * @param destinationAddress The address the funds will be claimed to
-   * @param timelock The timelock information
+   * @param currentBlockHeight The current block height on the network
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
    * @param paymentSecret The payment secret
    * @param privateKey The private key WIF string
@@ -145,7 +145,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * Generate the refund transaction and return the raw tx hex
    * @param utxos The unspent funding tx outputs
    * @param destinationAddress The address the funds will be refunded to
-   * @param timelock The timelock information
+   * @param currentBlockHeight The current block height on the network
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
    * @param privateKey The private key WIF string
    */
@@ -175,7 +175,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * Build the transaction using the provided params and return the raw tx hex
    * @param utxos The unspent funding tx outputs
    * @param destinationAddress The address the funds will be sent to
-   * @param timelock The timelock information
+   * @param currentBlockHeight The current block height on the network
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
    * @param unlock Claim secret (preimage) or refund public key
    * @param privateKey The private key WIF string
@@ -192,6 +192,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     // Create a new transaction instance
     const tx = new Transaction();
 
+    // BIP 68 applies
     tx.version = 2;
 
     // Total the utxos
