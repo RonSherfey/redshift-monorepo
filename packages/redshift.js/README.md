@@ -1,5 +1,10 @@
 # @radar/redshift.js
-The official Redshift Javascript SDK
+**The official Redshift Javascript SDK**
+
+## About
+
+This package acts as a wrapper for the REDSHIFT WS & HTTP client, types, and utility packages.
+For more detailed documentation, follow the links to child packages in the [Usage](#usage) section.
 
 ## Installation
 
@@ -16,6 +21,8 @@ yarn add @radar/redshift.js
 ```
 
 ## Usage
+
+[Types](../redshift-types)
 
 [Utilities](../redshift-utils)
 

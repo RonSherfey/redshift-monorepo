@@ -1,5 +1,5 @@
 # @radar/htlc
-A library used to construct and interact with HTLCs across multiple networks & network models.
+**A library used to construct and interact with HTLCs across multiple networks & network models**
 
 ## Installation
 
@@ -81,6 +81,8 @@ const refundTxHex = htlc.refund(
   privateKey,
 );
 ```
+
+For a working example, view the [Bitcoin HTLC tests](./test/integration/networks/bitcoin/bitcoin.test.ts).
 
 ## Usage - Ethereum
 

@@ -1,5 +1,5 @@
 # @radar/redshift-api-client
-Redshift HTTP & WebSocket Client Library
+**Redshift HTTP & WebSocket Client Library**
 
 ## Installation
 

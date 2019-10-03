@@ -1,5 +1,5 @@
 # @radar/redshift-utils
-Utilities used across Redshift codebases
+**Utilities used across Redshift codebases**
 
 ## Installation
 

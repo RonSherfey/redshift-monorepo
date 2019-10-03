@@ -24,7 +24,7 @@ The initial release of REDSHIFT supports unidirectional swaps as detailed below:
 3. The user sends funds to the escrow
 4. Once the the user's payment confirms, REDSHIFT pays the invoice, and sweeps the on-chain funds from the escrow
 
-This type of swap can be used to top up your Lightning balance in seconds, make off-chain purchases with on-chain funds, or simply swap assets.
+This type of swap can be used to top up your Lightning balance, make off-chain purchases with on-chain funds, or simply swap assets.
 
 ## Packages
 
