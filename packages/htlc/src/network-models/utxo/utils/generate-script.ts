@@ -1,6 +1,7 @@
 import { SwapError } from '@radar/redshift-types';
 import bip65 from 'bip65';
-import { address, opcodes, script } from 'bitcoinjs-lib';
+import bip68 from 'bip68';
+import { address, crypto, opcodes, script } from 'bitcoinjs-lib';
 import varuint from 'varuint-bitcoin';
 import { UTXO } from '../../../types';
 
@@ -54,10 +55,8 @@ function addressToPublicKeyHash(addr: string): string {
  * If true, push the remote pubkey on the stack.
  * If false, check the lock time, pubkey hash, and push the local pubkey.
  * Check remote or local pubkey signed the transaction.
- * @param claimerPublicKey The public key of the claimer used in the hashlock
- * @param paymentHash Lightning invoice payment hash
- * @param refundAddress Refund p2pkh or p2wpkh address
- * @param timelockBlockHeight Block height at which the swap expires
+ * @param scriptArgs The script arguements for creating a swap redeem script
+ * claimerPublicKey, paymentHash, refundAddress, timelock
  * @return The hex representation of the redeem script
  */
 export function createSwapRedeemScript(
@@ -73,28 +72,67 @@ export function createSwapRedeemScript(
     scriptArgs.paymentHash,
     refundPublicKeyHash,
   ].map(i => Buffer.from(i, 'hex'));
-  const cltvBuffer = script.number.encode(
-    bip65.encode({ blocks: scriptArgs.timelockBlockHeight }),
-  );
 
-  const swapScript = [
-    opcodes.OP_DUP,
-    opcodes.OP_SHA256,
-    paymentHashBuffer,
-    opcodes.OP_EQUAL,
-    opcodes.OP_IF,
-    opcodes.OP_DROP,
-    claimerPublicKeyBuffer,
-    opcodes.OP_ELSE,
-    cltvBuffer,
-    opcodes.OP_CHECKLOCKTIMEVERIFY,
-    opcodes.OP_DROP,
-    opcodes.OP_DUP,
-    opcodes.OP_HASH160,
-    refundPublicKeyHashBuffer,
-    opcodes.OP_EQUALVERIFY,
-    opcodes.OP_ENDIF,
-    opcodes.OP_CHECKSIG,
-  ];
-  return convertScriptElementsToHex(swapScript);
+  const paymentHashBufferRipeMd160 = crypto.ripemd160(paymentHashBuffer);
+
+  let swapScript: (number | Buffer)[];
+  if (scriptArgs.timelock.type === UTXO.LockType.RELATIVE) {
+    const nSequenceBuffer = script.number.encode(
+      bip68.encode({ blocks: scriptArgs.timelock.blockBuffer }),
+    );
+
+    swapScript = [
+      opcodes.OP_DUP,
+      opcodes.OP_HASH160,
+      paymentHashBufferRipeMd160,
+      opcodes.OP_EQUAL,
+      opcodes.OP_IF,
+      opcodes.OP_DROP,
+      claimerPublicKeyBuffer,
+      opcodes.OP_ELSE,
+      nSequenceBuffer,
+      opcodes.OP_CHECKSEQUENCEVERIFY,
+      opcodes.OP_DROP,
+      opcodes.OP_DUP,
+      opcodes.OP_HASH160,
+      refundPublicKeyHashBuffer,
+      opcodes.OP_EQUALVERIFY,
+      opcodes.OP_ENDIF,
+      opcodes.OP_CHECKSIG,
+    ];
+  } else if (scriptArgs.timelock.type === UTXO.LockType.ABSOLUTE) {
+    const cltvBuffer = script.number.encode(
+      bip65.encode({ blocks: scriptArgs.timelock.blockHeight }),
+    );
+
+    swapScript = [
+      opcodes.OP_DUP,
+      opcodes.OP_HASH160,
+      paymentHashBufferRipeMd160,
+      opcodes.OP_EQUAL,
+      opcodes.OP_IF,
+      opcodes.OP_DROP,
+      claimerPublicKeyBuffer,
+      opcodes.OP_ELSE,
+      cltvBuffer,
+      opcodes.OP_CHECKLOCKTIMEVERIFY,
+      opcodes.OP_DROP,
+      opcodes.OP_DUP,
+      opcodes.OP_HASH160,
+      refundPublicKeyHashBuffer,
+      opcodes.OP_EQUALVERIFY,
+      opcodes.OP_ENDIF,
+      opcodes.OP_CHECKSIG,
+    ];
+  } else {
+    throw new Error(SwapError.INVALID_TIMELOCK_METHOD);
+  }
+
+  // We convert to hex, make a buffer, decompile, then convert to hex in case nSequence < 17. Decompile will append OP_ to those cases.
+  // https://github.com/bitcoinjs/bitcoinjs-lib/issues/1485
+  return convertScriptElementsToHex(
+    script.decompile(
+      Buffer.from(convertScriptElementsToHex(swapScript), 'hex'),
+    ),
+  );
 }

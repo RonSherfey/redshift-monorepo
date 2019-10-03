@@ -2,14 +2,13 @@ import { Network, SubnetMap } from '@radar/redshift-types';
 
 export namespace UTXO {
   export type Config = string | RedeemScriptArgs;
-
   export interface Details<N extends Network> {
     network: N;
     subnet: SubnetMap[N];
     paymentHash: string; // payment hash hex string
     claimerPublicKey: string; // claim public key hex string
     refundPublicKeyHash: string; // refund pubkey hash string
-    timelockBlockHeight: number; // locked until block height number
+    timelock: UTXO.TimeLock;
     p2shOutputScript: string; // pay to script hash output hex string
     p2shAddress: string; // pay to script hash base58 address
     p2shP2wshAddress: string; // nested pay to witness script address
@@ -25,6 +24,23 @@ export namespace UTXO {
     claimerPublicKey: string;
     paymentHash: string;
     refundAddress: string;
-    timelockBlockHeight: number;
+    timelock: AbsoluteTimeLock | RelativeTimeLock;
+  }
+
+  export type TimeLock = AbsoluteTimeLock | RelativeTimeLock;
+
+  export enum LockType {
+    RELATIVE = 'relative',
+    ABSOLUTE = 'absolute',
+  }
+
+  export interface AbsoluteTimeLock {
+    type: LockType.ABSOLUTE;
+    blockHeight: number;
+  }
+
+  export interface RelativeTimeLock {
+    type: LockType.RELATIVE;
+    blockBuffer: number;
   }
 }

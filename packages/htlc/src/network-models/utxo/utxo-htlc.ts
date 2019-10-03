@@ -1,5 +1,6 @@
 import { Network, SubnetMap, SwapError, TxOutput } from '@radar/redshift-types';
 import bip65 from 'bip65';
+import bip68 from 'bip68';
 import {
   address,
   crypto,
@@ -9,6 +10,7 @@ import {
   Transaction,
   TransactionBuilder,
 } from 'bitcoinjs-lib';
+import { Output } from 'bitcoinjs-lib/types/transaction';
 import { isString } from 'util';
 import { UTXO } from '../../types';
 import { isDefined } from '../../utils';
@@ -48,6 +50,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     this._redeemScript = isString(config)
       ? config
       : createSwapRedeemScript(config);
+
     this._details = getSwapRedeemScriptDetails(
       this._network,
       this._subnet,
@@ -79,6 +82,9 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
       pubkey: signingKey.publicKey,
       network: networkPayload,
     });
+    if (!address) {
+      throw new Error(SwapError.EXPECTED_ADDRESS);
+    }
 
     // Add the inputs being spent to the transaction
     utxos.forEach(utxo => {
@@ -130,6 +136,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
       feeTokensPerVirtualByte,
       paymentSecret,
       privateKey,
+      true,
     );
   }
 
@@ -170,6 +177,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
    * @param unlock Claim secret (preimage) or refund public key
    * @param privateKey The private key WIF string
+   * @param isClaim Whether it is a claim transaction or not
    */
   private buildTransaction(
     utxos: TxOutput[],
@@ -178,9 +186,13 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     feeTokensPerVirtualByte: number,
     unlock: string,
     privateKey: string,
+    isClaim?: boolean,
   ): string {
     // Create a new transaction instance
     const tx = new Transaction();
+
+    // BIP 68 applies
+    tx.version = 2;
 
     // Total the utxos
     const tokens = utxos.reduce((t, c) => t + c.tokens, 0);
@@ -194,13 +206,18 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
       tokens,
     );
 
-    // Set transaction locktime
     tx.locktime = bip65.encode({
       blocks: currentBlockHeight,
     });
 
+    let nSequence = 0;
+    if (this._details.timelock.type === UTXO.LockType.RELATIVE && !isClaim) {
+      // The nSequence must be specified if a relative timelock is used and it's not a claim tx
+      nSequence = (this.details.timelock as UTXO.RelativeTimeLock).blockBuffer;
+    }
+
     // Add the inputs being spent to the transaction
-    this.addInputs(utxos, tx, this.generateInputScript());
+    this.addInputs(utxos, tx, nSequence, this.generateInputScript());
 
     // Estimate the tx fee
     const fee = estimateFee(
@@ -218,7 +235,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     }
 
     // Reduce the final output value to give some tokens over to fees
-    const [out] = tx.outs;
+    const [out] = tx.outs as Output[];
     out.value -= fee;
 
     // Set the signed witnesses
@@ -243,15 +260,21 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * Add the transaction inputs.
    * @param utxos The utxos we're spending
    * @param tx The tx instance
+   * @param nSequence The nSequence number
    * @param inputScript The input unlock script
    */
-  private addInputs(utxos: TxOutput[], tx: Transaction, inputScript?: Buffer) {
+  private addInputs(
+    utxos: TxOutput[],
+    tx: Transaction,
+    nSequence: number,
+    inputScript?: Buffer,
+  ) {
     // Add Inputs
     utxos.forEach(utxo => {
       tx.addInput(
         toReversedByteOrderBuffer(utxo.txId),
         utxo.index,
-        0,
+        nSequence,
         inputScript,
       );
     });

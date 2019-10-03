@@ -4,6 +4,7 @@ import {
   Network,
   TxOutput,
 } from '@radar/redshift-types';
+import bip65 from 'bip65';
 import { expect } from 'chai';
 import { HTLC, UTXO, UtxoHtlc } from '../../../../src';
 import { config, toSatoshi, UtxoRpcClient } from '../../../lib/helpers';
@@ -18,10 +19,14 @@ let fundingUtxos: TxOutput[];
 let htlcArgs: UTXO.RedeemScriptArgs;
 let paymentSecret: string;
 
+const ABSOLUTE_TIMELOCK: number = 5;
 /**
  * Create an HTLC, fund it, and set the values necessary to take action on the swap.
  */
-function setupTestSuite(refundAddress: string = refunder.p2pkhAddress) {
+function setupTestSuite(
+  refundAddress: string = refunder.p2pkhAddress,
+  mineBlocksCount: number = 1,
+) {
   before(async () => {
     await setCoinbaseUtxos();
 
@@ -31,7 +36,10 @@ function setupTestSuite(refundAddress: string = refunder.p2pkhAddress) {
       refundAddress,
       paymentHash: random.paymentHash,
       claimerPublicKey: claimer.publicKey,
-      timelockBlockHeight: await rpcClient.getBlockCount(),
+      timelock: {
+        type: UTXO.LockType.ABSOLUTE,
+        blockHeight: (await rpcClient.getBlockCount()) + ABSOLUTE_TIMELOCK,
+      },
     };
     paymentSecret = random.paymentSecret;
 
@@ -44,6 +52,7 @@ function setupTestSuite(refundAddress: string = refunder.p2pkhAddress) {
       coinbaseUtxos,
       fundSatoshiAmount,
       funder.privateKey,
+      0,
     );
     const fundingTxId = await rpcClient.sendRawTransaction(fundTxHex);
 
@@ -59,7 +68,7 @@ function setupTestSuite(refundAddress: string = refunder.p2pkhAddress) {
     ];
 
     // Mine the funding transaction
-    await mineBlocks();
+    await mineBlocks(mineBlocksCount);
   });
 }
 
@@ -84,7 +93,7 @@ async function setCoinbaseUtxos() {
   ];
 }
 
-describe('UTXO HTLC - Bitcoin Network', () => {
+describe('UTXO BIP65 HTLC - Bitcoin Network', () => {
   before(async () => {
     // Mine 400 blocks ahead of the coinbase transaction. Segwit activates around 300.
     await mineBlocks(400);
@@ -116,7 +125,7 @@ describe('UTXO HTLC - Bitcoin Network', () => {
     });
   });
 
-  describe('Claim', () => {
+  describe('Claim', async () => {
     setupTestSuite();
 
     let claimTxId: string;
@@ -148,10 +157,27 @@ describe('UTXO HTLC - Bitcoin Network', () => {
   });
 
   describe('Refund', () => {
-    describe('P2PKH Address Refund', () => {
+    describe('P2PKH Address Refund Fail Case', async () => {
       setupTestSuite();
 
+      it('should not accept a refund if absolute timelock hasnt elapsed', async () => {
+        const currentBlockHeight = await rpcClient.getBlockCount();
+        const refundTxHex = htlc.refund(
+          fundingUtxos,
+          refunder.p2pkhAddress,
+          currentBlockHeight,
+          feeTokensPerVirtualByte,
+          refunder.privateKey,
+        );
+        const refundTxId = await rpcClient.sendRawTransaction(refundTxHex);
+        expect(refundTxId).to.be.null;
+      });
+    });
+
+    describe('P2PKH Address Refund Success Case', async () => {
+      setupTestSuite(undefined, ABSOLUTE_TIMELOCK);
       let refundTxId: string;
+
       it('should build a valid refund transaction given valid parameters', async () => {
         const currentBlockHeight = await rpcClient.getBlockCount();
         const refundTxHex = htlc.refund(
@@ -173,9 +199,25 @@ describe('UTXO HTLC - Bitcoin Network', () => {
       });
     });
 
-    describe('P2WPKH Address Refund', () => {
+    describe('P2WPKH Address Refund Fail Case', async () => {
       setupTestSuite(refunder.p2wpkhAddress);
 
+      it('should not accept a refund if absolute timelock hasnt elapsed', async () => {
+        const currentBlockHeight = await rpcClient.getBlockCount();
+        const refundTxHex = htlc.refund(
+          fundingUtxos,
+          refunder.p2pkhAddress,
+          currentBlockHeight,
+          feeTokensPerVirtualByte,
+          refunder.privateKey,
+        );
+        const refundTxId = await rpcClient.sendRawTransaction(refundTxHex);
+        expect(refundTxId).to.be.null;
+      });
+    });
+
+    describe('P2WPKH Address Refund Success Case', () => {
+      setupTestSuite(refunder.p2wpkhAddress, ABSOLUTE_TIMELOCK);
       let refundTxId: string;
       it('should build a valid refund transaction given valid parameters', async () => {
         const currentBlockHeight = await rpcClient.getBlockCount();
@@ -196,6 +238,17 @@ describe('UTXO HTLC - Bitcoin Network', () => {
           .to.be.above(0.009)
           .and.below(0.01); // Refund Output less tx fee
       });
+    });
+  });
+  describe('BIP65 Library', () => {
+    it('should produce the correct output for seconds input', () => {
+      const bip65Encoded = bip65.encode({ utc: 600000000 });
+      expect(bip65Encoded).to.equal(600000000);
+    });
+
+    it('should produce the correct output for block input', () => {
+      const bip65Encoded = bip65.encode({ blocks: 54 });
+      expect(bip65Encoded).to.equal(0x00000036);
     });
   });
 });

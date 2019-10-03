@@ -1,3 +1,4 @@
+// Typescript compiler configuration for targeting ES Modules
 {
   "extends": "../tsconfig.settings.json",
   "compilerOptions": {

@@ -21,3 +21,19 @@ export function toReversedByteOrderBuffer(arg: Buffer | string) {
 export function toReversedByteOrderHexString(string: string) {
   return toReversedByteOrderBuffer(string).toString('hex');
 }
+
+/**
+ * Prepend 0 in case of uneven hex char count
+ * @param input - The hex input
+ */
+export function makeHexEven(input: string): string {
+  if (!input) return input;
+
+  let output: string;
+  if (input.length % 2 !== 0) {
+    output = `0${input.replace('0x', '')}`;
+  } else {
+    output = input.replace('0x', '');
+  }
+  return output;
+}
