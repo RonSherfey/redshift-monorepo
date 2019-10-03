@@ -166,7 +166,6 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
       feeTokensPerVirtualByte,
       publicKey.toString('hex'),
       privateKey,
-      false,
     );
   }
 
@@ -187,7 +186,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     feeTokensPerVirtualByte: number,
     unlock: string,
     privateKey: string,
-    isClaim: boolean,
+    isClaim?: boolean,
   ): string {
     // Create a new transaction instance
     const tx = new Transaction();
