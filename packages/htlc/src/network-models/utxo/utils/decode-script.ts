@@ -7,6 +7,7 @@ import {
 import { crypto, payments, script } from 'bitcoinjs-lib';
 import { UTXO } from '../../../types';
 import { getBitcoinJSNetwork } from './bitcoinjs-lib';
+import { makeHexEven } from './format-utils';
 
 /**
  * Build the timelock object using the decompiled timelock opcode and value
@@ -18,8 +19,15 @@ function getTimeLockObjectFromDecompiledOpcode(
   timelockValue: string,
 ): UTXO.TimeLock {
   switch (timelockOpcode) {
-    case DecompiledOpCode.OP_CHECKSEQUENCEVERIFY:
-      const sanitizedTimeLockValue = timelockValue.replace('OP_', ''); // https://github.com/bitcoinjs/bitcoinjs-lib/issues/1485
+    case DecompiledOpCode.OP_CHECKSEQUENCEVERIFY: {
+      let sanitizedTimeLockValue = timelockValue;
+      if (timelockValue.startsWith('OP_')) {
+        // If the timelock is less than 17, the decode script thinks its an opcode.
+        // We must strip the OP_ prefix and manually convert to hex.
+        // https://github.com/bitcoinjs/bitcoinjs-lib/issues/1485
+        sanitizedTimeLockValue = Number(timelockValue.slice(3)).toString(16);
+      }
+      sanitizedTimeLockValue = makeHexEven(sanitizedTimeLockValue);
       return {
         type: UTXO.LockType.RELATIVE,
         blockBuffer: Buffer.from(sanitizedTimeLockValue, 'hex').readUIntLE(
@@ -27,14 +35,17 @@ function getTimeLockObjectFromDecompiledOpcode(
           sanitizedTimeLockValue.length / 2,
         ),
       };
-    case DecompiledOpCode.OP_CHECKLOCKTIMEVERIFY:
+    }
+    case DecompiledOpCode.OP_CHECKLOCKTIMEVERIFY: {
+      const sanitizedTimeLockValue = makeHexEven(timelockValue);
       return {
         type: UTXO.LockType.ABSOLUTE,
-        blockHeight: Buffer.from(timelockValue, 'hex').readUIntLE(
+        blockHeight: Buffer.from(sanitizedTimeLockValue, 'hex').readUIntLE(
           0,
-          timelockValue.length / 2,
+          sanitizedTimeLockValue.length / 2,
         ),
       };
+    }
     default:
       throw new Error(SwapError.INVALID_TIMELOCK_METHOD);
   }

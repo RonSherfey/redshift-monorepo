@@ -75,7 +75,7 @@ export function createSwapRedeemScript(
 
   const paymentHashBufferRipeMd160 = crypto.ripemd160(paymentHashBuffer);
 
-  let swapScript;
+  let swapScript: (number | Buffer)[];
   if (scriptArgs.timelock.type === UTXO.LockType.RELATIVE) {
     const nSequenceBuffer = script.number.encode(
       bip68.encode({ blocks: scriptArgs.timelock.blockBuffer }),
@@ -125,7 +125,7 @@ export function createSwapRedeemScript(
       opcodes.OP_CHECKSIG,
     ];
   } else {
-    throw new Error('Invalid Timelock Type (createSwapRedeemScript)');
+    throw new Error(SwapError.INVALID_TIMELOCK_METHOD);
   }
 
   // we convert to hex, make a buffer, decompile, then convert to hex in case nSequence < 17. Decompile will append OP_ to those cases.
