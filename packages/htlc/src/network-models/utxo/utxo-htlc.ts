@@ -98,10 +98,6 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     // Total spendable amount
     const tokens = utxos.reduce((t, c) => t + c.tokens, 0);
 
-    if (!address) {
-      throw new Error('No address provided for output (fund)');
-    }
-
     tx.addOutput(this.details.p2shP2wshAddress, amount);
     tx.addOutput(address, tokens - amount - fee);
 
@@ -179,6 +175,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
    * @param unlock Claim secret (preimage) or refund public key
    * @param privateKey The private key WIF string
+   * @param isClaim Whether it is a claim transaction or not
    */
   private buildTransaction(
     utxos: TxOutput[],
@@ -187,7 +184,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     feeTokensPerVirtualByte: number,
     unlock: string,
     privateKey: string,
-    claim: boolean,
+    isClaim: boolean,
   ): string {
     // Create a new transaction instance
     const tx = new Transaction();
@@ -211,17 +208,14 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
       blocks: currentBlockHeight,
     });
 
-    if (this._details.timelock.type === UTXO.LockType.ABSOLUTE || claim) {
-      // Add the inputs being spent to the transaction
-      this.addInputs(utxos, tx, 0, this.generateInputScript());
-    } else {
-      this.addInputs(
-        utxos,
-        tx,
-        (this.details.timelock as UTXO.RelativeTimeLock).blockBuffer,
-        this.generateInputScript(),
-      );
+    let nSequence = 0;
+    if (this._details.timelock.type === UTXO.LockType.RELATIVE && !isClaim) {
+      // The nSequence must be specified if a relative timelock is used and it's not a claim tx
+      nSequence = (this.details.timelock as UTXO.RelativeTimeLock).blockBuffer;
     }
+
+    // Add the inputs being spent to the transaction
+    this.addInputs(utxos, tx, nSequence, this.generateInputScript());
 
     // Estimate the tx fee
     const fee = estimateFee(

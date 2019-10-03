@@ -128,7 +128,7 @@ export function createSwapRedeemScript(
     throw new Error(SwapError.INVALID_TIMELOCK_METHOD);
   }
 
-  // we convert to hex, make a buffer, decompile, then convert to hex in case nSequence < 17. Decompile will append OP_ to those cases.
+  // We convert to hex, make a buffer, decompile, then convert to hex in case nSequence < 17. Decompile will append OP_ to those cases.
   // https://github.com/bitcoinjs/bitcoinjs-lib/issues/1485
   return convertScriptElementsToHex(
     script.decompile(

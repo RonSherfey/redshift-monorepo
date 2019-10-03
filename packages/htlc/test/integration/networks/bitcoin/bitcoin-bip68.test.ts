@@ -19,7 +19,7 @@ let fundingUtxos: TxOutput[];
 let htlcArgs: UTXO.RedeemScriptArgs;
 let paymentSecret: string;
 
-const RELATIVE_TIMELOCK: number = 20;
+const RELATIVE_TIMELOCK: number = 5;
 
 /**
  * Create an HTLC, fund it, and set the values necessary to take action on the swap.
