@@ -24,6 +24,24 @@ describe('validator', () => {
     });
   });
 
+  describe('isValidMainnetOnchainTicker', () => {
+    it('should return true if the mainnet on-chain ticker is valid', () => {
+      expect(
+        validator.isValidMainnetOnchainTicker(
+          fixtures.valid.mainnetOnchainTicker,
+        ),
+      ).to.be.true;
+    });
+
+    it('should return false if the mainnet on-chain ticker is not valid', () => {
+      expect(
+        validator.isValidMainnetOnchainTicker(
+          fixtures.invalid.mainnetOnchainTicker,
+        ),
+      ).to.be.false;
+    });
+  });
+
   describe('isValidMarket', () => {
     it('should return true if the market is valid', () => {
       expect(validator.isValidMarket(fixtures.valid.market)).to.be.true;

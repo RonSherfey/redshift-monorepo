@@ -1,36 +1,64 @@
-import { Market, Network, OnChainTicker, Subnet } from '@radar/redshift-types';
+import {
+  MainnetOnChainTicker,
+  Market,
+  Network,
+  OnChainTicker,
+  Subnet,
+} from '@radar/redshift-types';
 import { decode as base58Decode } from 'base58check';
 import { decode as bech32Decode } from 'bech32';
+import { isString } from 'util';
 
 export const validator = {
   /**
    * Determine if the passed network is valid
+   * @param n The network
    */
-  isValidNetwork(n: Network): boolean {
-    return !!Network[(n || '').toUpperCase()];
+  isValidNetwork(n: unknown): n is Network {
+    if (isString(n)) {
+      return !!Network[(n || '').toUpperCase()];
+    }
+    return false;
   },
 
   /**
    * Determine if the passed on-chain ticker is valid
    * @param ticker The on-chain ticker
    */
-  isValidOnchainTicker(ticker: OnChainTicker) {
-    return !!ticker && !!OnChainTicker[ticker.toUpperCase()];
+  isValidOnchainTicker(ticker: unknown): ticker is OnChainTicker {
+    if (isString(ticker)) {
+      return !!ticker && !!OnChainTicker[ticker.toUpperCase()];
+    }
+    return false;
+  },
+
+  /**
+   * Determine if the passed mainnet on-chain ticker is valid
+   * @param ticker The mainnet on-chain ticker
+   */
+  isValidMainnetOnchainTicker(ticker: unknown): ticker is MainnetOnChainTicker {
+    if (isString(ticker)) {
+      return !!ticker && !!MainnetOnChainTicker[ticker.toUpperCase()];
+    }
+    return false;
   },
 
   /**
    * Determine if the passed market is valid
    * @param ticker The market
    */
-  isValidMarket(market: Market) {
-    return !!market && !!Market[market.toUpperCase()];
+  isValidMarket(market: unknown): market is Market {
+    if (isString(market)) {
+      return !!market && !!Market[market.toUpperCase()];
+    }
+    return false;
   },
 
   /**
    * Determine if the passed uuid is valid
    * @param uuid The UUID to test
    */
-  isValidUUID(uuid: string) {
+  isValidUUID(uuid: string): boolean {
     if (
       new RegExp(
         /^[0-9a-f]{8}-?[0-9a-f]{4}-?[1-5][0-9a-f]{3}-?[89ab][0-9a-f]{3}-?[0-9a-f]{12}$/i,
@@ -72,7 +100,7 @@ export const validator = {
    * This is used as simple address validation
    * @param s The string to validate
    */
-  isValidBase58CheckOrBech32(s: string) {
+  isValidBase58CheckOrBech32(s: string): boolean {
     if (this.isValidBase58Check(s) || this.isValidBech32(s)) {
       return true;
     }
@@ -83,7 +111,7 @@ export const validator = {
    * Determine if the passed string is a valid hex
    * @param s The string to validate
    */
-  isValidHex(s: string) {
+  isValidHex(s: string): boolean {
     if (
       new RegExp(/^(0x)?[a-f0-9]+$/i).test(s) // Valid hex
     ) {
@@ -97,7 +125,7 @@ export const validator = {
    * @param network The chain network
    * @param subnet The chain subnet
    */
-  isValidNetworkAndSubnet(network: Network, subnet: Subnet) {
+  isValidNetworkAndSubnet(network: unknown, subnet: unknown): boolean {
     switch (network) {
       case Network.BITCOIN:
         switch (subnet) {
@@ -123,7 +151,7 @@ export const validator = {
    * Validate a WIF private key. Return true if valid
    * @param key The private key
    */
-  isValidWifPrivateKey(key: string) {
+  isValidWifPrivateKey(key: string): boolean {
     // Regex - Contains only base58 characters with length of 52
     if (!!key && new RegExp(/^[a-km-zA-HJ-NP-Z1-9]{52}$/i).test(key)) {
       return true;
