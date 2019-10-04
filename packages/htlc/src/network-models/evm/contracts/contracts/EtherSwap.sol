@@ -2,6 +2,7 @@ pragma solidity ^0.5.8;
 
 import "./Swap.sol";
 
+// solium-disable security/no-call-value
 contract EtherSwap is Swap {
     enum OrderState { HasFundingBalance, Claimed, Refunded }
 
@@ -55,8 +56,10 @@ contract EtherSwap is Swap {
         require(block.number <= order.refundBlockHeight, "Too late to claim.");
 
         order.preimage = preimage;
-        owner.transfer(order.onchainAmount);
         order.state = OrderState.Claimed;
+
+        (bool success, ) = owner.call.value(order.onchainAmount)("");
+        require(success, "Transfer failed.");
 
         emit OrderClaimed(orderUUID);
     }
@@ -71,8 +74,10 @@ contract EtherSwap is Swap {
         require(order.state == OrderState.HasFundingBalance, "Order cannot be refunded.");
         require(block.number > order.refundBlockHeight, "Too early to refund.");
 
-        order.user.transfer(order.onchainAmount);
         order.state = OrderState.Refunded;
+
+        (bool success, ) = order.user.call.value(order.onchainAmount)("");
+        require(success, "Transfer failed.");
 
         emit OrderRefunded(orderUUID);
     }
