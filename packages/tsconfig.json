@@ -5,6 +5,6 @@
         { "path": "redshift-utils" },
         { "path": "redshift-api-client" },
         { "path": "redshift.js" },
-        { "path": "htlc/tsconfig.cjs.json" }
+        { "path": "htlc/tsconfig.json" }
     ]
 }

@@ -1,3 +1,4 @@
+// Typescript compiler configuration for targeting CommonJS
 {
   "extends": "../tsconfig.settings.json",
   "compilerOptions": {
@@ -15,5 +16,5 @@
     "test",
     "dist",
     "src/network-models/evm/contracts"
-  ],
+  ]
 }

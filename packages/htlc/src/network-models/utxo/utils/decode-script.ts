@@ -7,6 +7,49 @@ import {
 import { crypto, payments, script } from 'bitcoinjs-lib';
 import { UTXO } from '../../../types';
 import { getBitcoinJSNetwork } from './bitcoinjs-lib';
+import { makeHexEven } from './format-utils';
+
+/**
+ * Build the timelock object using the decompiled timelock opcode and value
+ * @param timelockOpcode The timelock opcode
+ * @param timelockValue The timelock value
+ */
+function getTimeLockObjectFromDecompiledOpcode(
+  timelockOpcode: DecompiledOpCode,
+  timelockValue: string,
+): UTXO.TimeLock {
+  switch (timelockOpcode) {
+    case DecompiledOpCode.OP_CHECKSEQUENCEVERIFY: {
+      let sanitizedTimeLockValue = timelockValue;
+      if (timelockValue.startsWith('OP_')) {
+        // If the timelock is less than 17, the decode script thinks its an opcode.
+        // We must strip the OP_ prefix and manually convert to hex.
+        // https://github.com/bitcoinjs/bitcoinjs-lib/issues/1485
+        sanitizedTimeLockValue = Number(timelockValue.slice(3)).toString(16);
+      }
+      sanitizedTimeLockValue = makeHexEven(sanitizedTimeLockValue);
+      return {
+        type: UTXO.LockType.RELATIVE,
+        blockBuffer: Buffer.from(sanitizedTimeLockValue, 'hex').readUIntLE(
+          0,
+          sanitizedTimeLockValue.length / 2,
+        ),
+      };
+    }
+    case DecompiledOpCode.OP_CHECKLOCKTIMEVERIFY: {
+      const sanitizedTimeLockValue = makeHexEven(timelockValue);
+      return {
+        type: UTXO.LockType.ABSOLUTE,
+        blockHeight: Buffer.from(sanitizedTimeLockValue, 'hex').readUIntLE(
+          0,
+          sanitizedTimeLockValue.length / 2,
+        ),
+      };
+    }
+    default:
+      throw new Error(SwapError.INVALID_TIMELOCK_METHOD);
+  }
+}
 
 /**
  * Decompiles a redeem script and constructs a Details object
@@ -22,35 +65,35 @@ export function getSwapRedeemScriptDetails<N extends Network>(
   const networkPayload = getBitcoinJSNetwork(network, subnet);
   const redeemScriptBuffer = Buffer.from(redeemScriptHex, 'hex');
   const scriptAssembly = script
-    .toASM(script.decompile(redeemScriptBuffer))
+    .toASM(script.decompile(redeemScriptBuffer) || new Buffer(''))
     .split(' ');
 
-  let claimerPublicKey;
-  let paymentHash;
-  let cltv;
-  let refundPublicKeyHash;
+  let claimerPublicKey: string;
+  let paymentHash: string;
+  let timelock: UTXO.TimeLock;
+  let refundPublicKeyHash: string;
 
   switch (scriptAssembly.length) {
     case 12:
       {
         // public key redeem swap script
         const [
-          OP_SHA256,
+          OP_HASH160,
           decompiledPaymentHash,
           OP_EQUAL,
           OP_IF,
           decompiledClaimerPublicKey,
           OP_ELSE,
-          decompiledCltv,
-          OP_CHECKLOCKTIMEVERIFY,
+          decompiledTimeLockValue,
+          OP_TIMELOCKMETHOD, // should be either OP_CHECKSEQUENCEVERIFY or OP_CHECKLOCKTIMEVERIFY
           OP_DROP,
           decompiledRefundPublicKey,
           OP_ENDIF,
           OP_CHECKSIG,
         ] = scriptAssembly;
 
-        if (OP_SHA256 !== DecompiledOpCode.OP_SHA256) {
-          throw new Error(SwapError.EXPECTED_OP_SHA256);
+        if (OP_HASH160 !== DecompiledOpCode.OP_HASH160) {
+          throw new Error(SwapError.EXPECTED_OP_HASH160);
         }
 
         if (OP_EQUAL !== DecompiledOpCode.OP_EQUAL) {
@@ -66,9 +109,10 @@ export function getSwapRedeemScriptDetails<N extends Network>(
         }
 
         if (
-          OP_CHECKLOCKTIMEVERIFY !== DecompiledOpCode.OP_CHECKLOCKTIMEVERIFY
+          OP_TIMELOCKMETHOD !== DecompiledOpCode.OP_CHECKSEQUENCEVERIFY &&
+          OP_TIMELOCKMETHOD !== DecompiledOpCode.OP_CHECKLOCKTIMEVERIFY
         ) {
-          throw new Error(SwapError.EXPECTED_OP_CHECKLOCKTIMEVERIFY);
+          throw new Error(SwapError.EXPECTED_OP_TIMELOCKMETHOD);
         }
 
         if (OP_DROP !== DecompiledOpCode.OP_DROP) {
@@ -101,8 +145,12 @@ export function getSwapRedeemScriptDetails<N extends Network>(
         refundPublicKeyHash = crypto
           .hash160(Buffer.from(decompiledRefundPublicKey, 'hex'))
           .toString('hex');
-        cltv = decompiledCltv;
         paymentHash = decompiledPaymentHash;
+
+        timelock = getTimeLockObjectFromDecompiledOpcode(
+          OP_TIMELOCKMETHOD,
+          decompiledTimeLockValue,
+        );
       }
       break;
 
@@ -111,18 +159,18 @@ export function getSwapRedeemScriptDetails<N extends Network>(
         // public key hash redeem swap script
         const [
           OP_DUP,
-          OP_SHA256,
+          OP_HASH160,
           decompiledPaymentHash,
           OP_EQUAL,
           OP_IF,
           OP_DROP,
           decompiledClaimerPublicKey,
           OP_ELSE,
-          decompiledCltv,
-          OP_CHECKLOCKTIMEVERIFY,
+          decompiledTimeLockValue,
+          OP_TIMELOCKMETHOD,
           OP_DROP2,
           OP_DUP2,
-          OP_HASH160,
+          OP_HASH1602,
           decompiledRefundPublicKeyHash,
           OP_EQUALVERIFY,
           OP_ENDIF,
@@ -133,8 +181,8 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           throw new Error(SwapError.EXPECTED_OP_DUP);
         }
 
-        if (OP_SHA256 !== DecompiledOpCode.OP_SHA256) {
-          throw new Error(SwapError.EXPECTED_OP_SHA256);
+        if (OP_HASH160 !== DecompiledOpCode.OP_HASH160) {
+          throw new Error(SwapError.EXPECTED_OP_HASH160);
         }
 
         if (OP_EQUAL !== DecompiledOpCode.OP_EQUAL) {
@@ -154,9 +202,10 @@ export function getSwapRedeemScriptDetails<N extends Network>(
         }
 
         if (
-          OP_CHECKLOCKTIMEVERIFY !== DecompiledOpCode.OP_CHECKLOCKTIMEVERIFY
+          OP_TIMELOCKMETHOD !== DecompiledOpCode.OP_CHECKSEQUENCEVERIFY &&
+          OP_TIMELOCKMETHOD !== DecompiledOpCode.OP_CHECKLOCKTIMEVERIFY
         ) {
-          throw new Error(SwapError.EXPECTED_OP_CHECKLOCKTIMEVERIFY);
+          throw new Error(SwapError.EXPECTED_OP_TIMELOCKMETHOD);
         }
 
         if (OP_DROP2 !== DecompiledOpCode.OP_DROP) {
@@ -167,7 +216,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           throw new Error(SwapError.EXPECTED_OP_DUP);
         }
 
-        if (OP_HASH160 !== DecompiledOpCode.OP_HASH160) {
+        if (OP_HASH1602 !== DecompiledOpCode.OP_HASH160) {
           throw new Error(SwapError.EXPECTED_OP_HASH160);
         }
 
@@ -199,8 +248,12 @@ export function getSwapRedeemScriptDetails<N extends Network>(
 
         claimerPublicKey = decompiledClaimerPublicKey;
         refundPublicKeyHash = decompiledRefundPublicKeyHash;
-        cltv = decompiledCltv;
         paymentHash = decompiledPaymentHash;
+
+        timelock = getTimeLockObjectFromDecompiledOpcode(
+          OP_TIMELOCKMETHOD,
+          decompiledTimeLockValue,
+        );
       }
       break;
 
@@ -240,26 +293,21 @@ export function getSwapRedeemScriptDetails<N extends Network>(
     hash: refundPublicKeyHashBuffer,
   }).address;
 
-  const timelockBlockHeight = Buffer.from(cltv, 'hex').readUIntLE(
-    0,
-    cltv.length / 2,
-  );
-
   return {
     network,
     subnet,
     claimerPublicKey,
     paymentHash,
     refundPublicKeyHash,
-    timelockBlockHeight,
-    p2shAddress,
-    p2wshAddress,
-    p2shP2wshAddress: p2shWrappedWitnessAddress,
-    p2shOutputScript: p2shOutput.toString('hex'),
-    p2shP2wshOutputScript: p2shWrappedWitnessOutput.toString('hex'),
-    p2wshOutputScript: p2wshOutput.toString('hex'),
-    refundP2wpkhAddress: p2wpkhRefundAddress,
-    refundP2pkhAddress: p2pkhRefundAddress,
-    redeemScript: redeemScriptHex,
+    timelock,
+    p2shAddress: p2shAddress || '',
+    p2wshAddress: p2wshAddress || '',
+    p2shP2wshAddress: p2shWrappedWitnessAddress || '',
+    p2shOutputScript: (p2shOutput || '').toString('hex'),
+    p2shP2wshOutputScript: (p2shWrappedWitnessOutput || '').toString('hex'),
+    p2wshOutputScript: (p2wshOutput || '').toString('hex'),
+    refundP2wpkhAddress: p2wpkhRefundAddress || '',
+    refundP2pkhAddress: p2pkhRefundAddress || '',
+    redeemScript: redeemScriptHex || '',
   };
 }

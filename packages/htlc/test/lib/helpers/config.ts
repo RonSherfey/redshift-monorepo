@@ -1,6 +1,7 @@
 import { BitcoinSubnet, Network } from '@radar/redshift-types';
 import { crypto } from 'bitcoinjs-lib';
 import uuidv4 from 'uuid/v4';
+import { UTXO } from '../../../src';
 import { addHexPrefix } from '../../../src/utils';
 import { getTestingMnemonic } from './env-vars';
 import { getKeyPairFromMnemonic } from './wallet';
@@ -53,39 +54,90 @@ const networkSpecificConfigs = {
   bitcoin: {
     unit: {
       valid: {
-        redeemScript:
-          '76a820e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256702e10bb17576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
-        htlc: {
-          args: {
-            claimerPublicKey:
-              '0398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25',
-            paymentHash:
-              'e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d',
-            refundAddress: 'ST3cmHBZSa5KsDrbgFMmDaj78DhDa9US3J',
-            timelockBlockHeight: 3041,
+        absoluteTimeLock: {
+          redeemScript:
+            '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256702e10bb17576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
+          htlc: {
+            args: {
+              claimerPublicKey:
+                '0398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25',
+              paymentHash:
+                'e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d',
+              refundAddress: 'ST3cmHBZSa5KsDrbgFMmDaj78DhDa9US3J',
+              timelock: {
+                type: UTXO.LockType.ABSOLUTE,
+                blockHeight: 3041,
+              },
+            },
+            details: {
+              network: 'bitcoin',
+              subnet: 'simnet',
+              claimerPublicKey:
+                '0398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25',
+              paymentHash: 'c15949a2e2a414b5c641f32c4c2ee07be644e165',
+              refundPublicKeyHash: '3f1857b3db895b4d481a46e5a0129cb2b04781c8',
+              timelock: {
+                type: UTXO.LockType.ABSOLUTE,
+                blockHeight: 3041,
+              },
+              p2shOutputScript:
+                'a914c62820678cf19902ad2be6905fb7ea87a4bc81ed87',
+              p2shAddress: 'rodwyPBBTFooEpUoWnVYSeAX2PNbESEfcj',
+              p2shP2wshAddress: 'rpY9hikYMcsrwnb8fAPMLMunNk2Ck6rbmH',
+              p2shP2wshOutputScript:
+                'a914d0078c5b4b93ef5ef598ad2bb7a4dffc9c9b9db587',
+              p2wshAddress:
+                'sb1qe60gt270wluxfy0epq4dgg3sxv67eqede7ym5w4yt62mwu2l0u7syfcpqg',
+              p2wshOutputScript:
+                '0020ce9e85abcf77f86491f9082ad422303335ec832dcf89ba3aa45e95b7715f7f3d',
+              refundP2wpkhAddress: 'sb1q8uv90v7m39d56jq6gmj6qy5uk2cy0qwgfu40g6',
+              refundP2pkhAddress: 'ST3cmHBZSa5KsDrbgFMmDaj78DhDa9US3J',
+              redeemScript:
+                '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256702e10bb17576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
+            },
           },
-          details: {
-            network: 'bitcoin',
-            subnet: 'simnet',
-            claimerPublicKey:
-              '0398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25',
-            paymentHash:
-              'e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d',
-            refundPublicKeyHash: '3f1857b3db895b4d481a46e5a0129cb2b04781c8',
-            timelockBlockHeight: 3041,
-            p2shOutputScript: 'a9145a53e89d2db880a0dcaa627693b021344d15fdcf87',
-            p2shAddress: 'rdooShNdwHvAX73aXvu7kG2sqfE93RRshs',
-            p2shP2wshAddress: 'rWD48icLn4KwfPCWECVqRkfYD8rXmo6zdD',
-            p2shP2wshOutputScript:
-              'a91406f8bb6bbc7e0932d010e2242ba7f1c37208682587',
-            p2wshAddress:
-              'sb1qg69sz0pa3xj5sfftq0lrtt6c3pl9ry0vd547he6j3sn55x6kujlsdtpk2y',
-            p2wshOutputScript:
-              '0020468b013c3d89a548252b03fe35af58887e5191ec6d2bebe7528c274a1b56e4bf',
-            refundP2wpkhAddress: 'sb1q8uv90v7m39d56jq6gmj6qy5uk2cy0qwgfu40g6',
-            refundP2pkhAddress: 'ST3cmHBZSa5KsDrbgFMmDaj78DhDa9US3J',
-            redeemScript:
-              '76a820e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256702e10bb17576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
+        },
+        relativeTimeLock: {
+          redeemScript:
+            '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25670114b27576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
+          htlc: {
+            args: {
+              claimerPublicKey:
+                '0398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25',
+              paymentHash:
+                'e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d',
+              refundAddress: 'ST3cmHBZSa5KsDrbgFMmDaj78DhDa9US3J',
+              timelock: {
+                type: UTXO.LockType.RELATIVE,
+                blockBuffer: 20,
+              },
+            },
+            details: {
+              network: 'bitcoin',
+              subnet: 'simnet',
+              claimerPublicKey:
+                '0398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25',
+              paymentHash: 'c15949a2e2a414b5c641f32c4c2ee07be644e165',
+              refundPublicKeyHash: '3f1857b3db895b4d481a46e5a0129cb2b04781c8',
+              timelock: {
+                type: UTXO.LockType.RELATIVE,
+                blockBuffer: 20,
+              },
+              p2shOutputScript:
+                'a914abbe2fd62eca9b6f4fcac561b1dd20f9e2499e1787',
+              p2shAddress: 'rmEHVaJE1SKHNzVZjye1Nq6vcSJn9k4d7Z',
+              p2shP2wshAddress: 'raHc4bACRGaoxMSTEeExXupKLaZitzAQJW',
+              p2shP2wshOutputScript:
+                'a91433b58d4b5f5ef4bed6c35afeaf817d880146703787',
+              p2wshAddress:
+                'sb1qxlce8hcm59dpgp5v0yn8ydh3t6q6namkfaxmuce8pdmaj4d5l7ts0u9ch3',
+              p2wshOutputScript:
+                '002037f193df1ba15a14068c79267236f15e81a9f7764f4dbe63270b77d955b4ff97',
+              refundP2wpkhAddress: 'sb1q8uv90v7m39d56jq6gmj6qy5uk2cy0qwgfu40g6',
+              refundP2pkhAddress: 'ST3cmHBZSa5KsDrbgFMmDaj78DhDa9US3J',
+              redeemScript:
+                '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25670114b27576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
+            },
           },
         },
       },

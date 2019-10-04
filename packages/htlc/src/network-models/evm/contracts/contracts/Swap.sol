@@ -12,7 +12,7 @@ contract Swap is Owned {
     /**
      * Set the block height at which a refund will successfully process.
      */
-    function setRefundDelay(uint delay) public onlyOwner {
+    function setRefundDelay(uint delay) external onlyOwner {
         require(delay <= MAX_REFUND_DELAY, "Delay is too large.");
         refundDelay = delay;
     }

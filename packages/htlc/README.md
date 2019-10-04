@@ -17,16 +17,35 @@ yarn add @radar/htlc
 
 ## Usage - Bitcoin
 
-### Construct a new Bitcoin HTLC:
+### Construct a new Bitcoin HTLC with an absolute timelock:
 
 ```typescript
-import { HTLC } from '@radar/htlc';
+import { HTLC, UTXO } from '@radar/htlc';
 
 const htlc = HTLC.construct(Network.BITCOIN, BitcoinSubnet.SIMNET, {
   paymentHash: 'fba6da3ff596b9c6fabe67d4f728474697640ef6edd9e361c2a46be345112839',
   claimerPublicKey: '0286ab3b59ce3862515b01c8a282edb6011b4eb50c608ab298bfd70f6033f7bc65',
   refundAddress: 'sb1qxnqqm56ta40p3uhtsmtdxglhwuxjk3tul94mq0',
-  timelockBlockHeight: 800,
+  timelock: {
+    type: UTXO.LockType.ABSOLUTE,
+    blockHeight: 597732,
+  },
+});
+```
+
+### Construct a new Bitcoin HTLC with a relative timelock:
+
+```typescript
+import { HTLC, UTXO } from '@radar/htlc';
+
+const htlc = HTLC.construct(Network.BITCOIN, BitcoinSubnet.SIMNET, {
+  paymentHash: 'fba6da3ff596b9c6fabe67d4f728474697640ef6edd9e361c2a46be345112839',
+  claimerPublicKey: '0286ab3b59ce3862515b01c8a282edb6011b4eb50c608ab298bfd70f6033f7bc65',
+  refundAddress: 'sb1qxnqqm56ta40p3uhtsmtdxglhwuxjk3tul94mq0',
+  timelock: {
+    type: UTXO.LockType.RELATIVE,
+    blockBuffer: 50,
+  },
 });
 ```
 
@@ -38,7 +57,7 @@ import { HTLC } from '@radar/htlc';
 const htlc = HTLC.construct(
   Network.BITCOIN,
   BitcoinSubnet.SIMNET,
-  '76a820fba6da3ff596b9c6fabe67d4f728474697640ef6edd9e361c2a46be345112839876375210286ab3b59ce3862515b01c8a282edb6011b4eb50c608ab298bfd70f6033f7bc6567022003b17576a91434c00dd34bed5e18f2eb86d6d323f7770d2b457c8868ac',
+  '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25670114b27576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
 );
 ```
 

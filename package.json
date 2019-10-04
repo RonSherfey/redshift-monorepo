@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "build": "concurrently 'yarn build:cjs' 'yarn build:esm'",
-    "build:cjs": "tsc -b packages/redshift-types packages/redshift-utils packages/htlc/tsconfig.cjs.json packages/redshift-api-client packages/redshift.js",
+    "build:cjs": "tsc -b packages/redshift-types packages/redshift-utils packages/htlc packages/redshift-api-client packages/redshift.js",
     "build:esm": "tsc -b packages/htlc/tsconfig.esm.json",
     "test": "lerna run test --stream --parallel",
     "lint": "tslint -c tslint.json 'packages/**/*.ts' --fix",

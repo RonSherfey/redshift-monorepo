@@ -2,6 +2,7 @@ pragma solidity ^0.5.8;
 
 import "./Swap.sol";
 
+// solium-disable security/no-call-value
 contract EtherSwap is Swap {
     enum OrderState { HasFundingBalance, Claimed, Refunded }
 
@@ -24,7 +25,7 @@ contract EtherSwap is Swap {
     /**
      * Allow the sender to fund a swap in one or more transactions.
      */
-    function fund(bytes16 orderUUID, bytes32 paymentHash) public payable {
+    function fund(bytes16 orderUUID, bytes32 paymentHash) external payable {
         SwapOrder storage order = orders[orderUUID];
 
         if (!order.exist) {
@@ -46,7 +47,7 @@ contract EtherSwap is Swap {
      * Allow the recipient to claim the funds once they know the preimage of the hashlock.
      * Anyone can claim but tokens only send to owner.
      */
-    function claim(bytes16 orderUUID, bytes32 preimage) public {
+    function claim(bytes16 orderUUID, bytes32 preimage) external {
         SwapOrder storage order = orders[orderUUID];
 
         require(order.exist == true, "Order does not exist.");
@@ -55,8 +56,10 @@ contract EtherSwap is Swap {
         require(block.number <= order.refundBlockHeight, "Too late to claim.");
 
         order.preimage = preimage;
-        owner.transfer(order.onchainAmount);
         order.state = OrderState.Claimed;
+
+        (bool success, ) = owner.call.value(order.onchainAmount)("");
+        require(success, "Transfer failed.");
 
         emit OrderClaimed(orderUUID);
     }
@@ -64,15 +67,17 @@ contract EtherSwap is Swap {
     /**
      * Refund the sent amount back to the funder if the timelock has expired.
      */
-    function refund(bytes16 orderUUID) public {
+    function refund(bytes16 orderUUID) external {
         SwapOrder storage order = orders[orderUUID];
 
         require(order.exist == true, "Order does not exist.");
         require(order.state == OrderState.HasFundingBalance, "Order cannot be refunded.");
         require(block.number > order.refundBlockHeight, "Too early to refund.");
 
-        order.user.transfer(order.onchainAmount);
         order.state = OrderState.Refunded;
+
+        (bool success, ) = order.user.call.value(order.onchainAmount)("");
+        require(success, "Transfer failed.");
 
         emit OrderRefunded(orderUUID);
     }
