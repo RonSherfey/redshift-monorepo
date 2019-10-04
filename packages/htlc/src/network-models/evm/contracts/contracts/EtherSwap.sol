@@ -25,7 +25,7 @@ contract EtherSwap is Swap {
     /**
      * Allow the sender to fund a swap in one or more transactions.
      */
-    function fund(bytes16 orderUUID, bytes32 paymentHash) public payable {
+    function fund(bytes16 orderUUID, bytes32 paymentHash) external payable {
         SwapOrder storage order = orders[orderUUID];
 
         if (!order.exist) {
@@ -47,7 +47,7 @@ contract EtherSwap is Swap {
      * Allow the recipient to claim the funds once they know the preimage of the hashlock.
      * Anyone can claim but tokens only send to owner.
      */
-    function claim(bytes16 orderUUID, bytes32 preimage) public {
+    function claim(bytes16 orderUUID, bytes32 preimage) external {
         SwapOrder storage order = orders[orderUUID];
 
         require(order.exist == true, "Order does not exist.");
@@ -67,7 +67,7 @@ contract EtherSwap is Swap {
     /**
      * Refund the sent amount back to the funder if the timelock has expired.
      */
-    function refund(bytes16 orderUUID) public {
+    function refund(bytes16 orderUUID) external {
         SwapOrder storage order = orders[orderUUID];
 
         require(order.exist == true, "Order does not exist.");
