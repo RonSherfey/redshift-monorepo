@@ -92,10 +92,10 @@
     log-update "^2.3.0"
     strip-ansi "^3.0.1"
 
-"@radarrelay/tslint-config@^5.0.0":
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@radarrelay/tslint-config/-/tslint-config-5.0.0.tgz#c1bbb7daa780a609293c6d8e32b38d9af0459f72"
-  integrity sha512-u9P/oxbPgMQrAIrV54F5K1uLQ+tAMqoy2+Mbq9qbrLhjo4bMOliRA5FDuWH1NAcnLeoem8X4fKhJzM6++vV6AQ==
+"@radar/tslint-config@^5.0.0":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@radar/tslint-config/-/tslint-config-5.0.1.tgz#a4648b11c665cd233632277db099cf1b6fa75f4b"
+  integrity sha512-B45+HVLxgap9s83KAmY1IosRqqVVkmIHYnCpUtXSfx0mUQtIsV308jOQdInbUKDUG6eqrQQB0PP9s+QuLOfrrA==
   dependencies:
     "@0xproject/tslint-config" "^1.0.7"
     tslint-config-airbnb "^5.11.0"

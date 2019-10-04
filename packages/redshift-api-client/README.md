@@ -1,5 +1,5 @@
 # @radar/redshift-api-client
-**Redshift HTTP & WebSocket Client Library**
+**REDSHIFT HTTP & WebSocket Client Library**
 
 ## Installation
 
@@ -104,7 +104,7 @@ const client = new WebSocketClient();
 
 **Connect**
 
-Establish a connection to the Redshift WebSocket API
+Establish a connection to the REDSHIFT WebSocket API
 
 ```typescript
 await client.connect();
@@ -112,7 +112,7 @@ await client.connect();
 
 **Disconnect**
 
-Disconnect from the Redshift WebSocket API
+Disconnect from the REDSHIFT WebSocket API
 
 ```typescript
 client.disconnect();

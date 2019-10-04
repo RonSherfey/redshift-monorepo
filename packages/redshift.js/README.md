@@ -1,5 +1,5 @@
 # @radar/redshift.js
-**The official Redshift Javascript SDK**
+**The official REDSHIFT Javascript SDK**
 
 ## About
 

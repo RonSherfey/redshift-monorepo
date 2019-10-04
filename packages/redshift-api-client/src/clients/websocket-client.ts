@@ -40,7 +40,7 @@ export class WebSocketClient {
   }
 
   /**
-   * Establish a connection to the Redshift WebSocket API
+   * Establish a connection to the REDSHIFT WebSocket API
    * @param opts The socket connection options
    */
   public async connect(opts?: SocketIOClient.ConnectOpts): Promise<string> {
@@ -62,7 +62,7 @@ export class WebSocketClient {
   }
 
   /**
-   * Disconnect from the Redshift WebSocket API
+   * Disconnect from the REDSHIFT WebSocket API
    */
   public disconnect() {
     if (this._socket && this._socket.connected) {
