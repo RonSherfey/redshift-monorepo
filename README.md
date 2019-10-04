@@ -20,13 +20,12 @@ This repository is a monorepo, which includes the HTLC logic that powers REDSHIF
 The initial release of REDSHIFT supports unidirectional swaps as detailed below:
 
 1. A user comes to REDSHIFT with a Lightning invoice that they would like REDSHIFT to pay. They have on-chain bitcoin or ether.
-2. The user makes a request to REDSHIFT that contains the invoice and on-chain asset that they would like to use to pay.
+2. The user makes a request to REDSHIFT that contains the invoice and on-chain asset ticker that they will use to pay.
 3. REDSHIFT returns a quote to the user, which contains the information required to send the escrow payment.
 4. The user sends the escrow payment in the amount specified by REDSHIFT.
 4. Once the payment confirms, REDSHIFT pays the invoice and uses the [preimage](https://wiki.ion.radar.tech/tech/bitcoin/pre-image) to sweep the funds from the escrow.
 
-In the event that REDSHIFT is unable to pay the invoice, REDSHIFT will not have access to the funds in the escrow. The user will be able
-to execute a refund transaction after the timelock has expired.
+In the event that REDSHIFT is unable to pay the invoice, REDSHIFT will not have access to the funds in the escrow. The user will be able to execute a refund transaction after the timelock has expired to recoup their funds.
 
 This type of swap can be used to top up your Lightning balance, make off-chain purchases with on-chain funds, or simply swap assets.
 
