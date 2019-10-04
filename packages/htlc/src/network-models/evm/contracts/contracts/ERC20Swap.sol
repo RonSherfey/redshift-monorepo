@@ -32,7 +32,7 @@ contract ERC20Swap is Swap {
     /**
      * Allow the sender to fund a swap in one or more transactions.
      */
-    function fund(bytes16 orderUUID, bytes32 paymentHash, address tokenContractAddress, uint tokenAmount) public {
+    function fund(bytes16 orderUUID, bytes32 paymentHash, address tokenContractAddress, uint tokenAmount) external {
         SwapOrder storage order = orders[orderUUID];
 
         if (!order.exist) {
@@ -67,7 +67,7 @@ contract ERC20Swap is Swap {
      * Allow the recipient to claim the funds once they know the preimage of the hashlock.
      * Anyone can claim but tokens only send to owner.
      */
-    function claim(bytes16 orderUUID, address tokenContractAddress, bytes32 preimage) public {
+    function claim(bytes16 orderUUID, address tokenContractAddress, bytes32 preimage) external {
         SwapOrder storage order = orders[orderUUID];
 
         require(order.exist == true, "Order does not exist.");
@@ -86,7 +86,7 @@ contract ERC20Swap is Swap {
     /**
      * Refund the sent token amount back to the funder if the timelock has expired.
      */
-    function refund(bytes16 orderUUID, address tokenContractAddress) public {
+    function refund(bytes16 orderUUID, address tokenContractAddress) external {
         SwapOrder storage order = orders[orderUUID];
 
         require(order.exist == true, "Order does not exist.");
