@@ -69,6 +69,9 @@ docker-compose up -d
 yarn test
 ```
 
+**Note:** All tests in all packages will run if you execute `yarn test` from the `redshift-monorepo` folder.
+If you would like to run tests specific to one package, `cd` into the target package directory before running `yarn test`.
+
 ## Contributing
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.

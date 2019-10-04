@@ -101,7 +101,8 @@ const refundTxHex = htlc.refund(
 );
 ```
 
-For a working example, view the [Bitcoin HTLC tests](./test/integration/networks/bitcoin/bitcoin.test.ts).
+For working examples, view the [Absolute](./test/integration/networks/bitcoin/bitcoin-bip65.test.ts) or
+[Relative](./test/integration/networks/bitcoin/bitcoin-bip68.test.ts) Timelock Bitcoin HTLC tests.
 
 ## Usage - Ethereum
 
@@ -166,6 +167,9 @@ Don't want to sign and broadcast the transaction? Set `shouldBroadcast` to false
 const unsignedTx = await htlc.refund(false);
 ```
 
+For working examples, view the [Ether](./test/integration/networks/ethereum/ether.test.ts) or
+[ERC20](./test/integration/networks/ethereum/erc20.test.ts) Ethereum HTLC tests.
+
 ## Usage - Stellar
 
 ### Construct a Stellar HTLC:
@@ -204,6 +208,8 @@ Once broadcast, the escrow account gets merged into the server account. Swap Com
 ``` typescript
 await htlc.claim(paymentSecret);
 ```
+
+For a working example, view the [Stellar](./test/integration/networks/stellar/stellar.test.ts) HTLC tests.
 
 ## Testing
 
