@@ -7,12 +7,12 @@ export interface ContractAddresses {
 
 const subnetToAddresses: { [subnet: string]: ContractAddresses } = {
   [EthereumSubnet.MAINNET]: {
-    etherSwap: '0xfA2c720305c11655350134185a3d10d2B2b1CaC0',
-    erc20Swap: '0xF7A5c9bfA0A02a70AE17E993A508978989306aAa',
+    etherSwap: '0x46340430971885eFfA5757eE03356eD228258ac0',
+    erc20Swap: '0x920412379dB3CbBf17b4c81F93F065115aFaCb96',
   },
   [EthereumSubnet.KOVAN_TESTNET]: {
-    etherSwap: '0x5F4200bB489318C0Ea7A59FBE2241dF0FB1C8f8B',
-    erc20Swap: '0xdcE79992251CD3646DCDC69F9B55D14d0eEFd997',
+    etherSwap: '0xd4589fB5b5ABB44e1A8cb95CfF0Ca9E0e78D9D5d',
+    erc20Swap: '0xA102bB327123afc530AC122b69c0c675627f6c19',
   },
   [EthereumSubnet.GANACHE_SIMNET]: {
     etherSwap: '0xf0398fad8c2aa38c476b010c269158d442730e98',
