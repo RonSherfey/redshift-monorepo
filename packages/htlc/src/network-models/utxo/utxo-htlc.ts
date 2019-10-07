@@ -1,6 +1,5 @@
 import { Network, SubnetMap, SwapError, TxOutput } from '@radar/redshift-types';
 import bip65 from 'bip65';
-import bip68 from 'bip68';
 import {
   address,
   crypto,
@@ -211,9 +210,9 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     });
 
     let nSequence = 0;
-    if (this._details.timelock.type === UTXO.LockType.RELATIVE && !isClaim) {
+    if (this._details.timelockType === UTXO.LockType.RELATIVE && !isClaim) {
       // The nSequence must be specified if a relative timelock is used and it's not a claim tx
-      nSequence = (this.details.timelock as UTXO.RelativeTimeLock).blockBuffer;
+      nSequence = this._details.timelockValue;
     }
 
     // Add the inputs being spent to the transaction

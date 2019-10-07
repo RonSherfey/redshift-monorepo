@@ -5,10 +5,11 @@ export namespace UTXO {
   export interface Details<N extends Network> {
     network: N;
     subnet: SubnetMap[N];
-    paymentHash: string; // payment hash hex string
+    paymentHashRipemd160: string; // ripemd-160 hash of the payment hash hex string
     claimerPublicKey: string; // claim public key hex string
     refundPublicKeyHash: string; // refund pubkey hash string
-    timelock: UTXO.TimeLock;
+    timelockType: LockType; // timelock type (absolute or relative)
+    timelockValue: number; // timelock value (block height or block buffer)
     p2shOutputScript: string; // pay to script hash output hex string
     p2shAddress: string; // pay to script hash base58 address
     p2shP2wshAddress: string; // nested pay to witness script address
@@ -24,7 +25,7 @@ export namespace UTXO {
     claimerPublicKey: string;
     paymentHash: string;
     refundAddress: string;
-    timelock: AbsoluteTimeLock | RelativeTimeLock;
+    timelock: TimeLock;
   }
 
   export type TimeLock = AbsoluteTimeLock | RelativeTimeLock;
