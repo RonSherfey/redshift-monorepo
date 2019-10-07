@@ -1,7 +1,7 @@
 {
   "name": "@radar/redshift-api-client",
   "version": "0.1.2",
-  "description": "Redshift HTTP & WebSocket Client Library",
+  "description": "REDSHIFT HTTP & WebSocket Client Library",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

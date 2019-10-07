@@ -9,7 +9,7 @@
     "clean": "rimraf packages/**/dist"
   },
   "devDependencies": {
-    "@radarrelay/tslint-config": "^5.0.0",
+    "@radar/tslint-config": "^5.0.0",
     "@ts-tools/node": "^0.7.4",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.5",

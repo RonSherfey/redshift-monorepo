@@ -1,5 +1,5 @@
 # @radar/redshift-types
-Common types used across Redshift codebases
+**Common types used across REDSHIFT codebases**
 
 ## Installation
 

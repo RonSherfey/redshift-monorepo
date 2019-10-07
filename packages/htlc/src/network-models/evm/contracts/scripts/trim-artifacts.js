@@ -9,14 +9,34 @@ const fs = require('fs'),
 glob.sync( '../contract-artifacts/**/*.json' ).forEach(relativePath => {
   const artifactPath = path.resolve(relativePath);
   let artifact = require(artifactPath);
-  const { contractName, abi, bytecode, source, compiler, updatedAt } = artifact;
+  const {
+    contractName,
+    abi,
+    bytecode,
+    deployedBytecode,
+    source,
+    compiler,
+    updatedAt,
+    schemaVersion,
+    userdoc,
+  } = artifact;
+  const networks = Object.keys(artifact.networks).reduce((filteredNetworks, networkId) => {
+    if (networkId === '1' || networkId === '42') { // Save Mainnet or Kovan only
+      filteredNetworks[networkId] = artifact.networks[networkId]
+    }
+    return filteredNetworks;
+  }, {});
   artifact = {
     contractName,
     abi,
     bytecode,
+    deployedBytecode,
     source,
     compiler,
-    updatedAt
+    networks,
+    updatedAt,
+    schemaVersion,
+    userdoc
   };
   fs.writeFile(artifactPath, JSON.stringify(artifact, null, 2) + '\r\n', function (err) {
     if (err) return console.log(err);

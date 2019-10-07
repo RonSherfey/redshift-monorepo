@@ -7,21 +7,21 @@ export class RedshiftClient {
   private _ws: WebSocketClient;
 
   /**
-   * The Redshift HTTP API client instance
+   * The REDSHIFT HTTP API client instance
    */
   get http() {
     return this._http;
   }
 
   /**
-   * The Redshift WebSocket API client instance
+   * The REDSHIFT WebSocket API client instance
    */
   get ws() {
     return this._ws;
   }
 
   /**
-   * Instantiate the Redshift client
+   * Instantiate the REDSHIFT client
    * @param url The redshift WebSocket & HTTP API urls without the paths
    */
   constructor(url: string = config.url) {

@@ -7,7 +7,7 @@ import {
 } from '@radar/redshift.js';
 import { expect } from './lib';
 
-describe('Redshift.js', () => {
+describe('redshift.js', () => {
   it('populates the exports', () => {
     expect(HttpClient).to.not.be.undefined;
     expect(RedshiftClient).to.not.be.undefined;
