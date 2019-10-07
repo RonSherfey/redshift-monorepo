@@ -52,6 +52,19 @@ function getTimeLockObjectFromDecompiledOpcode(
 }
 
 /**
+ * Get the timelock value for the active lock type
+ * @param timelock The timelock object
+ */
+function getTimelockValue(timelock: UTXO.TimeLock) {
+  switch (timelock.type) {
+    case UTXO.LockType.ABSOLUTE:
+      return timelock.blockHeight;
+    case UTXO.LockType.RELATIVE:
+      return timelock.blockBuffer;
+  }
+}
+
+/**
  * Decompiles a redeem script and constructs a Details object
  * @param subnet The network subnet the redeem script will execute on
  * @param redeemScriptHex The hex representation of the redeem script
@@ -69,7 +82,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
     .split(' ');
 
   let claimerPublicKey: string;
-  let paymentHash: string;
+  let paymentHashRipemd160: string;
   let timelock: UTXO.TimeLock;
   let refundPublicKeyHash: string;
 
@@ -79,7 +92,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
         // public key redeem swap script
         const [
           OP_HASH160,
-          decompiledPaymentHash,
+          decompiledPaymentHashRipemd160,
           OP_EQUAL,
           OP_IF,
           decompiledClaimerPublicKey,
@@ -145,7 +158,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
         refundPublicKeyHash = crypto
           .hash160(Buffer.from(decompiledRefundPublicKey, 'hex'))
           .toString('hex');
-        paymentHash = decompiledPaymentHash;
+        paymentHashRipemd160 = decompiledPaymentHashRipemd160;
 
         timelock = getTimeLockObjectFromDecompiledOpcode(
           OP_TIMELOCKMETHOD,
@@ -160,7 +173,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
         const [
           OP_DUP,
           OP_HASH160,
-          decompiledPaymentHash,
+          decompiledPaymentHashRipemd160,
           OP_EQUAL,
           OP_IF,
           OP_DROP,
@@ -248,7 +261,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
 
         claimerPublicKey = decompiledClaimerPublicKey;
         refundPublicKeyHash = decompiledRefundPublicKeyHash;
-        paymentHash = decompiledPaymentHash;
+        paymentHashRipemd160 = decompiledPaymentHashRipemd160;
 
         timelock = getTimeLockObjectFromDecompiledOpcode(
           OP_TIMELOCKMETHOD,
@@ -297,9 +310,10 @@ export function getSwapRedeemScriptDetails<N extends Network>(
     network,
     subnet,
     claimerPublicKey,
-    paymentHash,
+    paymentHashRipemd160,
     refundPublicKeyHash,
-    timelock,
+    timelockType: timelock.type,
+    timelockValue: getTimelockValue(timelock),
     p2shAddress: p2shAddress || '',
     p2wshAddress: p2wshAddress || '',
     p2shP2wshAddress: p2shWrappedWitnessAddress || '',

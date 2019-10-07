@@ -65,7 +65,7 @@ const networkSpecificConfigs = {
                 'e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d',
               refundAddress: 'ST3cmHBZSa5KsDrbgFMmDaj78DhDa9US3J',
               timelock: {
-                type: UTXO.LockType.ABSOLUTE,
+                type: UTXO.LockType.ABSOLUTE as UTXO.LockType.ABSOLUTE, // cast to narrow type
                 blockHeight: 3041,
               },
             },
@@ -74,12 +74,10 @@ const networkSpecificConfigs = {
               subnet: 'simnet',
               claimerPublicKey:
                 '0398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25',
-              paymentHash: 'c15949a2e2a414b5c641f32c4c2ee07be644e165',
+              paymentHashRipemd160: 'c15949a2e2a414b5c641f32c4c2ee07be644e165',
               refundPublicKeyHash: '3f1857b3db895b4d481a46e5a0129cb2b04781c8',
-              timelock: {
-                type: UTXO.LockType.ABSOLUTE,
-                blockHeight: 3041,
-              },
+              timelockType: UTXO.LockType.ABSOLUTE,
+              timelockValue: 3041,
               p2shOutputScript:
                 'a914c62820678cf19902ad2be6905fb7ea87a4bc81ed87',
               p2shAddress: 'rodwyPBBTFooEpUoWnVYSeAX2PNbESEfcj',
@@ -108,7 +106,7 @@ const networkSpecificConfigs = {
                 'e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d',
               refundAddress: 'ST3cmHBZSa5KsDrbgFMmDaj78DhDa9US3J',
               timelock: {
-                type: UTXO.LockType.RELATIVE,
+                type: UTXO.LockType.RELATIVE as UTXO.LockType.RELATIVE, // cast to narrow type
                 blockBuffer: 20,
               },
             },
@@ -117,12 +115,10 @@ const networkSpecificConfigs = {
               subnet: 'simnet',
               claimerPublicKey:
                 '0398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25',
-              paymentHash: 'c15949a2e2a414b5c641f32c4c2ee07be644e165',
+              paymentHashRipemd160: 'c15949a2e2a414b5c641f32c4c2ee07be644e165',
               refundPublicKeyHash: '3f1857b3db895b4d481a46e5a0129cb2b04781c8',
-              timelock: {
-                type: UTXO.LockType.RELATIVE,
-                blockBuffer: 20,
-              },
+              timelockType: UTXO.LockType.RELATIVE,
+              timelockValue: 20,
               p2shOutputScript:
                 'a914abbe2fd62eca9b6f4fcac561b1dd20f9e2499e1787',
               p2shAddress: 'rmEHVaJE1SKHNzVZjye1Nq6vcSJn9k4d7Z',

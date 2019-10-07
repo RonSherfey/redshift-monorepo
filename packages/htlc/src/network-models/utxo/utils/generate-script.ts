@@ -73,7 +73,7 @@ export function createSwapRedeemScript(
     refundPublicKeyHash,
   ].map(i => Buffer.from(i, 'hex'));
 
-  const paymentHashBufferRipeMd160 = crypto.ripemd160(paymentHashBuffer);
+  const paymentHashBufferRipemd160 = crypto.ripemd160(paymentHashBuffer);
 
   let swapScript: (number | Buffer)[];
   if (scriptArgs.timelock.type === UTXO.LockType.RELATIVE) {
@@ -84,7 +84,7 @@ export function createSwapRedeemScript(
     swapScript = [
       opcodes.OP_DUP,
       opcodes.OP_HASH160,
-      paymentHashBufferRipeMd160,
+      paymentHashBufferRipemd160,
       opcodes.OP_EQUAL,
       opcodes.OP_IF,
       opcodes.OP_DROP,
@@ -108,7 +108,7 @@ export function createSwapRedeemScript(
     swapScript = [
       opcodes.OP_DUP,
       opcodes.OP_HASH160,
-      paymentHashBufferRipeMd160,
+      paymentHashBufferRipemd160,
       opcodes.OP_EQUAL,
       opcodes.OP_IF,
       opcodes.OP_DROP,
