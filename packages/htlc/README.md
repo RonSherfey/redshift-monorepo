@@ -215,7 +215,7 @@ For a working example, view the [Stellar](./test/integration/networks/stellar/st
 
 ### Build container services for tests
 ```sh
-docker-compose up
+docker-compose up -d
 ```
 
 ### Run tests:
