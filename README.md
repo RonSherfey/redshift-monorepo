@@ -6,7 +6,7 @@
 
 [REDSHIFT](https://ion.radar.tech/redshift) enables wallet-to-wallet cross-blockchain trading and payments for the Lightning Network. This is accomplished through the use of [submarine swaps](https://wiki.ion.radar.tech/tech/research/submarine-swap), and more specifically, [HTLCs](https://wiki.ion.radar.tech/tech/bitcoin/hltc).
 
-This repository is a monorepo, which includes the HTLC logic that powers REDSHIFT, an SDK that can be used to integrate submarine swaps into your application, and other helpful utilities.
+This repository is a monorepo, which includes the [HTLC](/packages/htlc) logic that powers REDSHIFT, an [SDK](/packages/redshift.js) that can be used to integrate submarine swaps into your application, and other helpful [utilities](/packages/redshift-utils).
 
 ### Supported On-Chain Assets
 
