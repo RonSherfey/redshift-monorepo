@@ -2,7 +2,7 @@ require("ts-node/register");
 var path = require("path");
 var HDWalletProvider = require("truffle-hdwallet-provider");
 
-var mnemonic = "venue sauce setup question scorpion legend enemy wise fitness over cave series";
+var mnemonic = "REPLACE_ME_WITH_TESTNET_MNEMONIC";
 
 module.exports = {
   networks: {
