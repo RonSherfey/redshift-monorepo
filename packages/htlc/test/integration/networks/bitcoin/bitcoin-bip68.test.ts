@@ -1,6 +1,7 @@
 import {
   BitcoinSubnet,
   BlockResult,
+  FundTxOutput,
   Network,
   TxOutput,
 } from '@radar/redshift-types';
@@ -14,7 +15,7 @@ const { funder, claimer, refunder } = config.bitcoin.integration;
 const feeTokensPerVirtualByte = 1;
 let htlc: UtxoHtlc<Network.BITCOIN>;
 let rpcClient: UtxoRpcClient;
-let coinbaseUtxos: TxOutput[];
+let coinbaseUtxos: FundTxOutput[];
 let fundingUtxos: TxOutput[];
 let htlcArgs: UTXO.RedeemScriptArgs;
 let paymentSecret: string;
@@ -84,12 +85,17 @@ async function setCoinbaseUtxos() {
     coinbaseBlockHash,
   )) as BlockResult;
   const coinbaseTxId = coinbaseBlock.tx[0];
-  const coinbaseUtxo = await rpcClient.getTxOutput(coinbaseTxId, 0);
+  const [coinbaseUtxo, coinbaseTx] = await Promise.all([
+    rpcClient.getTxOutput(coinbaseTxId, 0),
+    rpcClient.getTransactionByHash(coinbaseTxId),
+  ]);
+
   coinbaseUtxos = [
     {
       txId: coinbaseTxId,
       index: 0,
       tokens: toSatoshi(coinbaseUtxo.value),
+      txHex: coinbaseTx.hex,
     },
   ];
 }

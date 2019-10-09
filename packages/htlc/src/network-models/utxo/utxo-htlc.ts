@@ -1,13 +1,19 @@
-import { Network, SubnetMap, SwapError, TxOutput } from '@radar/redshift-types';
+import {
+  FundTxOutput,
+  Network,
+  SubnetMap,
+  SwapError,
+  TxOutput,
+} from '@radar/redshift-types';
 import bip65 from 'bip65';
 import {
   address,
   crypto,
   ECPair,
   payments,
+  Psbt,
   script,
   Transaction,
-  TransactionBuilder,
 } from 'bitcoinjs-lib';
 import { Output } from 'bitcoinjs-lib/types/transaction';
 import { isString } from 'util';
@@ -65,19 +71,21 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * @param fee Fee tokens for the transaction
    */
   public fund(
-    utxos: TxOutput[],
+    utxos: FundTxOutput[],
     amount: number,
     privateKey: string,
     fee: number = 0,
   ): string {
     const networkPayload = getBitcoinJSNetwork(this._network, this._subnet);
-    const tx = new TransactionBuilder(networkPayload);
+    const tx = new Psbt({
+      network: networkPayload,
+    });
 
     // The signing key
     const signingKey = ECPair.fromWIF(privateKey, networkPayload);
 
-    // Generate prev output script
-    const { output, address } = payments.p2wpkh({
+    // Get change address
+    const { address } = payments.p2wpkh({
       pubkey: signingKey.publicKey,
       network: networkPayload,
     });
@@ -87,28 +95,40 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
 
     // Add the inputs being spent to the transaction
     utxos.forEach(utxo => {
-      if (isDefined(utxo.txId) && isDefined(utxo.index)) {
-        tx.addInput(
-          toReversedByteOrderBuffer(utxo.txId),
-          utxo.index,
-          0,
-          output,
-        );
+      const { txId, index, txHex, redeemScript, witnessScript } = utxo;
+      if (isDefined(txId) && isDefined(index) && isDefined(txHex)) {
+        tx.addInput({
+          index,
+          hash: toReversedByteOrderBuffer(txId),
+          sequence: 0,
+          nonWitnessUtxo: Buffer.from(txHex, 'hex'),
+          ...(redeemScript ? { redeemScript } : {}),
+          ...(witnessScript ? { witnessScript } : {}),
+        });
       }
     });
 
     // Total spendable amount
     const tokens = utxos.reduce((t, c) => t + c.tokens, 0);
 
-    tx.addOutput(this.details.p2shP2wshAddress, amount);
-    tx.addOutput(address, tokens - amount - fee);
+    tx.addOutputs([
+      {
+        address: this.details.p2shP2wshAddress, // HTLC address
+        value: amount,
+      },
+      {
+        address, // Change address
+        value: tokens - amount - fee,
+      },
+    ]);
 
     // Sign the inputs
-    utxos.forEach((output, i) => {
-      tx.sign(i, signingKey, undefined, undefined, output.tokens);
-    });
+    tx.signAllInputs(signingKey);
 
-    return tx.build().toHex();
+    return tx
+      .finalizeAllInputs()
+      .extractTransaction()
+      .toHex();
   }
 
   /**
