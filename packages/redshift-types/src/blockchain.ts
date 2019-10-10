@@ -33,6 +33,12 @@ export interface TxOutput {
   tokens: number; // amount of tokens in this output
   address?: string; // output address
   script?: Buffer;
+  redeemScript?: Buffer;
+  witnessScript?: Buffer;
+}
+
+export interface FundTxOutput extends TxOutput {
+  txHex: string; // The hex encoded tx
 }
 
 export interface KeyPair {

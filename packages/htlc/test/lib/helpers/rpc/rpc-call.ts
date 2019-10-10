@@ -70,7 +70,10 @@ export async function postRpcCall(
         username: `${connectionConfig.username}`,
       },
     });
-    return resp.data;
+    if (resp.data.error) {
+      throw new Error(resp.data.error.message);
+    }
+    return resp.data.result;
   } catch (error) {
     throw new Error(`${NetworkError.RPC_CALL_FAILED}:${error}`);
   }
