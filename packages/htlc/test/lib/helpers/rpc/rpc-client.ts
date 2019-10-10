@@ -20,8 +20,7 @@ export class UtxoRpcClient {
    * @return <Result Object>
    */
   public async getBlockCount(): Promise<number> {
-    return (await postRpcCall(this._network, this._subnet, 'getblockcount', []))
-      .result;
+    return postRpcCall(this._network, this._subnet, 'getblockcount', []);
   }
 
   /**
@@ -30,9 +29,7 @@ export class UtxoRpcClient {
    * @return <Result Object>
    */
   public async getBlockHash(height: number): Promise<string> {
-    return (await postRpcCall(this._network, this._subnet, 'getblockhash', [
-      height,
-    ])).result;
+    return postRpcCall(this._network, this._subnet, 'getblockhash', [height]);
   }
 
   /**
@@ -40,12 +37,7 @@ export class UtxoRpcClient {
    * @return <Result Object>
    */
   public async getBestBlockHash(): Promise<string> {
-    return (await postRpcCall(
-      this._network,
-      this._subnet,
-      'getbestblockhash',
-      [],
-    )).result;
+    return postRpcCall(this._network, this._subnet, 'getbestblockhash', []);
   }
 
   /**
@@ -58,10 +50,10 @@ export class UtxoRpcClient {
     hash: string,
     returnDecoded: boolean = true,
   ): Promise<BlockResult | string> {
-    return (await postRpcCall(this._network, this._subnet, 'getblock', [
+    return postRpcCall(this._network, this._subnet, 'getblock', [
       hash,
       returnDecoded,
-    ])).result;
+    ]);
   }
 
   /**
@@ -71,10 +63,7 @@ export class UtxoRpcClient {
    * @return <Result Object>
    */
   async getTxOutput(txId: string, vout: number): Promise<any> {
-    return (await postRpcCall(this._network, this._subnet, 'gettxout', [
-      txId,
-      vout,
-    ])).result;
+    return postRpcCall(this._network, this._subnet, 'gettxout', [txId, vout]);
   }
 
   /**
@@ -87,12 +76,10 @@ export class UtxoRpcClient {
     hash: string,
     returnDecoded: boolean = true,
   ): Promise<string | any> {
-    return (await postRpcCall(
-      this._network,
-      this._subnet,
-      'getrawtransaction',
-      [hash, returnDecoded ? 1 : 0],
-    )).result;
+    return postRpcCall(this._network, this._subnet, 'getrawtransaction', [
+      hash,
+      returnDecoded ? 1 : 0,
+    ]);
   }
 
   /**
@@ -101,11 +88,8 @@ export class UtxoRpcClient {
    * @return <Result Object>
    */
   public async sendRawTransaction(txHex: string): Promise<any> {
-    return (await postRpcCall(
-      this._network,
-      this._subnet,
-      'sendrawtransaction',
-      [txHex],
-    )).result;
+    return postRpcCall(this._network, this._subnet, 'sendrawtransaction', [
+      txHex,
+    ]);
   }
 }
