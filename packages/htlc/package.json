@@ -1,6 +1,6 @@
 {
   "name": "@radar/htlc",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "A library used to construct and interact with HTLCs across multiple networks & network models",
   "main": "dist/cjs/index.js",
   "types": "dist/cjs/index.d.ts",
@@ -12,7 +12,7 @@
   "author": "RadarTech",
   "license": "MIT",
   "dependencies": {
-    "@radar/redshift-types": "^0.5.6",
+    "@radar/redshift-types": "^0.5.7",
     "@types/big.js": "^4.0.5",
     "@types/bip32": "^1.0.1",
     "@types/bitcoinjs-lib": "4.0.0",
