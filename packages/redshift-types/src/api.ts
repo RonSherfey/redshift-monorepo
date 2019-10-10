@@ -84,6 +84,7 @@ export interface RefundDetailsResponse<
   T extends RefundDetails = RefundDetails
 > {
   market: Market;
+  state: UserSwapState;
   blocksRemaining: number | undefined;
   refundableAtBlockHeight: number | undefined;
   refundableBalance: string;
