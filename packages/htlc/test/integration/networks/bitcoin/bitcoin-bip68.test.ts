@@ -191,7 +191,6 @@ describe('UTXO BIP68 HTLC - Bitcoin Network', () => {
     describe('P2PKH Address Refund Failure Case', async () => {
       setupTestSuite();
 
-      let refundTxId: string;
       it('should not allow a refund transaction if relative timelock hasnt elapsed', async () => {
         const currentBlockHeight = await rpcClient.getBlockCount();
         const refundTxHex = htlc.refund(
@@ -201,8 +200,11 @@ describe('UTXO BIP68 HTLC - Bitcoin Network', () => {
           feeTokensPerVirtualByte,
           refunder.privateKey,
         );
-        refundTxId = await rpcClient.sendRawTransaction(refundTxHex);
-        expect(refundTxId).to.be.null;
+        await expect(
+          rpcClient.sendRawTransaction(refundTxHex),
+        ).to.be.rejectedWith(
+          /TX rejected: transaction's sequence locks on inputs not met/,
+        );
       });
     });
 
@@ -234,7 +236,6 @@ describe('UTXO BIP68 HTLC - Bitcoin Network', () => {
     describe('P2WPKH Address Refund Failure Case', async () => {
       setupTestSuite(refunder.p2wpkhAddress);
 
-      let refundTxId: string;
       it('should not allow a refund transaction if relative timelock hasnt elapsed', async () => {
         const currentBlockHeight = await rpcClient.getBlockCount();
         const refundTxHex = htlc.refund(
@@ -244,8 +245,11 @@ describe('UTXO BIP68 HTLC - Bitcoin Network', () => {
           feeTokensPerVirtualByte,
           refunder.privateKey,
         );
-        refundTxId = await rpcClient.sendRawTransaction(refundTxHex);
-        expect(refundTxId).to.be.null;
+        await expect(
+          rpcClient.sendRawTransaction(refundTxHex),
+        ).to.be.rejectedWith(
+          /TX rejected: transaction's sequence locks on inputs not met/,
+        );
       });
     });
   });

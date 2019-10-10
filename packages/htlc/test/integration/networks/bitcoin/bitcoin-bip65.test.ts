@@ -175,8 +175,9 @@ describe('UTXO BIP65 HTLC - Bitcoin Network', () => {
           feeTokensPerVirtualByte,
           refunder.privateKey,
         );
-        const refundTxId = await rpcClient.sendRawTransaction(refundTxHex);
-        expect(refundTxId).to.be.null;
+        await expect(
+          rpcClient.sendRawTransaction(refundTxHex),
+        ).to.be.rejectedWith(/locktime requirement not satisfied/);
       });
     });
 
@@ -217,8 +218,9 @@ describe('UTXO BIP65 HTLC - Bitcoin Network', () => {
           feeTokensPerVirtualByte,
           refunder.privateKey,
         );
-        const refundTxId = await rpcClient.sendRawTransaction(refundTxHex);
-        expect(refundTxId).to.be.null;
+        await expect(
+          rpcClient.sendRawTransaction(refundTxHex),
+        ).to.be.rejectedWith(/locktime requirement not satisfied/);
       });
     });
 
