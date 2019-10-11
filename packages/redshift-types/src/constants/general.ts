@@ -203,7 +203,7 @@ export namespace Ws {
     MAKER_QUOTE = 'makerQuote',
     PAYMENT_RESULT = 'paymentResult',
     ACTIVE_CONFIGURATION = 'activeConfiguration',
-    ADDRESS_TED = 'addressBlacklisted',
+    ADDRESS_BLACKLISTED = 'addressBlacklisted',
     // LIQUIDITY PROVIDER
     REQUEST_QUOTE = 'requestQuote',
   }
