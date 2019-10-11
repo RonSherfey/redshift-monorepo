@@ -45,6 +45,11 @@ export enum UserSwapState {
   FUND_WINDOW_ELAPSED = 'FundWindowElapsed', // The fund window has elapsed
 }
 
+/**
+ * Payment Failed Reasons types
+ * Used to differentiate between a can't pay because of a blacklisted sender address (did not even tried to pay)
+ * and other reasons generally technical like can't route the payment, etc
+ */
 export enum PaymentFailedReason {
   ADDRESS_BLACKLISTED = 'AddressBlacklisted',
   PAYMENT_FAILED = 'PaymentFailed',
