@@ -17,6 +17,7 @@ export enum InternalSwapState {
   COMPLETE = 'Complete', // On-chain funds have been claimed
 
   WAITING_FOR_REFUND_TX = 'WaitingForRefundTx',
+  ADDRESS_BLACKLISTED_WAITING_FOR_REFUND_TX = 'AddressBlacklistedWaitingForRefundTx',
   WAITING_FOR_REFUND_TX_CONFIRMATION = 'WaitingForRefundTxConfirmation',
   REFUNDED = 'Refunded',
 
@@ -202,6 +203,7 @@ export namespace Ws {
     MAKER_QUOTE = 'makerQuote',
     PAYMENT_RESULT = 'paymentResult',
     ACTIVE_CONFIGURATION = 'activeConfiguration',
+    ADDRESS_TED = 'addressBlacklisted',
     // LIQUIDITY PROVIDER
     REQUEST_QUOTE = 'requestQuote',
   }
