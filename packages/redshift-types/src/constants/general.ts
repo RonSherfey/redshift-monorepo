@@ -17,6 +17,7 @@ export enum InternalSwapState {
   COMPLETE = 'Complete', // On-chain funds have been claimed
 
   WAITING_FOR_REFUND_TX = 'WaitingForRefundTx',
+  ADDRESS_BLACKLISTED_WAITING_FOR_REFUND_TX = 'AddressBlacklistedWaitingForRefundTx',
   WAITING_FOR_REFUND_TX_CONFIRMATION = 'WaitingForRefundTxConfirmation',
   REFUNDED = 'Refunded',
 
@@ -37,10 +38,21 @@ export enum UserSwapState {
   COMPLETE = 'Complete', // Invoice has been paid
 
   WAITING_FOR_REFUND_TX = 'WaitingForRefundTx',
+  ADDRESS_BLACKLISTED_WAITING_FOR_REFUND_TX = 'AddressBlacklistedWaitingForRefundTx',
   WAITING_FOR_REFUND_TX_CONFIRMATION = 'WaitingForRefundTxConfirmation',
   REFUNDED = 'Refunded',
 
   FUND_WINDOW_ELAPSED = 'FundWindowElapsed', // The fund window has elapsed
+}
+
+/**
+ * Payment Failed Reasons types
+ * Used to differentiate between a can't pay because of a blacklisted sender address (did not even tried to pay)
+ * and other reasons generally technical like can't route the payment, etc
+ */
+export enum PaymentFailedReason {
+  ADDRESS_BLACKLISTED = 'AddressBlacklisted',
+  PAYMENT_FAILED = 'PaymentFailed',
 }
 
 /**

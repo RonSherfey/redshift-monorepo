@@ -2,6 +2,7 @@ import { Market, OffChainTicker, OnChainTicker } from '.';
 import { TxOutput } from './blockchain';
 import {
   Network,
+  PaymentFailedReason,
   Subnet,
   UserSwapState,
   UserTransactionType,
@@ -235,6 +236,7 @@ export interface MakerQuote<D extends FundTxDetails = FundTxDetails> {
 export interface PaymentResult {
   orderId: string;
   success: boolean;
+  failedReason?: PaymentFailedReason;
   preimage?: string;
 }
 
