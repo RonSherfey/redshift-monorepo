@@ -38,6 +38,7 @@ export enum UserSwapState {
   COMPLETE = 'Complete', // Invoice has been paid
 
   WAITING_FOR_REFUND_TX = 'WaitingForRefundTx',
+  ADDRESS_BLACKLISTED_WAITING_FOR_REFUND_TX = 'AddressBlacklistedWaitingForRefundTx',
   WAITING_FOR_REFUND_TX_CONFIRMATION = 'WaitingForRefundTxConfirmation',
   REFUNDED = 'Refunded',
 
