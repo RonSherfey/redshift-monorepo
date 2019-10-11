@@ -186,10 +186,12 @@ export interface PayReqConfiguration {
   maxBaseUnits: string;
 }
 
-export interface ActiveConfigurationRequest {
-  markets: Market[];
-  payReq: PayReqConfiguration;
-}
+export type ActiveConfigurationRequest = {
+  // Liquidity providers MUST provide config values for every market that they subscribe to
+  [M in Market]?: {
+    payReq: PayReqConfiguration;
+  }
+};
 
 export type QuoteSubscriptionRequest = Market[];
 
