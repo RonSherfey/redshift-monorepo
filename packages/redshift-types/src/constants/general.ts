@@ -45,6 +45,11 @@ export enum UserSwapState {
   FUND_WINDOW_ELAPSED = 'FundWindowElapsed', // The fund window has elapsed
 }
 
+export enum PaymentFailedReason {
+  ADDRESS_BLACKLISTED = 'AddressBlacklisted',
+  PAYMENT_FAILED = 'PaymentFailed',
+}
+
 /**
  * Internal swap transaction types
  */
@@ -204,7 +209,6 @@ export namespace Ws {
     MAKER_QUOTE = 'makerQuote',
     PAYMENT_RESULT = 'paymentResult',
     ACTIVE_CONFIGURATION = 'activeConfiguration',
-    ADDRESS_BLACKLISTED = 'addressBlacklisted',
     // LIQUIDITY PROVIDER
     REQUEST_QUOTE = 'requestQuote',
   }
