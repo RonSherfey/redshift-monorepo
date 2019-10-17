@@ -11,7 +11,7 @@ import fixtureSocket from 'can-fixture-socket';
 import sinon from 'sinon';
 import io from 'socket.io-client';
 import { WebSocketClient } from '../src';
-import { config } from '../src/config';
+import { RedshiftApiUrl } from '../src/constants';
 import { expect, fixtures } from './lib';
 
 describe('WebSocket Client', () => {
@@ -23,7 +23,7 @@ describe('WebSocket Client', () => {
     client = new WebSocketClient();
     server = new fixtureSocket.Server(io);
 
-    socket = io(config.url);
+    socket = io(RedshiftApiUrl.MAINNET);
     socketStub = sinon.stub(client, '_socket' as any).get(() => {
       return socket;
     });

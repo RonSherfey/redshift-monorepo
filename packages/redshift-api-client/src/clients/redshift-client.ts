@@ -1,4 +1,4 @@
-import { config } from '../config';
+import { RedshiftApiUrl } from '../constants';
 import { HttpClient } from './http-client';
 import { WebSocketClient } from './websocket-client';
 
@@ -24,7 +24,7 @@ export class RedshiftClient {
    * Instantiate the REDSHIFT client
    * @param url The redshift WebSocket & HTTP API urls without the paths
    */
-  constructor(url: string = config.url) {
+  constructor(url: string = RedshiftApiUrl.MAINNET) {
     this._http = new HttpClient(url);
     this._ws = new WebSocketClient(url);
   }

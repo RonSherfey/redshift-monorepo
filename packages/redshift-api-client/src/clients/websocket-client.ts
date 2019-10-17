@@ -18,7 +18,7 @@ import {
 } from '@radar/redshift-types';
 import { validator } from '@radar/redshift-utils';
 import io from 'socket.io-client';
-import { config } from '../config';
+import { RedshiftApiUrl } from '../constants';
 
 export class WebSocketClient {
   private _url: string;
@@ -35,7 +35,7 @@ export class WebSocketClient {
    * Instantiate the WebSocket client
    * @param url The redshift WebSocket API url without the path
    */
-  constructor(url: string = config.url) {
+  constructor(url: string = RedshiftApiUrl.MAINNET) {
     this._url = `${url}/user/v1`;
   }
 
