@@ -15,7 +15,7 @@ import {
 import { validator } from '@radar/redshift-utils';
 import axios from 'axios';
 import sha256 from 'simple-sha256';
-import { config } from '../config';
+import { RedshiftApiUrl } from '../constants';
 
 export class HttpClient {
   private _apiBase: string;
@@ -24,7 +24,7 @@ export class HttpClient {
    * Instantiate the HTTP client
    * @param url The redshift API url without the path
    */
-  constructor(url: string = config.url) {
+  constructor(url: string = RedshiftApiUrl.MAINNET) {
     this._apiBase = `${url}/api`;
   }
 

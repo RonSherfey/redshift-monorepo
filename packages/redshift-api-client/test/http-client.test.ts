@@ -2,7 +2,7 @@ import { ApiError, UserSwapState } from '@radar/redshift-types';
 import nock from 'nock';
 import sha256 from 'simple-sha256';
 import { HttpClient } from '../src';
-import { config } from '../src/config';
+import { RedshiftApiUrl } from '../src/constants';
 import { expect, fixtures } from './lib';
 
 describe('HTTP Client', () => {
@@ -13,7 +13,7 @@ describe('HTTP Client', () => {
 
   describe('getMarkets', () => {
     before(() => {
-      nock(`${config.url}/api`)
+      nock(`${RedshiftApiUrl.MAINNET}/api`)
         .get('/markets')
         .reply(200, fixtures.valid.markets.response);
     });
@@ -27,12 +27,12 @@ describe('HTTP Client', () => {
   describe('getMarketRequirements', () => {
     before(async () => {
       //  All market requirements
-      nock(`${config.url}/api`)
+      nock(`${RedshiftApiUrl.MAINNET}/api`)
         .get(`/markets/requirements`)
         .reply(200, fixtures.valid.allMarketRequirements.response);
 
       //  Single market requirements
-      nock(`${config.url}/api`)
+      nock(`${RedshiftApiUrl.MAINNET}/api`)
         .get(`/markets/${fixtures.valid.market}/requirements`)
         .reply(200, fixtures.valid.singleMarketRequirements.response);
     });
@@ -62,7 +62,7 @@ describe('HTTP Client', () => {
 
   describe('getOrders', () => {
     before(async () => {
-      nock(`${config.url}/api`)
+      nock(`${RedshiftApiUrl.MAINNET}/api`)
         .get('/orders')
         .query({ invoiceHash: await sha256(fixtures.valid.invoice) })
         .reply(200, fixtures.valid.orders.response);
@@ -82,7 +82,7 @@ describe('HTTP Client', () => {
 
   describe('getOrder', () => {
     before(async () => {
-      nock(`${config.url}/api`)
+      nock(`${RedshiftApiUrl.MAINNET}/api`)
         .get(`/orders/${fixtures.valid.orderId}`)
         .reply(200, fixtures.valid.order.response);
     });
@@ -101,7 +101,7 @@ describe('HTTP Client', () => {
 
   describe('getOrderState', () => {
     before(async () => {
-      nock(`${config.url}/api`)
+      nock(`${RedshiftApiUrl.MAINNET}/api`)
         .get(`/orders/${fixtures.valid.orderId}/state`)
         .reply(200, fixtures.valid.orderState.response);
     });
@@ -120,7 +120,7 @@ describe('HTTP Client', () => {
 
   describe('getOrderFundDetails', () => {
     before(async () => {
-      nock(`${config.url}/api`)
+      nock(`${RedshiftApiUrl.MAINNET}/api`)
         .get(`/orders/${fixtures.valid.orderId}/fundDetails`)
         .reply(200, fixtures.valid.orderFundDetails.response);
     });
@@ -139,7 +139,7 @@ describe('HTTP Client', () => {
 
   describe('getOrderTransactions', () => {
     before(async () => {
-      nock(`${config.url}/api`)
+      nock(`${RedshiftApiUrl.MAINNET}/api`)
         .get(`/orders/${fixtures.valid.orderId}/transactions`)
         .reply(200, fixtures.valid.orderTransactions.response);
     });
@@ -158,7 +158,7 @@ describe('HTTP Client', () => {
 
   describe('getOrderRefundDetails', () => {
     before(async () => {
-      nock(`${config.url}/api`)
+      nock(`${RedshiftApiUrl.MAINNET}/api`)
         .get(`/orders/${fixtures.valid.orderId}/refund`)
         .reply(200, fixtures.valid.orderRefund.response);
     });
