@@ -1,6 +1,6 @@
 {
   "name": "@radar/redshift-utils",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Utilities used across REDSHIFT codebases",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,7 +11,7 @@
   "author": "RadarTech",
   "license": "MIT",
   "dependencies": {
-    "@radar/redshift-types": "^0.5.7",
+    "@radar/redshift-types": "^0.5.9",
     "base58check": "^2.0.0",
     "bech32": "^1.1.3"
   },
