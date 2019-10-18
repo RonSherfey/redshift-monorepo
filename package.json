@@ -6,7 +6,8 @@
     "build:esm": "tsc -b packages/htlc/tsconfig.esm.json",
     "test": "lerna run test --stream --parallel",
     "lint": "tslint -c tslint.json 'packages/**/*.ts' --fix",
-    "clean": "rimraf packages/**/dist"
+    "clean": "rimraf packages/**/dist",
+    "lerna": "lerna"
   },
   "devDependencies": {
     "@radar/tslint-config": "^5.0.0",
