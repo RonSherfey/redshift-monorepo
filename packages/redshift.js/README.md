@@ -26,6 +26,8 @@ yarn add @radar/redshift.js
 
 [Utilities](../redshift-utils)
 
+[REDSHIFT Client](../redshift-api-client#usage---redshift-client)
+
 [HTTP Client](../redshift-api-client#usage---http-client)
 
 [WebSocket Client](../redshift-api-client#usage---websocket-client)
