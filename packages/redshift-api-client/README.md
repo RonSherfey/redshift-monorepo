@@ -15,7 +15,61 @@ npm install @radar/redshift-api-client
 yarn add @radar/redshift-api-client
 ```
 
+## Usage - REDSHIFT Client
+
+The REDSHIFT client acts as a wrapper for the HTTP & WebSocket clients.
+
+### Import
+```typescript
+import { RedshiftClient } from '@radar/redshift-api-client';
+```
+
+### Instantiation
+
+**Mainnet**
+
+By default, the REDSHIFT client targets mainnet
+
+```typescript
+const client = new RedshiftClient();
+```
+
+If you prefer to be explicit, you can pass `RedshiftApiUrl.MAINNET` into the constructor
+
+```typescript
+const client = new RedshiftClient(RedshiftApiUrl.MAINNET);
+```
+
+**Testnet**
+
+```typescript
+const client = new RedshiftClient(RedshiftApiUrl.TESTNET);
+```
+
+### Client Access
+
+The `http` and `ws` getters can be used to access the HTTP & WebSocket client methods.
+
+**`http` - Get Markets Example**
+
+Get the active markets
+
+```typescript
+const markets = await client.http.getMarkets();
+```
+
+**`ws` - Connect Example**
+
+Establish a connection to the REDSHIFT WebSocket API
+
+```typescript
+await client.ws.connect();
+```
+
+
 ## Usage - HTTP Client
+
+The HTTP client can be used to interact with the REDSHIFT HTTP endpoints.
 
 ### Import
 ```typescript
@@ -23,8 +77,25 @@ import { HttpClient } from '@radar/redshift-api-client';
 ```
 
 ### Instantiation
+
+**Mainnet**
+
+By default, the HTTP client targets mainnet
+
 ```typescript
 const client = new HttpClient();
+```
+
+If you prefer to be explicit, you can pass `RedshiftApiUrl.MAINNET` into the constructor
+
+```typescript
+const client = new HttpClient(RedshiftApiUrl.MAINNET);
+```
+
+**Testnet**
+
+```typescript
+const client = new HttpClient(RedshiftApiUrl.TESTNET);
 ```
 
 ### Methods
@@ -90,14 +161,33 @@ const details = await client.getOrderRefundDetails(orderId);
 
 ## Usage - WebSocket Client
 
+The WebSocket client can be used to interact with the REDSHIFT WebSocket endpoints. Many WebSocket interactions are promisified to provide a better developer experience.
+
 ### Import
 ```typescript
 import { WebSocketClient } from '@radar/redshift-api-client';
 ```
 
 ### Instantiation
+
+**Mainnet**
+
+By default, the WebSocket client targets mainnet
+
 ```typescript
 const client = new WebSocketClient();
+```
+
+If you prefer to be explicit, you can pass `RedshiftApiUrl.MAINNET` into the constructor
+
+```typescript
+const client = new WebSocketClient(RedshiftApiUrl.MAINNET);
+```
+
+**Testnet**
+
+```typescript
+const client = new WebSocketClient(RedshiftApiUrl.TESTNET);
 ```
 
 ### Methods
