@@ -67,6 +67,7 @@ export enum UserApiError {
   INVOICE_AMOUNT_BELOW_MINIMUM = 'InvoiceAmountBelowMinimum',
   INVOICE_AMOUNT_ABOVE_MAXIMUM = 'InvoiceAmountAboveMaximum',
   INVOICE_PAYMENT_NOT_ROUTABLE = 'InvoicePaymentNotRoutable',
+  TOO_MANY_SWAPS_IN_FLIGHT = 'TooManySwapsInFlight',
 }
 
 export enum LiquidityProviderApiError {
