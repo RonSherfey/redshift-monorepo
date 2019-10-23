@@ -1,0 +1,36 @@
+<div class="payment">
+  <a-row>
+    <a-col :span="11">
+      <a-statistic title="You Pay" :value="amount" :suffix="onchainTicker"></a-statistic>
+    </a-col>
+    <a-col :span="2">
+      <a-divider class="payment__amount-divider" type="vertical" />
+    </a-col>
+    <a-col :span="11">
+      <a-statistic title="We Pay" :value="invoiceAmount | toBitcoin" :suffix="offchainTicker"></a-statistic>
+    </a-col>
+  </a-row>
+  <a-divider />
+  <a-statistic-countdown
+    v-if="isState('WaitingForFundingTx')"
+    title="Quote expires in"
+    :value="expiryTimestampMs"
+    format="m:ss"
+  />
+  <div v-else>
+    <span v-if="!isState('Complete') || !swap.preimage">{{ swap.state | stateToHumanReadable }}</span>
+    <a-popover v-else title="Payment Proof (Invoice Preimage)">
+      <template slot="content">
+        <p>{{ swap.preimage }}</p>
+      </template>
+      {{ swap.state | stateToHumanReadable }}
+      <a-icon type="file-done" />
+    </a-popover>
+  </div>
+  <a-progress :percent="swap.progress.percent" :status="swap.progress.status" size="small" />
+  <a-divider />
+  <a-button @click="$router.replace('/')" v-if="isState('Complete', 'FundWindowElapsed', 'WaitingForRefundTx')" size="large" type="primary" block>
+    Start Another Swap
+  </a-button>
+  <MetaMaskButton v-else :tx="paymentDetails.unsignedFundingTx" :asset="onchainTicker" />
+</div>
