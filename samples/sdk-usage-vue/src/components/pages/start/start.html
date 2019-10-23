@@ -2,6 +2,7 @@
   <a-form class="start__form" :form="form" @submit="initiateSwap">
     <a-form-item label="Invoice" :colon="false">
       <a-input
+        autocomplete="off"
         size="large"
         v-decorator="[
           'invoice',
