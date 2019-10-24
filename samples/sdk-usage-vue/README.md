@@ -1,6 +1,6 @@
 # SDK Usage Sample - Vue
 
-A sample application showcasing how the REDSHIFT SDK can be integrated into a Vue application
+A sample application demoing how the REDSHIFT SDK can be integrated into a Vue application. Read the [Ether Swap Tutorial](../../docs/ether-swap-tutorial.md) for more details.
 
 ## Getting Started
 
