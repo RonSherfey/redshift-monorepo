@@ -85,7 +85,7 @@ export const metamask = {
       this.provider = await this.connectAndFetchProvider();
     }
     return new Promise((resolve, reject) => {
-      this.provider!.sendAsync(
+      this.provider.sendAsync(
         {
           method: 'eth_sendTransaction',
           params: [tx],

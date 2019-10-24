@@ -2,6 +2,7 @@ import { redshift } from '@/api';
 import { errorToHumanReadable } from '@/lib/swap';
 import { SwapFormFields } from '@/types';
 import {
+  ApiError,
   Market,
   MarketRequirements,
   MarketsResponse,
@@ -9,7 +10,7 @@ import {
 } from '@radar/redshift.js';
 import { notification } from 'ant-design-vue';
 import { WrappedFormUtils } from 'ant-design-vue/types/form/form';
-import { decode } from 'bolt11-decoder';
+import { decode, PaymentRequestObject } from 'bolt11-decoder';
 import { Component, Vue } from 'vue-property-decorator';
 import WithRender from './start.html';
 
@@ -34,31 +35,68 @@ export class Start extends Vue {
   }
 
   /**
-   * Validate the passed invoice
+   * The invoice field validator
    * @param _rule The validation rule
    * @param value The input value
    * @param callback The validator callback function
    */
-  validateInvoice(_rule: unknown, value: string, callback: Function) {
-    try {
-      decode(value);
-      callback();
-    } catch (error) {
+  invoiceValidator(_rule: unknown, value: string, callback: Function) {
+    if (!value) {
+      callback('Please enter an invoice');
+    } else if (!this.isValidInvoice(value).isValid) {
       callback('Please enter a valid invoice');
+    } else {
+      callback();
     }
   }
 
   /**
-   * Validate the passed refund address
+   * The market field validator
    * @param _rule The validation rule
    * @param value The input value
    * @param callback The validator callback function
    */
-  validateRefundAddress(_rule: unknown, value: string, callback: Function) {
-    if (validator.isValidBase58CheckOrBech32(value)) {
-      callback();
+  marketValidator(_rule: unknown, value: string, callback: Function) {
+    if (!value) {
+      callback('Please select an asset to pay with');
+    } else if (value.includes('BTC_')) {
+      callback('Bitcoin demo not implemented');
     } else {
+      callback();
+    }
+  }
+
+  /**
+   * The refund address field validator
+   * @param _rule The validation rule
+   * @param value The input value
+   * @param callback The validator callback function
+   */
+  refundAddressValidator(_rule: unknown, value: string, callback: Function) {
+    if (!value) {
+      callback('Please enter a refund address');
+    } else if (!validator.isValidBase58CheckOrBech32(value)) {
       callback('Please enter a valid refund address');
+    } else {
+      callback();
+    }
+  }
+
+  /**
+   * Validate the passed invoice. If valid, return the decoded invoice
+   * @param invoice The bolt11 invoice
+   */
+  isValidInvoice(invoice: string) {
+    try {
+      const decodedInvoice = decode(invoice);
+      return {
+        decodedInvoice,
+        isValid: true,
+      };
+    } catch (error) {
+      return {
+        isValid: false,
+      };
     }
   }
 
@@ -71,6 +109,50 @@ export class Start extends Vue {
   }
 
   /**
+   * Check if the invoice meets the requirements for the passed market
+   * @param decodedInvoice The decoded payment request
+   * @param market The market
+   */
+  marketRequirementsSatisfied(
+    decodedInvoice: PaymentRequestObject,
+    market: Market,
+  ) {
+    // Check that we have all information required to validate
+    if (this.requirements) {
+      const { payReq } = this.requirements.find(r => r.market === market) || {};
+
+      if (payReq) {
+        const { minExpirationSeconds, minBaseUnits, maxBaseUnits } = payReq;
+        const expiry = new Date(decodedInvoice.timeExpireDateString);
+        const secondsUntilExpiry = (expiry.getTime() - Date.now()) / 1000;
+
+        let error: ApiError | undefined = undefined;
+        if (secondsUntilExpiry < Number(minExpirationSeconds)) {
+          // Ensure invoice expiry is greater than mimumim
+          error = ApiError.INVOICE_EXPIRES_TOO_SOON;
+        } else if (decodedInvoice.satoshis < Number(minBaseUnits)) {
+          // Ensure invoice amount is greater than mimumim
+          error = ApiError.INVOICE_AMOUNT_BELOW_MINIMUM;
+        } else if (decodedInvoice.satoshis > Number(maxBaseUnits)) {
+          // Ensure invoice amount is less than maximum
+          error = ApiError.INVOICE_AMOUNT_ABOVE_MAXIMUM;
+        }
+
+        if (error) {
+          this.form.setFields({
+            invoice: {
+              value: decodedInvoice.paymentRequest,
+              errors: [new Error(errorToHumanReadable[error])],
+            },
+          });
+          return false;
+        }
+        return true;
+      }
+    }
+  }
+
+  /**
    * Initiate a swap using the values input by the user
    * @param e The submit event
    */
@@ -80,6 +162,14 @@ export class Start extends Vue {
       if (!err) {
         try {
           this.loading = true;
+
+          // Ensure the invoice meets the market requirements
+          const decodedInvoice = decode(data.invoice);
+          const invoiceMeetsRequirements = this.marketRequirementsSatisfied(
+            decodedInvoice,
+            data.market,
+          );
+          if (!invoiceMeetsRequirements) return;
 
           // Establish a WebSocket connection
           await redshift.ws.connect({
@@ -97,7 +187,7 @@ export class Start extends Vue {
           this.$router.replace({
             name: 'payment',
             query: {
-              invoiceAmount: decode(data.invoice).satoshis!.toString(),
+              invoiceAmount: decodedInvoice.satoshis.toString(),
               market: data.market,
               orderId: quote.orderId,
               expiryTimestampMs: quote.expiryTimestampMs.toString(),

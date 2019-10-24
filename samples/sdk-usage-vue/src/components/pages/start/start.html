@@ -8,8 +8,7 @@
           'invoice',
           { rules: [
               {
-                required: true,
-                validator: validateInvoice,
+                validator: invoiceValidator,
               }
             ]
           }
@@ -22,7 +21,12 @@
         size="large"
         v-decorator="[
           'market',
-          { rules: [{ required: true, message: 'Please select an asset to pay with' }] },
+          { rules: [
+              {
+                validator: marketValidator
+              }
+            ]
+          },
         ]"
         placeholder="Select an asset to pay with"
         @change="determineInputVisibility"
@@ -37,8 +41,7 @@
           'refundAddress',
           { rules: [
               {
-                required: true,
-                validator: validateRefundAddress,
+                validator: refundAddressValidator,
               }
             ]
           }
