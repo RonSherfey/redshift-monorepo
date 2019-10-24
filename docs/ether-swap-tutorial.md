@@ -50,7 +50,7 @@ First, we must fetch two important pieces of information from REDSHIFT: The acti
 
 The markets are rather self-explanatory. They tell us which markets REDSHIFT is currently servicing.
 
-The market requirements help us determine if an invoice will fail validations without making a round-trip to the server. This call is optional as the server will return the same validation error, but we can offer a better user experience by performing this check on the client-side. The market requirements include the minimum time until invoice expiration, minimum invoice amount, and maximum invoice amount that will be accepted by REDSHIFT.
+The market requirements can help inform us if the invoice will be rejected by REDSHIFT without making a round-trip to the server. This call is optional as the server will return the same validation error, but we can offer a better user experience by performing this check on the client-side. The market requirements include the minimum time until invoice expiration, minimum invoice amount, and maximum invoice amount that will be accepted by REDSHIFT.
 
 In our app, we make both calls at the same time as the page is created:
 
@@ -65,15 +65,15 @@ async created() {
 
 ### Gathering & Validating User Input
 
-Now that we have the markets and market requirements, we'll need to collect the information required to perform the swap from the user.
+Now that we have the markets and market requirements, we'll need to collect the information from the user required to perform the swap.
 
 At a minimum, we require the invoice that REDSHIFT will pay. If your application only supports one on-chain payment asset, ETH for example, then you will not need to collect the payment asset from the user.
 
-We also support bitcoin payments in our app, so we'll require the user to select the asset that they will use to pay.
+We also support bitcoin payments in our app, so we'll require the user to select the asset that they'll use to pay.
 
 To provide a better use experience, we'll validate the invoice on the client-side. To do so, we use [bolt11-decoder](https://github.com/RadarTech/bolt11-decoder), a lighter version of [bolt11](https://github.com/bitcoinjs/bolt11), to decode the invoice.
 
-If it does not decode successfully, then the invoice is invalid:
+If the invoice does not decode successfully, then it is invalid:
 
 ```typescript
 /**
@@ -97,7 +97,7 @@ isValidInvoice(invoice: string) {
 
 Once the user has input a valid invoice and selected a market, we have enough information to check if the market requirements have been met.
 
-We'll perform this check when the user clicks `Pay Invoice`. Alternatively, it could be ran when the input or select change event fires.
+We'll perform this check when the user clicks `Pay Invoice`. Alternatively, you could run this validation when the input or select change event fires.
 
 You can see this call in action inside the `initiateSwap` method:
 
@@ -149,7 +149,7 @@ The quote response will look like this:
 }
 ```
 
-| Quote Fields        |                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| Quote Field         | Description                                                                                                                                                                                                                                                                                                                                                                                                                        |
 |---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `orderId`           | A unique identifier for your order. This is required to execute a refund transaction in the event REDSHIFT fails to pay the invoice.                                                                                                                                                                                                                                                                                               |
 | `expiryTimestampMs` |  The timestamp in milliseconds that the quote will expire if the user has not taken action. We use this value to implement the quote expiration timer in the app. The action required to stop the quote expiration timer varies based on the payment asset. For Bitcoin, the timer will stop once a funding transaction is seen in the mempool. For Ethereum assets, the timer will not stop until a funding transaction confirms. |
@@ -158,3 +158,68 @@ The quote response will look like this:
 | `unsignedFundingTx` | The unsigned Ethereum funding transaction. When using metamask, this object can be passed directly into `web3.sendTransaction` to initiate payment.                                                                                                                                                                                                                                                                                |
 
 ## Payment
+
+We now have everything that we need to request payment from the user. Move to the [Payment](../samples/sdk-usage-vue/src/components/pages/payment/payment.ts) page for this part of the tutorial.
+
+<img width="340" src="https://user-images.githubusercontent.com/20102664/67523287-9e57d280-f66b-11e9-9f8c-2a6c1fa6ee01.png" />
+
+To provide a good UX, we'll subscribe to order state updates and present them to the user.
+
+You can subscribe to state updates using the following method:
+
+```typescript
+await redshift.ws.subscribeToOrderState(this.orderId);
+```
+
+Once subscribed, we must attach an event handler that gets fired when the order state changes. In this sample, we'll feed the state update event to a method called `handleStateChange` that will update the state for display, increase the progress bar completion percentage, and populate the payment proof once complete:
+
+
+```typescript
+redshift.ws.onOrderStateChanged(this.handleStateChange);
+```
+
+As you may have gathered from the above description, not all state updates share the same schema. There are three types of state updates.
+
+| Update Type               | Description                                                                                                                                                                                                                                                                                                                                                      |
+|---------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `GeneralStateUpdate`      | This is the most basic type of state update, which contains the `orderId` and `state`. General state updates are returned when REDSHIFT is notifying the subscriber of any state update that did not involve a transaction confirmation or invoice payment. Both the `TxConfirmedStateUpdate` and `SwapCompleteStateUpdate` state update types extend this type. |
+| `TxConfirmedStateUpdate`  | In addition to the `orderId` and `state` fields, this state update type returns a `transactionId`. This state update type is used when notifying the subscriber of a partial fund, fund, or refund transaction confirmation.                                                                                                                                     |
+| `SwapCompleteStateUpdate` | In addition to the `orderId` and `state` fields, this state update type returns a `preimage`. This state update is used when notifying the subscriber of an invoice payment. The `preimage` is the proof of payment.                                                                                                                                             |
+
+
+Now that our state update listener is hooked up, we're ready to accept payment from the user.
+
+In this example, all MetaMask interactions are handled through the [metamask object](../samples/sdk-usage-vue/src/lib/ethereum/metamask.ts). We'll skip over many of the actions required to connect and communicate with MetaMask as they are not specific to REDSHIFT.
+
+When the user clicks the `Send Payment` button, we need to pass the unsigned funding transaction to MetaMask using the `sendTransaction` RPC call. This will pop up the MetaMask window so the user can sign the transaction.
+
+In this example, we use the MetaMask provider to make the RPC call directly:
+
+```typescript
+/**
+ * Call eth_sendTransaction. Display an error message if
+ * an error is thrown.
+ * @param address The active address
+ */
+async sendTransaction(address: string) {
+  try {
+    const { data, to, value } = this.tx; // Tx values from REDSHIFT
+    await metamask.sendTransaction({
+      data,
+      to,
+      value: value ? decToHex(value as string) : undefined,
+      from: address,
+    });
+  } catch (error) {
+    this.metamaskError = error.message;
+  }
+}
+```
+
+Note that this code can be simplified by using a library like web3 or ethers.js.
+
+Once signed, MetaMask will broadcast the transaction automatically. The state state update listener will take over from here. Upon invoice payment, the progress bar will be set to 100%, the proof of payment will be populated, and the `Start Another Swap` button will be visible.
+
+## Refunds (Coming soon)
+
+If REDSHIFT fails to pay the invoice, the user must be able to reclaim the funds that they sent to the swap contract.
