@@ -34,7 +34,7 @@ yarn
 yarn start
 ```
 
-## Performing a Swap
+## Facilitating a Swap
 
 ### Overview
 
@@ -65,13 +65,13 @@ async created() {
 
 ### Gathering & Validating User Input
 
-Now that we have the markets and market requirements, we'll need to collect the information from the user required to perform the swap.
+Now that we have the markets and market requirements, we'll collect information from the user required to perform the swap.
 
 At a minimum, we require the invoice that REDSHIFT will pay. If your application only supports one on-chain payment asset, ETH for example, then you will not need to collect the payment asset from the user.
 
-We also support bitcoin payments in our app, so we'll require the user to select the asset that they'll use to pay.
+We also support bitcoin payments in our app, so the user is required to select a payment asset.
 
-To provide a better use experience, we'll validate the invoice on the client-side. To do so, we use [bolt11-decoder](https://github.com/RadarTech/bolt11-decoder), a lighter version of [bolt11](https://github.com/bitcoinjs/bolt11), to decode the invoice.
+To provide a better user experience, we'll validate the invoice on the client-side. To do so, we use [bolt11-decoder](https://github.com/RadarTech/bolt11-decoder), a lighter version of [bolt11](https://github.com/bitcoinjs/bolt11), to decode the invoice.
 
 If the invoice does not decode successfully, then it is invalid:
 
@@ -119,7 +119,7 @@ If the invoice does not meet the market requirements, the error is set on the in
 
 Once we've validated the information provided by the user, we're ready to request a quote from REDSHIFT.
 
-This is a simple process that involves two steps. We must establish a WebSocket connection and request the quote:
+This is a simple process that involves two steps; establish a WebSocket connection and request the quote:
 
 ```typescript
 // Establish a WebSocket connection
@@ -152,7 +152,7 @@ The quote response will look like this:
 | Quote Field         | Description                                                                                                                                                                                                                                                                                                                                                                                                                        |
 |---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `orderId`           | A unique identifier for your order. This is required to execute a refund transaction in the event REDSHIFT fails to pay the invoice.                                                                                                                                                                                                                                                                                               |
-| `expiryTimestampMs` |  The timestamp in milliseconds that the quote will expire if the user has not taken action. We use this value to implement the quote expiration timer in the app. The action required to stop the quote expiration timer varies based on the payment asset. For Bitcoin, the timer will stop once a funding transaction is seen in the mempool. For Ethereum assets, the timer will not stop until a funding transaction confirms. |
+| `expiryTimestampMs` |  The timestamp in milliseconds that the quote will expire if the user does not take action. We use this value to implement the quote expiration timer in the app. The action required to stop the quote expiration timer varies based on the payment asset. For Bitcoin, the timer will stop once a funding transaction is seen in the mempool. For Ethereum assets, the timer will stop when a funding transaction confirms. |
 | `amount`            | The amount the user must pay denominated in the payment asset that they selected (tBTC or kETH in this sample).                                                                                                                                                                                                                                                                                                                    |
 | `details`           | Quote details that are specific to the chosen market.                                                                                                                                                                                                                                                                                                                                                                              |
 | `unsignedFundingTx` | The unsigned Ethereum funding transaction. When using metamask, this object can be passed directly into `web3.sendTransaction` to initiate payment.                                                                                                                                                                                                                                                                                |
@@ -220,6 +220,6 @@ Note that this code can be simplified by using a library like web3 or ethers.js.
 
 Once signed, MetaMask will broadcast the transaction automatically. The state state update listener will take over from here. Upon invoice payment, the progress bar will be set to 100%, the proof of payment will be populated, and the `Start Another Swap` button will be visible.
 
-## Refunds (Coming soon)
+## Facilitating a Refund (Coming soon)
 
 If REDSHIFT fails to pay the invoice, the user must be able to reclaim the funds that they sent to the swap contract.
