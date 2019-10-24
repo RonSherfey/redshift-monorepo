@@ -2,7 +2,7 @@
 
 In this tutorial, we'll integrate the [REDSHIFT Javascript SDK](../packages/redshift.js) into a Vue frontend that can be used to execute a Kovan Testnet Ether (kETH) <-> Lightning Testnet Bitcoin (ltBTC) submarine swap.
 
-![swap-demo](https://user-images.githubusercontent.com/20102664/67441451-254c7280-f5ba-11e9-8af3-30345b30b4f8.gif)
+<img width="500px" src="https://user-images.githubusercontent.com/20102664/67451454-b4b74d00-f5dd-11e9-8422-73b98efac27d.gif" />
 
 ## Prerequisites
 
