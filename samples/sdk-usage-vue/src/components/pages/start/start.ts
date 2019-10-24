@@ -172,15 +172,13 @@ export class Start extends Vue {
           if (!invoiceMeetsRequirements) return;
 
           // Establish a WebSocket connection
-          await redshift.ws.connect({
-            transports: ['websocket'],
-          });
+          await redshift.ws.connect();
 
           // Request the quote
           const quote = await redshift.ws.requestQuote({
             invoice: data.invoice,
             market: data.market,
-            refundAddress: data.refundAddress,
+            refundAddress: data.refundAddress, // Used for bitcoin only
           });
 
           // Quote request was successful, navigate to the payment page

@@ -106,6 +106,7 @@ export class Payment extends Vue {
       case UserSwapState.COMPLETE:
         this.swap.progress.percent = 100;
         this.swap.preimage = (update as SwapCompleteStateUpdate).preimage;
+        redshift.ws.disconnect(); // Swap complete. We can close the WebSocket connection
         break;
       case UserSwapState.WAITING_FOR_REFUND_TX:
       case UserSwapState.ADDRESS_BLACKLISTED_WAITING_FOR_REFUND_TX:

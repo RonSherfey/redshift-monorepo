@@ -113,4 +113,49 @@ if (!invoiceMeetsRequirements) return;
 
 If the invoice does not meet the market requirements, the error is set on the input and code execution is stopped.
 
-<img width="340" src="https://user-images.githubusercontent.com/20102664/67514647-5aa89d00-f65a-11e9-8b64-781956482890.png" />
+<img width="340" src="https://user-images.githubusercontent.com/20102664/67514803-b6732600-f65a-11e9-9155-0123d67b155e.png" />
+
+### Requesting a Quote
+
+Once we've validated the information provided by the user, we're ready to request a quote from REDSHIFT.
+
+This is a simple process that involves two steps. We must establish a WebSocket connection and request the quote:
+
+```typescript
+// Establish a WebSocket connection
+await redshift.ws.connect();
+
+// Request the quote
+const quote = await redshift.ws.requestQuote({
+  invoice: data.invoice,
+  market: data.market,
+});
+```
+
+The quote response will look like this:
+
+```json
+{ 
+   "orderId":"56f970d4-24cc-4112-8e1a-4bef7becbee2",
+   "expiryTimestampMs":1571943386485,
+   "amount":"0.005068660000000000",
+   "details":{ 
+      "unsignedFundingTx":{ 
+         "to":"0xd4589fB5b5ABB44e1A8cb95CfF0Ca9E0e78D9D5d",
+         "data":"0x3fdcdd1e56f970d424cc41128e1a4bef7becbee20000000000000000000000000000000009495061c40a27c05ca574ff5c4d61869e4a936a003b13f8050d5aeba0ecfc7d",
+         "value":"5068660000000000"
+      }
+   }
+}
+```
+
+#### Quote Fields
+
+| `orderId`           | A unique identifier for your order. This is required to execute a refund transaction in the event REDSHIFT fails to pay the invoice.                                                                                                                                                                                                                                                                                               |
+|---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `expiryTimestampMs` |  The timestamp in milliseconds that the quote will expire if the user has not taken action. We use this value to implement the quote expiration timer in the app. The action required to stop the quote expiration timer varies based on the payment asset. For Bitcoin, the timer will stop once a funding transaction is seen in the mempool. For Ethereum assets, the timer will not stop until a funding transaction confirms. |
+| `amount`            | The amount the user must pay denominated in the payment asset that they selected (tBTC or kETH in this sample).                                                                                                                                                                                                                                                                                                                    |
+| `details`           | Quote details that are specific to the chosen market.                                                                                                                                                                                                                                                                                                                                                                              |
+| `unsignedFundingTx` | The unsigned Ethereum funding transaction. When using metamask, this object can be passed directly into `web3.sendTransaction` to initiate payment.                                                                                                                                                                                                                                                                                |
+
+## Payment
