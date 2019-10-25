@@ -1,0 +1,62 @@
+// Variables
+$off-white: #f7f7f8;
+$red: #ff3333;
+
+// HTML & Body Styles
+html, body {
+  height: 100vh;
+  padding: 0;
+  margin: 0;
+  background: $off-white;
+}
+
+// Page skeleton styles
+.page-skeleton {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+
+  &__card {
+    width: 400px;
+    text-align: center;
+  }
+}
+
+// Start page styles
+.start {
+  &__form {
+    text-align: left;
+  }
+}
+
+// Payment page styles
+.payment {
+  &__amount-divider {
+    margin-top: 5px;
+    height: 54px;
+  }
+}
+
+// MetaMask button styles
+.metamask-button {
+  &__error {
+    color: $red;
+    padding-bottom: 16px;
+  }
+}
+
+// Ant design overrides
+.ant-statistic-content-value-int {
+  font-size: 22px;
+}
+
+.ant-statistic-content-value-decimal {
+  font-size: 18px;
+}
+
+.ant-statistic-content-suffix {
+  font-size: 12px;
+}

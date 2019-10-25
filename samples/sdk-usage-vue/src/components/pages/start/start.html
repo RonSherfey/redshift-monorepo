@@ -1,0 +1,58 @@
+<div class="start">
+  <a-form class="start__form" :form="form" @submit="initiateSwap">
+    <a-form-item label="Invoice" :colon="false">
+      <a-input
+        autocomplete="off"
+        size="large"
+        v-decorator="[
+          'invoice',
+          { rules: [
+              {
+                validator: invoiceValidator,
+              }
+            ]
+          }
+        ]"
+        placeholder="Enter a Lightning invoice"
+      />
+    </a-form-item>
+    <a-form-item label="Pay with" :colon="false">
+      <a-select
+        size="large"
+        v-decorator="[
+          'market',
+          { rules: [
+              {
+                validator: marketValidator
+              }
+            ]
+          },
+        ]"
+        placeholder="Select an asset to pay with"
+        @change="determineInputVisibility"
+      >
+        <a-select-option v-for="m in markets" :value="m.market">{{ m.onchainTicker | onchainTickerToName }}</a-select-option>
+      </a-select>
+    </a-form-item>
+    <a-form-item v-if="showRefundAddressField" label="Refund Address" :colon="false">
+      <a-input
+        size="large"
+        v-decorator="[
+          'refundAddress',
+          { rules: [
+              {
+                validator: refundAddressValidator,
+              }
+            ]
+          }
+        ]"
+        placeholder="Enter a refund address"
+      />
+    </a-form-item>
+    <a-form-item>
+      <a-button size="large" type="primary" html-type="submit" :loading="loading" block>
+        Pay Invoice
+      </a-button>
+    </a-form-item>
+  </a-form>
+</div>
