@@ -1,4 +1,8 @@
-import { Market, UserSwapState } from '@radar/redshift.js';
+import {
+  Market,
+  RefundDetailsResponse,
+  UserSwapState,
+} from '@radar/redshift.js';
 
 ///#region Globals
 
@@ -53,15 +57,21 @@ export interface SwapFormFields {
   refundAddress?: string;
 }
 
-export interface SwapProgress {
+export interface Progress {
   percent: number;
   status: 'success' | 'exception' | 'active';
 }
 
 export interface SwapDetails {
   state: UserSwapState;
-  progress: SwapProgress;
+  progress: Progress;
   preimage?: string | undefined;
+}
+
+export interface RefundDetails {
+  state: UserSwapState;
+  progress: Progress;
+  details: RefundDetailsResponse;
 }
 
 //#endregion

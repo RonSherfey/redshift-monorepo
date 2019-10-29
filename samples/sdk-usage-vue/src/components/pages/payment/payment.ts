@@ -1,6 +1,6 @@
 import { redshift } from '@/api';
 import { MetaMaskButton } from '@/components/partials/metamask-button';
-import { marketToOffchainTicker, marketToOnchainTicker } from '@/lib/swap';
+import { marketToOffchainTicker, marketToOnchainTicker } from '@/lib/general';
 import { SwapDetails } from '@/types';
 import {
   StateUpdate,
@@ -94,26 +94,39 @@ export class Payment extends Vue {
 
     switch (update.state) {
       case UserSwapState.WAITING_FOR_FUNDING_TX_CONFIRMATION:
-      case UserSwapState.WAITING_FOR_ADDITIONAL_FUNDING_TX_CONFIRMATION:
+      case UserSwapState.WAITING_FOR_ADDITIONAL_FUNDING_TX_CONFIRMATION: {
         this.swap.progress.percent = 50;
         break;
-      case UserSwapState.PARTIALLY_FUNDED:
+      }
+      case UserSwapState.PARTIALLY_FUNDED: {
         this.swap.progress.percent = 75;
         break;
-      case UserSwapState.FUNDED:
+      }
+      case UserSwapState.FUNDED: {
         this.swap.progress.percent = 90;
         break;
-      case UserSwapState.COMPLETE:
+      }
+      case UserSwapState.COMPLETE: {
         this.swap.progress.percent = 100;
         this.swap.preimage = (update as SwapCompleteStateUpdate).preimage;
         redshift.ws.disconnect(); // Swap complete. We can close the WebSocket connection
         break;
+      }
       case UserSwapState.WAITING_FOR_REFUND_TX:
-      case UserSwapState.ADDRESS_BLACKLISTED_WAITING_FOR_REFUND_TX:
-        this.swap.progress.status = 'exception'; // TODO: Write refund flow example
+      case UserSwapState.ADDRESS_BLACKLISTED_WAITING_FOR_REFUND_TX: {
+        this.swap.progress.status = 'exception';
+        this.$router.replace({
+          name: 'refund',
+          query: {
+            orderId: this.orderId,
+          },
+        });
         break;
-      case UserSwapState.FUND_WINDOW_ELAPSED:
+      }
+      case UserSwapState.FUND_WINDOW_ELAPSED: {
+        this.swap.progress.status = 'exception';
         break;
+      }
     }
     this.swap.state = update.state;
   }

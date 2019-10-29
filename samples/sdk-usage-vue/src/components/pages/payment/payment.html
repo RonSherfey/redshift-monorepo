@@ -29,7 +29,7 @@
   </div>
   <a-progress :percent="swap.progress.percent" :status="swap.progress.status" size="small" />
   <a-divider />
-  <a-button @click="$router.replace('/')" v-if="isState('Complete', 'FundWindowElapsed', 'WaitingForRefundTx')" size="large" type="primary" block>
+  <a-button @click="$router.replace('/')" v-if="isState('Complete', 'FundWindowElapsed')" size="large" type="primary" block>
     Start Another Swap
   </a-button>
   <MetaMaskButton v-else :tx="paymentDetails.unsignedFundingTx" :asset="onchainTicker" />

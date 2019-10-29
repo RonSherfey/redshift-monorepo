@@ -1,9 +1,9 @@
-import { toUnitAmount } from '@/lib/general';
 import {
   errorToHumanReadable,
   onchainTickerToName,
   stateToHumanReadable,
-} from '@/lib/swap';
+  toUnitAmount,
+} from '@/lib/general';
 import { OnChainTicker } from '@radar/redshift.js';
 import Vue from 'vue';
 
