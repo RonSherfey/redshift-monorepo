@@ -10,7 +10,14 @@ import WithRender from './metamask-button.html';
 export class MetaMaskButton extends Vue {
   @Prop() public tx: EvmUnsignedTx;
   @Prop() public asset: OnChainTicker;
-  @Prop() public disabled: boolean;
+  @Prop({
+    default: 'Pay Invoice',
+  })
+  public buttonText: string;
+  @Prop({
+    default: false,
+  })
+  public disabled: boolean;
   public metamaskApproved: boolean = false;
   public metamaskNetworkCorrect: boolean = false;
   public metamaskAddress: string | undefined = '';

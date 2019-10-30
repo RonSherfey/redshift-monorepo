@@ -1,6 +1,6 @@
 <div class="metamask-button">
   <div class="metamask-button__error" v-if="metamaskError" v-html="$options.filters.errorToHumanReadable(metamaskError)"></div>
   <a-button size="large" type="primary"  @click="connectAndSendTransaction" :disabled="metamaskReady || disabled" block>
-    {{ metamaskReady ? 'Waiting...' : metamaskApproved ? 'Send Payment' : 'Connect MetaMask' }}
+    {{ metamaskReady ? 'Waiting...' : metamaskApproved ? buttonText : 'Connect MetaMask' }}
   </a-button>
 </div>

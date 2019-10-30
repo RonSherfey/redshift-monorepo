@@ -9,6 +9,6 @@
     <a-button @click="$router.replace('/')" v-if="isState('Refunded')" size="large" type="primary" block>
       Start Another Swap
     </a-button>
-    <MetaMaskButton v-else :tx="refund.details.details" :asset="onchainTicker" :disabled="blocksUntilRefundable > 0" />
+    <MetaMaskButton v-else :tx="refund.details.details" :asset="onchainTicker" :disabled="blocksUntilRefundable > 0" buttonText="Get Refund" />
   </a-spin>
 </div>
