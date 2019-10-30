@@ -218,8 +218,57 @@ async sendTransaction(address: string) {
 
 Note that this code can be simplified by using a library like web3 or ethers.js.
 
-Once signed, MetaMask will broadcast the transaction automatically. The state state update listener will take over from here. Upon invoice payment, the progress bar will be set to 100%, the proof of payment will be populated, and the `Start Another Swap` button will be visible.
+Once signed, MetaMask will broadcast the transaction automatically. The order state update listener will take over from here. Upon invoice payment, the progress bar will be set to 100%, the proof of payment will be populated, and the `Start Another Swap` button will be visible.
 
-## Facilitating a Refund (Coming soon)
+## Facilitating a Refund
+
+**NOTE: In a real application, the refund details should be provided to the user as a file download before they're allowed to fund the swap. This sample only demos the refund flow when navigating directly from a failed swap.**
 
 If REDSHIFT fails to pay the invoice, the user must be able to reclaim the funds that they sent to the swap contract.
+
+Open the [Refund](../samples/sdk-usage-vue/src/components/pages/refund/refund.ts) page to view the sample refund flow.
+
+In this example, the user is responsible for refund transaction submission. This is not strictly required. Any address is capable of signing and broadcasting the refund transaction. Regardless of who broadcasts this transaction, the funds will always be returned to the address that initially funded the swap. This could be used to submit the refund transaction on behalf of the user when the timelock expires, which offers a better UX.
+
+We cannot allow the user to broadcast the refund transaction immediately following invoice payment failure. Any refund transaction mined before the block timelock is met will fail. The ether swap timelock is currently set to 480 blocks, which means that the user must wait roughly 2 hours before refund transaction submission.
+
+To begin the process, we'll fetch the refund details using the order id of the failed swap:
+
+```typescript
+this.refund.details = await redshift.ws.requestRefundDetails(this.orderId);
+```
+
+The ether refund details contain the following information:
+
+
+| Refund Field              | Description                                                                                                                                                                                                                                                                                      |
+|---------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `market`                  | The market of the order, which contains the on-chain and off-chain asset tickers. `ETH_LBTC`, for example.                                                                                                                                                                                         |
+| `state`                   | The active order state. REDSHIFT will return refund details regardless of the order state. This field can be used in client-side validations to prevent the user from submitting a refund transaction for an order that's already complete or refunded.                                             |
+| `blocksRemaining`         | The number of blocks remaining until the timelock expires and the refund transaction can be submitted.                                                                                                                                                                                            |
+| `refundableAtBlockHeight` | The block height at which the timelock expires and the refund transaction can be submitted.                                                                                                                                                                                                      |
+| `refundableBalance`       | The balance that is available for refund. Note that this field will not be decreased once the refund is complete.                                                                                                                                                                    |
+| `details`                 | This field contains the network-specific details that are necessary to submit the refund transaction. In this case, it contains two properties: `to` and `data`. These can be passed into `sendTransaction` in the same way as the funding details to sign and broadcast the refund transaction. |
+
+If `blocksRemaining` is greater than 0 then we know that the refund transaction cannot be submitted yet. Instead, we'll display a block countdown to timelock expiration.
+
+<img width="340" src="https://user-images.githubusercontent.com/20102664/67877659-97afdc00-faff-11e9-8040-a983f38fc30a.png" />
+
+To accomplish this, we'll subscribe to the Ethereum block height using the REDSHIFT WebSocket API and update the UI when a new block is mined:
+
+```typescript
+if (this.blocksUntilRefundable > 0) {
+  const { network, subnet } = getNetworkDetails(this.refund.details.market);
+
+  await redshift.ws.subscribeToBlockHeight(network, subnet);
+  redshift.ws.onBlockHeightChanged(update =>
+    this.handleBlockHeightChange(update, network, subnet),
+  );
+}
+```
+
+Once `blocksUntilRefundable` is less than or equal to 0, we can enable the `Get Refund` button and allow the user to submit the refund transaction.
+
+<img width="340" src="https://user-images.githubusercontent.com/20102664/67881219-b87b3000-fb05-11e9-924f-0f9fb7248e80.png" />
+
+From here, we use the same approach as the funding transaction. The refund transaction details are passed to the `sendTransaction` RPC call and the progess bar is updated using the order state subscription. Upon refund confirmation, the progress bar will be set to 100% and the Start Another Swap button will be visible.

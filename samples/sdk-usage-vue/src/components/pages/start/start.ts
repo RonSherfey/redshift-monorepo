@@ -1,5 +1,5 @@
 import { redshift } from '@/api';
-import { errorToHumanReadable } from '@/lib/swap';
+import { errorToHumanReadable } from '@/lib/general';
 import { SwapFormFields } from '@/types';
 import {
   ApiError,

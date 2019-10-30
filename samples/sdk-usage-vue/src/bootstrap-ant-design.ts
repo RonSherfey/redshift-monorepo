@@ -12,6 +12,7 @@ import {
   Radio,
   Row,
   Select,
+  Spin,
   Statistic,
 } from 'ant-design-vue';
 import Vue from 'vue';
@@ -28,6 +29,7 @@ Vue.use(Progress);
 Vue.use(Radio);
 Vue.use(Row);
 Vue.use(Select);
+Vue.use(Spin);
 Vue.use(Statistic);
 
 notification.config({

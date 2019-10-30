@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import { Payment } from './components/pages/payment';
+import { Refund } from './components/pages/refund';
 import { Start } from './components/pages/start';
 
 Vue.use(Router);
@@ -18,6 +19,11 @@ export default new Router({
       path: '/payment',
       name: 'payment',
       component: Payment,
+    },
+    {
+      path: '/refund',
+      name: 'refund',
+      component: Refund,
     },
   ],
 });

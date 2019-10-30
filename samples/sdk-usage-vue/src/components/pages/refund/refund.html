@@ -1,0 +1,14 @@
+<div class="refund">
+  <a-spin tip="Loading Refund Details..." :spinning="isLoading">
+    <a-statistic title="Refund Amount" :value="refund.details.refundableBalance || '...'" :suffix="onchainTicker"></a-statistic>
+    <a-divider />
+    <a-statistic v-if="blocksUntilRefundable > 0" title="Blocks until Refundable" :value="blocksUntilRefundable" suffix="blocks"></a-statistic>
+    <span v-else>{{ refund.state | stateToHumanReadable }}</span>
+    <a-progress :percent="refund.progress.percent" :status="refund.progress.status" size="small" />
+    <a-divider />
+    <a-button @click="$router.replace('/')" v-if="isState('Refunded')" size="large" type="primary" block>
+      Start Another Swap
+    </a-button>
+    <MetaMaskButton v-else :tx="refund.details.details" :asset="onchainTicker" :disabled="blocksUntilRefundable > 0" buttonText="Get Refund" />
+  </a-spin>
+</div>
