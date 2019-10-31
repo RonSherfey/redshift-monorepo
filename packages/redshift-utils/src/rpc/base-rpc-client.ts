@@ -13,6 +13,7 @@ export abstract class BaseRpcClient {
   protected _connectionConfig: RpcConnectionConfig;
   private _clientInstancesCache: { [index: string]: AxiosInstance } = {};
 
+  // Common RPC methods across all network models
   abstract async getBlockCount(): Promise<number>;
   abstract async getBestBlockHash(): Promise<string>;
   abstract async getBalance(address: string): Promise<BigNumber>;
@@ -36,7 +37,7 @@ export abstract class BaseRpcClient {
   protected async postRpcCall(
     command: string,
     params: any,
-    timeout = 1000,
+    timeout = 3000,
   ): Promise<any> {
     const url = format.toUrl(this._connectionConfig);
     const data: JsonRpc.Request = {

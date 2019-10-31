@@ -45,7 +45,6 @@ export function toUnitAmount(
 
 /**
  * Get the on-chain ticker for the provided market
- * TODO: Move to @radar/redshift-utils
  * @param market The market
  */
 export function getOnchainTicker(market: Market) {
@@ -58,7 +57,6 @@ export function getOnchainTicker(market: Market) {
 /**
  * Get the network and subnet for the passed on-chain asset.
  * Extract the on-chain asset from the market if necessary.
- * TODO: Move to @radar/redshift-utils
  * @param value The on-chain ticker or market
  */
 export function getNetworkDetails(
