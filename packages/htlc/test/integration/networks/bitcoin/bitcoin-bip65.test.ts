@@ -3,13 +3,16 @@ import {
   BlockResult,
   FundTxOutput,
   Network,
+  RpcConnectionConfig,
   TxOutput,
 } from '@radar/redshift-types';
+import { UtxoRpcClient } from '@radar/redshift-utils';
 import bip65 from 'bip65';
 import { expect } from 'chai';
 import { HTLC, UTXO, UtxoHtlc } from '../../../../src';
-import { config, toSatoshi, UtxoRpcClient } from '../../../lib/helpers';
+import { config, toSatoshi } from '../../../lib/helpers';
 import { mineBlocks } from '../../../lib/helpers/btccli';
+import { getRpcConnectionConfig } from '../../../lib/rpc-config';
 
 const { funder, claimer, refunder } = config.bitcoin.integration;
 const feeTokensPerVirtualByte = 1;
@@ -104,8 +107,12 @@ describe('UTXO BIP65 HTLC - Bitcoin Network', () => {
     // Mine 400 blocks ahead of the coinbase transaction. Segwit activates around 300.
     await mineBlocks(400);
 
+    const connectionConfig: RpcConnectionConfig = getRpcConnectionConfig(
+      Network.BITCOIN,
+      BitcoinSubnet.SIMNET,
+    );
     // Instantiate a new rpc client
-    rpcClient = new UtxoRpcClient(Network.BITCOIN, BitcoinSubnet.SIMNET);
+    rpcClient = new UtxoRpcClient(connectionConfig);
   });
 
   describe('Fund', () => {

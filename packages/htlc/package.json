@@ -31,6 +31,7 @@
     "varuint-bitcoin": "^1.1.0"
   },
   "devDependencies": {
+    "@radar/redshift-utils": "^0.1.6",
     "@types/axios": "^0.14.0",
     "@types/bip39": "^2.4.1",
     "@types/chai-as-promised": "^7.1.0",
