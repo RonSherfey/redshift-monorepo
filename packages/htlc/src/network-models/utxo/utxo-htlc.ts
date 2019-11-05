@@ -109,7 +109,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     });
 
     // Total spendable amount
-    const tokens = utxos.reduce((t, c) => t + c.tokens, 0);
+    const tokens = utxos.reduce((t, c) => t + Number(c.tokens), 0);
 
     tx.addOutputs([
       {
@@ -214,7 +214,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     tx.version = 2;
 
     // Total the utxos
-    const tokens = utxos.reduce((t, c) => t + c.tokens, 0);
+    const tokens = utxos.reduce((t, c) => t + Number(c.tokens), 0);
 
     // Add a single output containing the destination address
     tx.addOutput(
@@ -323,7 +323,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
       const sigHash = tx.hashForWitnessV0(
         i,
         this.redeemScriptBuffer,
-        output.tokens,
+        Number(output.tokens),
         Transaction.SIGHASH_ALL,
       );
       const signature = script.signature.encode(
