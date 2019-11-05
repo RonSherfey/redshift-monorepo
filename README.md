@@ -34,7 +34,7 @@ This type of swap can be used to top up your Lightning balance, make off-chain p
 Follow the below links to try REDSHIFT:
 
 * [Testnet](https://widget.redshift.radar.tech)
-* Mainnet (Coming Soon)
+* [Mainnet](https://ion.radar.tech/redshift)
 
 ## Packages
 
