@@ -27,10 +27,12 @@ export function toHexString(number: BigNumber): string {
  * @param decimals The number of decimal places the unit amount has.
  */
 export function toBaseUnitAmount(
-  unitAmount: BigNumber,
-  decimals: BigNumber,
+  unitAmount: BigNumber | string | number,
+  decimals: BigNumber | string | number,
 ): BigNumber {
-  const baseUnitAmount = unitAmount.times(new BigNumber(ten).pow(decimals));
+  const baseUnitAmount = new BigNumber(unitAmount).times(
+    new BigNumber(ten).pow(decimals),
+  );
   if (baseUnitAmount.decimalPlaces() !== 0) {
     throw new Error(
       `Invalid unit amount: ${unitAmount.toString()} - Too many decimal places`,
@@ -46,10 +48,10 @@ export function toBaseUnitAmount(
  * @param decimals The number of decimal places the unit amount has.
  */
 export function toUnitAmount(
-  baseUnits: BigNumber,
-  decimals: BigNumber,
+  baseUnits: BigNumber | string | number,
+  decimals: BigNumber | string | number,
 ): BigNumber {
-  return baseUnits.div(new BigNumber(ten).pow(decimals));
+  return new BigNumber(baseUnits).div(new BigNumber(ten).pow(decimals));
 }
 
 /**
