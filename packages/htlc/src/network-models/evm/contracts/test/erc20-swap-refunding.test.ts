@@ -67,7 +67,7 @@ contract('ERC20Swap - Refunding', accounts => {
     );
     expect(res.logs).to.shallowDeepEqual([
       {
-        event: 'OrderErc20Refunded',
+        event: 'OrderRefunded',
         args: {
           orderUUID,
         },

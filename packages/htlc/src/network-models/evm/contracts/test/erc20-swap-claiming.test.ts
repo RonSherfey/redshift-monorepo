@@ -61,7 +61,7 @@ contract('ERC20Swap - Claiming', accounts => {
     );
     expect(res.logs).to.shallowDeepEqual([
       {
-        event: 'OrderErc20Claimed',
+        event: 'OrderClaimed',
         args: {
           orderUUID: validArgs.orderUUID,
         },

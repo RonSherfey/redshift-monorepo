@@ -33,7 +33,7 @@ contract('ERC20Swap - Funding', accounts => {
     );
     expect(res.logs).to.shallowDeepEqual([
       {
-        event: 'OrderErc20FundingReceived',
+        event: 'OrderFundingReceived',
         args: {
           orderUUID,
           onchainAmount: tokenAmount.toString(),
@@ -57,7 +57,7 @@ contract('ERC20Swap - Funding', accounts => {
     );
     expect(res.logs).to.shallowDeepEqual([
       {
-        event: 'OrderErc20FundingReceived',
+        event: 'OrderFundingReceived',
         args: {
           orderUUID,
           onchainAmount: String(tokenAmount * 2),
