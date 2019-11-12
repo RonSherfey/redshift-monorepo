@@ -19,15 +19,15 @@ contract ERC20Swap is Swap {
 
     mapping(bytes16 => SwapOrder) orders;
 
-    event OrderErc20FundingReceived(
+    event OrderFundingReceived(
         bytes16 orderUUID,
         uint onchainAmount,
         bytes32 paymentHash,
         uint refundBlockHeight,
         address tokenContractAddress
     );
-    event OrderErc20Claimed(bytes16 orderUUID);
-    event OrderErc20Refunded(bytes16 orderUUID);
+    event OrderClaimed(bytes16 orderUUID);
+    event OrderRefunded(bytes16 orderUUID);
 
     /**
      * Allow the sender to fund a swap in one or more transactions.
@@ -54,7 +54,7 @@ contract ERC20Swap is Swap {
 
         order.onchainAmount += tokenAmount;
 
-        emit OrderErc20FundingReceived(
+        emit OrderFundingReceived(
             orderUUID,
             order.onchainAmount,
             order.paymentHash,
@@ -80,7 +80,7 @@ contract ERC20Swap is Swap {
         ERC20Interface(tokenContractAddress).transfer(owner, order.onchainAmount);
         order.state = OrderState.Claimed;
 
-        emit OrderErc20Claimed(orderUUID);
+        emit OrderClaimed(orderUUID);
     }
 
     /**
@@ -97,6 +97,6 @@ contract ERC20Swap is Swap {
         ERC20Interface(tokenContractAddress).transfer(order.user, order.onchainAmount);
         order.state = OrderState.Refunded;
 
-        emit OrderErc20Refunded(orderUUID);
+        emit OrderRefunded(orderUUID);
     }
 }
