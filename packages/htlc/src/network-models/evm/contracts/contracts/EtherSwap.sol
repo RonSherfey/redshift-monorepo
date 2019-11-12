@@ -52,7 +52,7 @@ contract EtherSwap is Swap {
 
         require(order.exist == true, "Order does not exist.");
         require(order.state == OrderState.HasFundingBalance, "Order cannot be claimed.");
-        emit OrderClaimed(sha256(abi.encodePacked(preimage));
+        emit OrderClaimed(sha256(abi.encodePacked(preimage)));
         require(sha256(abi.encodePacked(preimage)) == order.paymentHash, "Incorrect payment preimage.");
         require(block.number <= order.refundBlockHeight, "Too late to claim.");
 
