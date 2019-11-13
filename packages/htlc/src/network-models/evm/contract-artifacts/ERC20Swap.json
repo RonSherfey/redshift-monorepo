@@ -248,11 +248,70 @@
           "name": "OrderErc20Refunded",
           "type": "event",
           "signature": "0xcfcf29fab214c4c5d494671a1fefb8a5efa9359fe62863910138b7f2881de63d"
+        },
+        "0x89abd53b328271c678e59d9fc06050a3351506621408a943039ff55b4b4de20d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "orderUUID",
+              "type": "bytes16"
+            },
+            {
+              "indexed": false,
+              "name": "onchainAmount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "paymentHash",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "name": "refundBlockHeight",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "tokenContractAddress",
+              "type": "address"
+            }
+          ],
+          "name": "OrderFundingReceived",
+          "type": "event",
+          "signature": "0x89abd53b328271c678e59d9fc06050a3351506621408a943039ff55b4b4de20d"
+        },
+        "0x96a7ce28124a58eee4f04c2ee97fd44eb93c29d0df55a43fa5e0daccb20a0be5": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "orderUUID",
+              "type": "bytes16"
+            }
+          ],
+          "name": "OrderClaimed",
+          "type": "event",
+          "signature": "0x96a7ce28124a58eee4f04c2ee97fd44eb93c29d0df55a43fa5e0daccb20a0be5"
+        },
+        "0x0fc93734e5a973e72ab53332bf6e822d652e9d044fa7f4fe3b13028352c14880": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "orderUUID",
+              "type": "bytes16"
+            }
+          ],
+          "name": "OrderRefunded",
+          "type": "event",
+          "signature": "0x0fc93734e5a973e72ab53332bf6e822d652e9d044fa7f4fe3b13028352c14880"
         }
       },
       "links": {},
-      "address": "0x920412379dB3CbBf17b4c81F93F065115aFaCb96",
-      "transactionHash": "0x2348699b626f903052debc2f7f5e38c3aeb21c109259164f24ed26943855ea01"
+      "address": "0x06dedDf1BAE98256a3CD5e8434022E1863E6cfD6",
+      "transactionHash": "0x337fc4773625babd462ff160d363c11e5fd33ad3bb951c603d93a2973a4a7e54"
     },
     "42": {
       "events": {
@@ -314,14 +373,73 @@
           "name": "OrderErc20Refunded",
           "type": "event",
           "signature": "0xcfcf29fab214c4c5d494671a1fefb8a5efa9359fe62863910138b7f2881de63d"
+        },
+        "0x89abd53b328271c678e59d9fc06050a3351506621408a943039ff55b4b4de20d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "orderUUID",
+              "type": "bytes16"
+            },
+            {
+              "indexed": false,
+              "name": "onchainAmount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "paymentHash",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "name": "refundBlockHeight",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "tokenContractAddress",
+              "type": "address"
+            }
+          ],
+          "name": "OrderFundingReceived",
+          "type": "event",
+          "signature": "0x89abd53b328271c678e59d9fc06050a3351506621408a943039ff55b4b4de20d"
+        },
+        "0x96a7ce28124a58eee4f04c2ee97fd44eb93c29d0df55a43fa5e0daccb20a0be5": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "orderUUID",
+              "type": "bytes16"
+            }
+          ],
+          "name": "OrderClaimed",
+          "type": "event",
+          "signature": "0x96a7ce28124a58eee4f04c2ee97fd44eb93c29d0df55a43fa5e0daccb20a0be5"
+        },
+        "0x0fc93734e5a973e72ab53332bf6e822d652e9d044fa7f4fe3b13028352c14880": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "orderUUID",
+              "type": "bytes16"
+            }
+          ],
+          "name": "OrderRefunded",
+          "type": "event",
+          "signature": "0x0fc93734e5a973e72ab53332bf6e822d652e9d044fa7f4fe3b13028352c14880"
         }
       },
       "links": {},
-      "address": "0xA102bB327123afc530AC122b69c0c675627f6c19",
-      "transactionHash": "0x790fe7b2971147dba91c8da7a3a04183e898cfcac9469d45cebdfe76ac40f34e"
+      "address": "0x99ae80f430462f05F7CcaB5468942D33E4FE12db",
+      "transactionHash": "0xc3dd6df90167d583fc2980556759a3dee5cf0e2f32959ec0f3d190f3c56ddb32"
     }
   },
-  "updatedAt": "2019-11-12T21:01:58.515Z",
+  "updatedAt": "2019-11-13T17:43:25.099Z",
   "schemaVersion": "3.0.14",
   "userdoc": {
     "methods": {
