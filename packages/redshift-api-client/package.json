@@ -1,6 +1,6 @@
 {
   "name": "@radar/redshift-api-client",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "REDSHIFT HTTP & WebSocket Client Library",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,7 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "@radar/redshift-types": "^0.5.11",
-    "@radar/redshift-utils": "^0.1.7",
+    "@radar/redshift-utils": "^0.1.8",
     "@types/axios": "^0.14.0",
     "@types/bech32": "^1.1.1",
     "@types/socket.io-client": "^1.4.32",
