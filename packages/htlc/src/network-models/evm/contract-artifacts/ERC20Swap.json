@@ -219,7 +219,7 @@
               "type": "address"
             }
           ],
-          "name": "OrderErc20FundingReceived",
+          "name": "OrderFundingReceived",
           "type": "event",
           "signature": "0x1fc3404b2b61946be5891f39322172e289ee6947959fd6ace7e6f754ac30b1c7"
         },
@@ -232,7 +232,7 @@
               "type": "bytes16"
             }
           ],
-          "name": "OrderErc20Claimed",
+          "name": "OrderClaimed",
           "type": "event",
           "signature": "0x4be7082001f60f2505b01150c05e41746eebdc14140ea85873ab800288d3fedd"
         },
@@ -245,7 +245,7 @@
               "type": "bytes16"
             }
           ],
-          "name": "OrderErc20Refunded",
+          "name": "OrderRefunded",
           "type": "event",
           "signature": "0xcfcf29fab214c4c5d494671a1fefb8a5efa9359fe62863910138b7f2881de63d"
         }
@@ -285,7 +285,7 @@
               "type": "address"
             }
           ],
-          "name": "OrderErc20FundingReceived",
+          "name": "OrderFundingReceived",
           "type": "event",
           "signature": "0x1fc3404b2b61946be5891f39322172e289ee6947959fd6ace7e6f754ac30b1c7"
         },
@@ -298,7 +298,7 @@
               "type": "bytes16"
             }
           ],
-          "name": "OrderErc20Claimed",
+          "name": "OrderClaimed",
           "type": "event",
           "signature": "0x4be7082001f60f2505b01150c05e41746eebdc14140ea85873ab800288d3fedd"
         },
@@ -311,7 +311,7 @@
               "type": "bytes16"
             }
           ],
-          "name": "OrderErc20Refunded",
+          "name": "OrderRefunded",
           "type": "event",
           "signature": "0xcfcf29fab214c4c5d494671a1fefb8a5efa9359fe62863910138b7f2881de63d"
         }
