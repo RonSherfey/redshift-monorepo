@@ -86,7 +86,12 @@ export const format = {
    */
   toUrl(config: RpcConnectionConfig) {
     const protocol = config.https ? 'https' : 'http';
-    const uri = !!config.port ? `${config.host}:${config.port}` : config.host;
-    return `${protocol}://${uri}`;
+    const netAddr = !!config.port
+      ? `${config.host}:${config.port}`
+      : config.host;
+    const url = !!config.path
+      ? `${protocol}://${netAddr}/${config.path}`
+      : `${protocol}://${netAddr}`;
+    return url;
   },
 };
