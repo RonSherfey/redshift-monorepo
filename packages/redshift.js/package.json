@@ -1,6 +1,6 @@
 {
   "name": "@radar/redshift.js",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "REDSHIFT Javascript SDK",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -13,7 +13,7 @@
   "dependencies": {
     "@radar/redshift-api-client": "^0.2.3",
     "@radar/redshift-types": "^0.5.11",
-    "@radar/redshift-utils": "^0.1.8"
+    "@radar/redshift-utils": "^0.1.9"
   },
   "devDependencies": {}
 }
