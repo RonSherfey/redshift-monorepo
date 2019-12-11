@@ -184,6 +184,7 @@ export interface PayReqConfiguration {
   minExpirationSeconds: string;
   minBaseUnits: string;
   maxBaseUnits: string;
+  maxCltvLimit: string; // max possible value for 1st hop CLTV
 }
 
 export type ActiveConfigurationRequest = {
