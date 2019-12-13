@@ -1,6 +1,6 @@
 {
   "name": "@radar/redshift-api-client",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "REDSHIFT HTTP & WebSocket Client Library",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,7 +11,7 @@
   "author": "RadarTech",
   "license": "MIT",
   "dependencies": {
-    "@radar/redshift-types": "^0.5.11",
+    "@radar/redshift-types": "^0.5.12",
     "@radar/redshift-utils": "^0.1.9",
     "@types/axios": "^0.14.0",
     "@types/bech32": "^1.1.1",
