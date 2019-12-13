@@ -82,6 +82,7 @@ export enum SimnetOnChainTicker {
   SDAI = 'SDAI', // Simnet DAI
   SXLM = 'SXLM', // Simnet Stellar Lumens
   SDCR = 'SDCR', // Simnet Decred
+  SUSDC = 'SUSDC', // Simnet USDC
 }
 
 /**
@@ -94,6 +95,7 @@ export enum TestnetOnChainTicker {
   KDAI = 'KDAI', // Kovan Testnet DAI
   TXLM = 'TXLM', // Testnet Stellar Lumens
   TDCR = 'TDCR', // Testnet Decred
+  KUSDC = 'KUSDC', // Kovan Testnet USDC
 }
 
 /**
@@ -106,6 +108,7 @@ export enum MainnetOnChainTicker {
   DAI = 'DAI', // DAI
   XLM = 'XLM', // Stellar Lumens
   DCR = 'DCR', // Decred
+  USDC = 'USDC', // USDC
 }
 
 /**
@@ -166,6 +169,7 @@ export enum SimnetMarket {
   SDAI_LSBTC = 'SDAI_LSBTC',
   SXLM_LSBTC = 'SXLM_LSBTC',
   SDCR_LSBTC = 'SDCR_LSBTC',
+  SUSDC_LSBTC = 'SUSDC_LSBTC',
 }
 
 /**
@@ -178,6 +182,7 @@ export enum TestnetMarket {
   KDAI_LTBTC = 'KDAI_LTBTC',
   TXLM_LTBTC = 'TXLM_LTBTC',
   TDCR_LTBTC = 'TDCR_LTBTC',
+  KUSDC_LTBTC = 'KUSDC_LTBTC',
 }
 
 /**
@@ -190,6 +195,7 @@ export enum MainnetMarket {
   DAI_LBTC = 'DAI_LBTC',
   XLM_LBTC = 'XLM_LBTC',
   DCR_LBTC = 'DCR_LBTC',
+  USDC_LBTC = 'USDC_LBTC',
 }
 
 /**
