@@ -1,8 +1,8 @@
 import { BitcoinSubnet, Network } from '@radar/redshift-types';
+import { format } from '@radar/redshift-utils';
 import { crypto } from 'bitcoinjs-lib';
 import uuidv4 from 'uuid/v4';
 import { UTXO } from '../../../src';
-import { addHexPrefix } from '../../../src/utils';
 import { getTestingMnemonic } from './env-vars';
 import { getKeyPairFromMnemonic } from './wallet';
 
@@ -34,8 +34,8 @@ function generateRandomIdSecretAndHashValues(prefixHex: boolean) {
   let paymentHash = sha256Hash(paymentSecret);
 
   if (prefixHex) {
-    paymentSecret = addHexPrefix(paymentSecret);
-    paymentHash = addHexPrefix(paymentHash);
+    paymentSecret = format.addHexPrefix(paymentSecret);
+    paymentHash = format.addHexPrefix(paymentHash);
   }
   return {
     orderUUID,
@@ -164,16 +164,16 @@ const networkSpecificConfigs = {
   },
   ethereum: {
     accounts: [
-      '0xf1bbe56399e4d6364ff7afbe6809d9096f9ffe42',
-      '0x7456485e92e734b59257fff1cbda22b96de60325',
-      '0x4f0655478a6e15d05a73f4353a19bfeadbf77afd',
-      '0x7f2eeffb609044b5b1b77ca1cf1ef10d67092aa5',
-      '0x2f0ba4c6635f983e57a4edf09655b78efba893b9',
-      '0x23bf24cd36806200136b69a0a6e9809f36c5ca0a',
-      '0xc4a29a15a1c4f5a9f3b8d861be47d00d1950d307',
-      '0x208bec74231c2ba3f8b4f1946a678ebc3e38802f',
-      '0x38f4c97e2dccf4e1e22e4acce8fa811480485b92',
-      '0xc516633e1f501ad5d813a86df04e90e5eaec0518',
+      '0x5409ED021D9299bf6814279A6A1411A7e866A631',
+      '0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb',
+      '0xE36Ea790bc9d7AB70C55260C66D52b1eca985f84',
+      '0xE834EC434DABA538cd1b9Fe1582052B880BD7e63',
+      '0x78dc5D2D739606d31509C31d654056A45185ECb6',
+      '0xA8dDa8d7F5310E4A9E24F8eBA77E091Ac264f872',
+      '0x06cEf8E666768cC40Cc78CF93d9611019dDcB628',
+      '0x4404ac8bd8F9618D27Ad2f1485AA1B2cFD82482D',
+      '0x7457d5E02197480Db681D3fdF256c7acA21bDc12',
+      '0x91c987bf62D25945dB517BDAa840A6c661374402',
     ],
   },
 };

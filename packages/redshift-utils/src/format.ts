@@ -6,9 +6,37 @@ import {
 import crypto from 'crypto';
 import hexToUuid from 'hex-to-uuid';
 import { isString } from 'value-utils';
-import Web3 from 'web3';
 
 export const format = {
+  /**
+   * Determine if the passed string is a valid hex
+   * @param arg The string to check
+   */
+  isHex(arg: string) {
+    if (
+      new RegExp(/^(0x)?[a-f0-9]+$/i).test(arg) // Valid hex
+    ) {
+      return true;
+    }
+    return false;
+  },
+
+  /**
+   * Determine if a string has a hex prefix
+   * @param arg The string to check
+   */
+  isHexPrefixed(arg: string) {
+    return arg.startsWith('0x');
+  },
+
+  /**
+   * Add a hex prefix to an unprefixed string
+   * @param arg The string to add the prefix to
+   */
+  addHexPrefix(arg: string): string {
+    return format.isHexPrefixed(arg) ? arg : `0x${arg}`;
+  },
+
   /**
    * Strip the hex prefix from the passed string if it exists
    * @param hex The hex string
@@ -50,7 +78,7 @@ export const format = {
     if (!isString(uuid)) {
       return uuid;
     }
-    if (Web3.utils.isHex(uuid)) {
+    if (format.isHex(uuid)) {
       return hexToUuid(uuid);
     }
     return uuid.toLowerCase();

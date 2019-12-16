@@ -11,7 +11,8 @@
     "moduleResolution": "node"
   },
   "references": [
-    { "path": "../redshift-types" }
+    { "path": "../redshift-types" },
+    { "path": "../redshift-utils" }
   ],
   "exclude": [
     "test",
