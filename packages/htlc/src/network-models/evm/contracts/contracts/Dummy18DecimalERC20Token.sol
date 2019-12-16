@@ -1,10 +1,10 @@
 pragma solidity ^0.5.8;
 
 // ----------------------------------------------------------------------------
-// 'FIXED' 'Example Fixed Supply Token' token contract
+// 'DETDC' 'Dummy 18 Decimal Token' token contract
 //
-// Symbol      : FIXED
-// Name        : Example Fixed Supply Token
+// Symbol      : DETDC
+// Name        : Dummy 18 Decimal Token
 // Total supply: 1,000,000.000000000000000000
 // Decimals    : 18
 //
@@ -98,7 +98,7 @@ contract Owned {
 // ERC20 Token, with the addition of symbol, name and decimals and a
 // fixed supply
 // ----------------------------------------------------------------------------
-contract ERC20Token is ERC20Interface, Owned {
+contract Dummy18DecimalERC20Token is ERC20Interface, Owned {
     using SafeMath for uint;
 
     string public symbol;
@@ -114,8 +114,8 @@ contract ERC20Token is ERC20Interface, Owned {
     // Constructor
     // ------------------------------------------------------------------------
     constructor() public {
-        symbol = "FIXED";
-        name = "Example Fixed Supply Token";
+        symbol = "DETDC";
+        name = "Dummy 18 Decimal Token";
         decimals = 18;
         _totalSupply = 1000000 * 10**uint(decimals);
         balances[owner] = _totalSupply;
