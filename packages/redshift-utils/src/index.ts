@@ -1,3 +1,4 @@
+export * from './asset';
 export * from './format';
 export * from './numeric';
 export * from './rpc';
