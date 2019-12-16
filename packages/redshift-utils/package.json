@@ -1,6 +1,6 @@
 {
   "name": "@radar/redshift-utils",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "Utilities used across REDSHIFT codebases",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
