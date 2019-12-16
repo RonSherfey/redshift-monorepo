@@ -1,9 +1,15 @@
-import { Market, Network, OnChainTicker, Subnet } from '@radar/redshift-types';
+import {
+  MainnetOnChainTicker,
+  Market,
+  Network,
+  OnChainTicker,
+  Subnet,
+} from '@radar/redshift-types';
 
 export const fixtures = {
   valid: {
     network: Network.BITCOIN,
-    subnet: Subnet.SIMNET,
+    subnet: Subnet.MAINNET,
     onchainTicker: OnChainTicker.BTC,
     mainnetOnchainTicker: OnChainTicker.BTC,
     market: Market.BTC_LBTC,
@@ -13,11 +19,11 @@ export const fixtures = {
     hex: '0xdeadbeef',
   },
   invalid: {
-    network: 'invalid_network',
-    subnet: 'invalid_subnet',
-    onchainTicker: 'invalid_onchain_ticker',
-    mainnetOnchainTicker: 'invalid_mainnet_onchain_ticker',
-    market: 'invalid_market',
+    network: 'invalid_network' as Network,
+    subnet: 'invalid_subnet' as Subnet,
+    onchainTicker: 'invalid_onchain_ticker' as OnChainTicker,
+    mainnetOnchainTicker: 'invalid_mainnet_onchain_ticker' as MainnetOnChainTicker,
+    market: 'invalid_market' as Market,
     uuid: 'invalid_uuid',
     base58Check: 'invalid_base58',
     bech32: 'invalid_bech32',
