@@ -10,7 +10,8 @@
     "module": "commonjs"
   },
   "references": [
-    { "path": "../redshift-types" }
+    { "path": "../redshift-types" },
+    { "path": "../redshift-utils" }
   ],
   "exclude": [
     "test",

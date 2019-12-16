@@ -1,8 +1,8 @@
 import { BitcoinSubnet, Network } from '@radar/redshift-types';
+import { format } from '@radar/redshift-utils';
 import { crypto } from 'bitcoinjs-lib';
 import uuidv4 from 'uuid/v4';
 import { UTXO } from '../../../src';
-import { addHexPrefix } from '../../../src/utils';
 import { getTestingMnemonic } from './env-vars';
 import { getKeyPairFromMnemonic } from './wallet';
 
@@ -34,8 +34,8 @@ function generateRandomIdSecretAndHashValues(prefixHex: boolean) {
   let paymentHash = sha256Hash(paymentSecret);
 
   if (prefixHex) {
-    paymentSecret = addHexPrefix(paymentSecret);
-    paymentHash = addHexPrefix(paymentHash);
+    paymentSecret = format.addHexPrefix(paymentSecret);
+    paymentHash = format.addHexPrefix(paymentHash);
   }
   return {
     orderUUID,

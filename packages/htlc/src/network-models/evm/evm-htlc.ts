@@ -6,11 +6,11 @@ import {
   PartialEvmTxParams,
   SubnetMap,
 } from '@radar/redshift-types';
+import { format } from '@radar/redshift-utils';
 import Big from 'big.js';
 import abi from 'ethereumjs-abi';
 import uuidToHex from 'uuid-to-hex';
 import { EVM, Provider } from '../../types';
-import { addHexPrefix, isHex } from '../../utils';
 import { BaseHtlc } from '../shared';
 import { getContractAddressesForSubnetOrThrow } from './contract-addresses';
 
@@ -105,8 +105,8 @@ export class EvmHtlc<
    * @param uuid The UUID to format
    */
   private formatOrderUUID(uuid: string) {
-    if (isHex(uuid)) {
-      return addHexPrefix(uuid);
+    if (format.isHex(uuid)) {
+      return format.addHexPrefix(uuid);
     }
     return uuidToHex(uuid, true);
   }
@@ -147,14 +147,14 @@ export class EvmHtlc<
           .simpleEncode(
             'fund(bytes16,bytes32,address,uint)',
             this._orderUUID,
-            addHexPrefix(paymentHash),
+            format.addHexPrefix(paymentHash),
             this._tokenContractAddress,
             amount,
           )
           .toString('hex');
         return {
           to: this._swapContractAddress,
-          data: addHexPrefix(erc20MethodArgs),
+          data: format.addHexPrefix(erc20MethodArgs),
           ...txParams,
         };
       case EVM.AssetType.ETHER:
@@ -162,12 +162,12 @@ export class EvmHtlc<
           .simpleEncode(
             'fund(bytes16,bytes32)',
             this._orderUUID,
-            addHexPrefix(paymentHash),
+            format.addHexPrefix(paymentHash),
           )
           .toString('hex');
         return {
           to: this._swapContractAddress,
-          data: addHexPrefix(etherMethodArgs),
+          data: format.addHexPrefix(etherMethodArgs),
           value: new Big(amount).times(1e18).toString(), // Ether to Wei
           ...txParams,
         };
@@ -190,12 +190,12 @@ export class EvmHtlc<
             'claim(bytes16,bytes32,bytes32)',
             this._orderUUID,
             this._tokenContractAddress,
-            addHexPrefix(paymentSecret),
+            format.addHexPrefix(paymentSecret),
           )
           .toString('hex');
         return {
           to: this._swapContractAddress,
-          data: addHexPrefix(erc20MethodArgs),
+          data: format.addHexPrefix(erc20MethodArgs),
           ...txParams,
         };
       case EVM.AssetType.ETHER:
@@ -203,12 +203,12 @@ export class EvmHtlc<
           .simpleEncode(
             'claim(bytes16,bytes32)',
             this._orderUUID,
-            addHexPrefix(paymentSecret),
+            format.addHexPrefix(paymentSecret),
           )
           .toString('hex');
         return {
           to: this._swapContractAddress,
-          data: addHexPrefix(etherMethodArgs),
+          data: format.addHexPrefix(etherMethodArgs),
           ...txParams,
         };
     }
@@ -232,7 +232,7 @@ export class EvmHtlc<
           .toString('hex');
         return {
           to: this._swapContractAddress,
-          data: addHexPrefix(erc20MethodArgs),
+          data: format.addHexPrefix(erc20MethodArgs),
           ...txParams,
         };
       case EVM.AssetType.ETHER:
@@ -241,7 +241,7 @@ export class EvmHtlc<
           .toString('hex');
         return {
           to: this._swapContractAddress,
-          data: addHexPrefix(etherMethodArgs),
+          data: format.addHexPrefix(etherMethodArgs),
           ...txParams,
         };
     }
