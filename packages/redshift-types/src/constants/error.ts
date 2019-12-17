@@ -106,6 +106,7 @@ export enum LightningError {
   PAY_REQ_AMT_BELOW_MIN_ALLOWED = 'PaymentRequestAmountBelowMinimumAllowed',
   PAY_REQ_AMT_ABOVE_MAX_ALLOWED = 'PaymentRequestAmountAboveMaximumAllowed',
   PAY_REQ_EXPIRY_CLTV_ABOVE_MAXIMUM = 'PaymentRequestExpiryCLTVAboveMaximum',
+  PAY_REQ_EXPIRY_CLTV_ABOVE_TOTAL_ROUTE_CLTV_MAXIMUM = 'PaymentRequestExpiryCLTVAboveTotalRouteCLTVMaximum',
   PAY_REQ_NOT_ROUTABLE = 'PaymentRequestNotRoutable',
 }
 
