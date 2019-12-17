@@ -1,6 +1,6 @@
 {
   "name": "@radar/redshift-utils",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "Utilities used across REDSHIFT codebases",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,7 +12,6 @@
   "license": "MIT",
   "dependencies": {
     "@radar/redshift-types": "^0.5.12",
-    "@types/axios": "^0.14.0",
     "axios": "^0.18.1",
     "base58check": "^2.0.0",
     "bech32": "^1.1.3",

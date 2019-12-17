@@ -1,6 +1,6 @@
 {
   "name": "@radar/htlc",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "A library used to construct and interact with HTLCs across multiple networks & network models",
   "main": "dist/cjs/index.js",
   "types": "dist/cjs/index.d.ts",
@@ -13,7 +13,7 @@
   "license": "MIT",
   "dependencies": {
     "@radar/redshift-types": "^0.5.12",
-    "@radar/redshift-utils": "^0.1.12",
+    "@radar/redshift-utils": "^0.1.13",
     "@types/big.js": "^4.0.5",
     "@types/bip32": "^1.0.1",
     "@types/bitcoinjs-lib": "4.0.0",
@@ -32,7 +32,6 @@
     "varuint-bitcoin": "^1.1.0"
   },
   "devDependencies": {
-    "@types/axios": "^0.14.0",
     "@types/bip39": "^2.4.1",
     "@types/chai-as-promised": "^7.1.0",
     "@types/chai-json-schema": "^1.4.3",
