@@ -1,7 +1,7 @@
 import { RpcConnectionConfig } from '@radar/redshift-types';
 import BigNumber from 'bignumber.js';
-import { Tx } from 'web3/eth/types';
 import { hexToBigNumber } from '../../numeric';
+import { EthereumTx } from '../../types';
 import { BaseRpcClient } from '../base-rpc-client';
 
 export class EthereumRpcClient extends BaseRpcClient {
@@ -65,7 +65,7 @@ export class EthereumRpcClient extends BaseRpcClient {
    * Value is returned in hex format.
    * @param tx The partially filled tx params
    */
-  public async estimateGas(tx: Tx): Promise<string> {
+  public async estimateGas(tx: EthereumTx): Promise<string> {
     return this.postRpcCall('eth_estimateGas', [tx]);
   }
 

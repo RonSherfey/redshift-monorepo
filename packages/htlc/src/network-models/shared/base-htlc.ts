@@ -4,7 +4,7 @@ import {
   Subnet,
   SubnetMap,
 } from '@radar/redshift-types';
-import { getSubnetForNetwork } from '../../utils/network-utils';
+import { asset } from '@radar/redshift-utils';
 
 export abstract class BaseHtlc<N extends Network> {
   protected _network: N;
@@ -20,7 +20,7 @@ export abstract class BaseHtlc<N extends Network> {
       throw new Error(NetworkError.INVALID_NETWORK);
     }
 
-    if (getSubnetForNetwork(network)[subnet as Subnet]) {
+    if (asset.getSubnetForNetwork(network)[subnet as Subnet]) {
       throw new Error(NetworkError.INVALID_SUBNET);
     }
 

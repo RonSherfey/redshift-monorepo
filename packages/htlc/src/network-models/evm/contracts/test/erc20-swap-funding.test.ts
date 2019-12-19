@@ -1,17 +1,17 @@
 import {
+  Dummy18DecimalERC20TokenInstance,
   ERC20SwapInstance,
-  ERC20TokenInstance,
 } from '../types/truffle-contracts';
 import { config, expect } from './lib';
 
 // tslint:disable:variable-name
-const ERC20Token = artifacts.require('ERC20Token');
+const ERC20Token = artifacts.require('Dummy18DecimalERC20Token');
 const ERC20Swap = artifacts.require('ERC20Swap');
 ERC20Swap.numberFormat = 'String';
 
 contract('ERC20Swap - Funding', accounts => {
   const [{ orderUUID, hash, tokenAmount, refundDelay }] = config.valid;
-  let erc20TokenInstance: ERC20TokenInstance;
+  let erc20TokenInstance: Dummy18DecimalERC20TokenInstance;
   let erc20SwapInstance: ERC20SwapInstance;
 
   before(async () => {
