@@ -20,7 +20,7 @@ glob.sync( '../contract-artifacts/**/*.json' ).forEach(relativePath => {
     schemaVersion,
     userdoc,
   } = artifact;
-  const networks = Object.keys(artifact.networks).reduce((filteredNetworks, networkId) => {
+  const networks = Object.keys(artifact.networks || {}).reduce((filteredNetworks, networkId) => {
     if (networkId === '1' || networkId === '42') { // Save Mainnet or Kovan only
       filteredNetworks[networkId] = artifact.networks[networkId]
     }
