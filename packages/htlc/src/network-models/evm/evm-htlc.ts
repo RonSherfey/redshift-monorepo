@@ -187,7 +187,7 @@ export class EvmHtlc<
       case EVM.AssetType.ERC20:
         const erc20MethodArgs = abi
           .simpleEncode(
-            'claim(bytes16,bytes32,bytes32)',
+            'claim(bytes16,address,bytes32)',
             this._orderUUID,
             this._tokenContractAddress,
             format.addHexPrefix(paymentSecret),

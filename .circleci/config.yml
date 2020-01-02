@@ -15,7 +15,9 @@ jobs:
         node-version: "8.12"
     - run: 
         name: Setup Integration Environment
-        command: docker-compose up -d
+        command: |
+          source ~/.bashrc
+          scripts/simnet-setup.sh ci
     - run:
         name: Build Packages
         command: |
