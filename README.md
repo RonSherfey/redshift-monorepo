@@ -58,9 +58,9 @@ yarn
 yarn build
 ```
 
-### Start simnet services for tests 
+### Start simnet services & deploy contracts for tests
 ```sh
-docker-compose up -d
+scripts/simnet-setup.sh
 ```
 
 ### Run tests

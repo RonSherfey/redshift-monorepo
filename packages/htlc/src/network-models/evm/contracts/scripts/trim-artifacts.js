@@ -16,7 +16,6 @@ glob.sync( '../contract-artifacts/**/*.json' ).forEach(relativePath => {
     deployedBytecode,
     source,
     compiler,
-    updatedAt,
     schemaVersion,
     userdoc,
   } = artifact;
@@ -34,7 +33,6 @@ glob.sync( '../contract-artifacts/**/*.json' ).forEach(relativePath => {
     source,
     compiler,
     networks,
-    updatedAt,
     schemaVersion,
     userdoc
   };
