@@ -11,7 +11,7 @@ contract EtherSwap is Swap {
         bytes16 orderUUID;
         bytes32 paymentHash;
     }
-    struct FundWithRefundHashlockDetails {
+    struct FundDetailsWithAdminRefundEnabled {
         bytes16 orderUUID;
         bytes32 paymentHash;
         bytes32 refundHash;
@@ -42,7 +42,7 @@ contract EtherSwap is Swap {
         bytes32 paymentHash,
         uint256 refundBlockHeight
     );
-    event OrderFundingReceived(
+    event OrderFundingReceivedWithAdminRefundEnabled(
         bytes16 orderUUID,
         uint256 onchainAmount,
         bytes32 paymentHash,
@@ -84,9 +84,10 @@ contract EtherSwap is Swap {
 
     /**
      * Allow the sender to fund a swap in one or more transactions and provide a refund
-     * hash, which can enable faster refunds if the refund preimage is supplied.
+     * hash, which can enable faster refunds if the refund preimage is supplied by the
+     * counterparty once it's decided that a claim transaction will not be submitted.
      */
-    function fundWithRefundHashlock(FundWithRefundHashlockDetails memory details) public payable {
+    function fundWithAdminRefundEnabled(FundDetailsWithAdminRefundEnabled memory details) public payable {
         SwapOrder storage order = orders[details.orderUUID];
 
         if (!order.exist) {
@@ -101,7 +102,13 @@ contract EtherSwap is Swap {
         }
         order.onchainAmount += msg.value;
 
-        emit OrderFundingReceived(details.orderUUID, order.onchainAmount, order.paymentHash, order.refundBlockHeight, order.refundHash);
+        emit OrderFundingReceivedWithAdminRefundEnabled(
+            details.orderUUID,
+            order.onchainAmount,
+            order.paymentHash,
+            order.refundBlockHeight,
+            order.refundHash
+        );
     }
 
     /**

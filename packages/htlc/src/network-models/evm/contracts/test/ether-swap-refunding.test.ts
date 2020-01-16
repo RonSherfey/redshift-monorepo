@@ -22,8 +22,8 @@ contract('EtherSwap - Refunding', accounts => {
     );
   };
 
-  const fundSwapWithRefundHashlock = async () => {
-    await swapInstance.fundWithRefundHashlock(
+  const fundSwapWithAdminRefundEnabled = async () => {
+    await swapInstance.fundWithAdminRefundEnabled(
       {
         orderUUID: validArgs.orderUUID,
         paymentHash: validArgs.paymentHash,
@@ -82,7 +82,7 @@ contract('EtherSwap - Refunding', accounts => {
 
   describe('adminRefund', () => {
     it('should revert if the order does not exist', async () => {
-      await fundSwapWithRefundHashlock();
+      await fundSwapWithAdminRefundEnabled();
       await expect(
         swapInstance.adminRefund({
           orderUUID: invalidArgs.orderUUID,
@@ -92,7 +92,7 @@ contract('EtherSwap - Refunding', accounts => {
     });
 
     it('should revert if the preimage is incorrect', async () => {
-      await fundSwapWithRefundHashlock();
+      await fundSwapWithAdminRefundEnabled();
       await expect(
         swapInstance.adminRefund({
           orderUUID: validArgs.orderUUID,
@@ -102,7 +102,7 @@ contract('EtherSwap - Refunding', accounts => {
     });
 
     it('should succeed if the order exists and the refund preimage is correct', async () => {
-      await fundSwapWithRefundHashlock();
+      await fundSwapWithAdminRefundEnabled();
       const res = await swapInstance.adminRefund({
         orderUUID: validArgs.orderUUID,
         refundPreimage: validArgs.refundPreimage,
@@ -118,7 +118,7 @@ contract('EtherSwap - Refunding', accounts => {
     });
 
     it('should revert if already refunded', async () => {
-      await fundSwapWithRefundHashlock();
+      await fundSwapWithAdminRefundEnabled();
       await swapInstance.adminRefund({
         orderUUID: validArgs.orderUUID,
         refundPreimage: validArgs.refundPreimage,

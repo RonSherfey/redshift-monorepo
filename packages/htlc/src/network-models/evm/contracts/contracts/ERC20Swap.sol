@@ -13,12 +13,12 @@ contract ERC20Swap is Swap {
         address tokenContractAddress;
         uint256 tokenAmount;
     }
-    struct FundWithRefundHashlockDetails {
+    struct FundDetailsWithAdminRefundEnabled {
         bytes16 orderUUID;
         bytes32 paymentHash;
-        bytes32 refundHash;
         address tokenContractAddress;
         uint256 tokenAmount;
+        bytes32 refundHash;
     }
     struct ClaimDetails {
         bytes16 orderUUID;
@@ -48,7 +48,7 @@ contract ERC20Swap is Swap {
         uint256 refundBlockHeight,
         address tokenContractAddress
     );
-    event OrderFundingReceived(
+    event OrderFundingReceivedWithAdminRefundEnabled(
         bytes16 orderUUID,
         uint256 onchainAmount,
         bytes32 paymentHash,
@@ -58,6 +58,7 @@ contract ERC20Swap is Swap {
     );
     event OrderClaimed(bytes16 orderUUID);
     event OrderRefunded(bytes16 orderUUID);
+    event OrderAdminRefunded(bytes16 orderUUID);
 
     /**
      * Delete the order data that is no longer necessary after a swap is claimed or refunded.
@@ -106,9 +107,10 @@ contract ERC20Swap is Swap {
 
     /**
      * Allow the sender to fund a swap in one or more transactions and provide a refund
-     * hash, which can enable faster refunds if the refund preimage is supplied.
+     * hash, which can enable faster refunds if the refund preimage is supplied by the
+     * counterparty once it's decided that a claim transaction will not be submitted.
      */
-    function fundWithRefundHashlock(FundWithRefundHashlockDetails memory details) public {
+    function fundWithAdminRefundEnabled(FundDetailsWithAdminRefundEnabled memory details) public {
         SwapOrder storage order = orders[details.orderUUID];
 
         if (!order.exist) {
@@ -131,7 +133,7 @@ contract ERC20Swap is Swap {
         );
         order.onchainAmount += details.tokenAmount;
 
-        emit OrderFundingReceived(
+        emit OrderFundingReceivedWithAdminRefundEnabled(
             details.orderUUID,
             order.onchainAmount,
             order.paymentHash,
@@ -211,7 +213,7 @@ contract ERC20Swap is Swap {
         );
 
         deleteUnnecessaryOrderData(order);
-        emit OrderRefunded(details.orderUUID);
+        emit OrderAdminRefunded(details.orderUUID);
     }
 
     /**
@@ -227,9 +229,9 @@ contract ERC20Swap is Swap {
      * Allow the sender to fund multiple swaps in one or more transactions and
      * provide a refund hashes, which can enable faster refunds if the refund preimage is supplied.
      */
-    function batchFundWithRefundHashlock(FundWithRefundHashlockDetails[] calldata details) external {
+    function batchFundWithAdminRefundEnabled(FundDetailsWithAdminRefundEnabled[] calldata details) external {
         for (uint256 i = 0; i < details.length; i++) {
-            fundWithRefundHashlock(details[i]);
+            fundWithAdminRefundEnabled(details[i]);
         }
     }
 

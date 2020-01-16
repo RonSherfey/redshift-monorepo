@@ -78,7 +78,7 @@ contract('ERC20Swap - Funding', () => {
     });
   });
 
-  describe('fundWithRefundHashlock', () => {
+  describe('fundWithAdminRefundEnabled', () => {
     before(async () => {
       // deploy erc20 swap contract
       erc20SwapInstance = await ERC20Swap.new();
@@ -88,7 +88,7 @@ contract('ERC20Swap - Funding', () => {
       // approve token for transfer
       await erc20TokenInstance.approve(erc20SwapInstance.address, tokenAmount);
       // fund swap contract
-      const res = await erc20SwapInstance.fundWithRefundHashlock({
+      const res = await erc20SwapInstance.fundWithAdminRefundEnabled({
         orderUUID,
         paymentHash,
         refundHash,
@@ -97,7 +97,7 @@ contract('ERC20Swap - Funding', () => {
       });
       expect(res.logs).to.shallowDeepEqual([
         {
-          event: 'OrderFundingReceived',
+          event: 'OrderFundingReceivedWithAdminRefundEnabled',
           args: {
             orderUUID,
             paymentHash,
@@ -114,7 +114,7 @@ contract('ERC20Swap - Funding', () => {
       // approve token for transfer
       await erc20TokenInstance.approve(erc20SwapInstance.address, tokenAmount);
       // fund swap contract
-      const res = await erc20SwapInstance.fundWithRefundHashlock({
+      const res = await erc20SwapInstance.fundWithAdminRefundEnabled({
         orderUUID,
         paymentHash,
         refundHash,
@@ -123,7 +123,7 @@ contract('ERC20Swap - Funding', () => {
       });
       expect(res.logs).to.shallowDeepEqual([
         {
-          event: 'OrderFundingReceived',
+          event: 'OrderFundingReceivedWithAdminRefundEnabled',
           args: {
             orderUUID,
             paymentHash,

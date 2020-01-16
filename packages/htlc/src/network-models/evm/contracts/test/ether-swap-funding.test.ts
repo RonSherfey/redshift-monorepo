@@ -66,13 +66,13 @@ contract('EtherSwap - Funding', accounts => {
     });
   });
 
-  describe('fundWithRefundHashlock', () => {
+  describe('fundWithAdminRefundEnabled', () => {
     before(async () => {
       swapInstance = await Swap.new();
     });
 
     it('should emit the expected logs when a valid funding payment is received', async () => {
-      const res = await swapInstance.fundWithRefundHashlock(
+      const res = await swapInstance.fundWithAdminRefundEnabled(
         {
           orderUUID,
           paymentHash,
@@ -85,7 +85,7 @@ contract('EtherSwap - Funding', accounts => {
       );
       expect(res.logs).to.shallowDeepEqual([
         {
-          event: 'OrderFundingReceived',
+          event: 'OrderFundingReceivedWithAdminRefundEnabled',
           args: {
             orderUUID,
             paymentHash,
@@ -98,7 +98,7 @@ contract('EtherSwap - Funding', accounts => {
     });
 
     it('should increment the on chain amount when a second valid funding payment is received', async () => {
-      const res = await swapInstance.fundWithRefundHashlock(
+      const res = await swapInstance.fundWithAdminRefundEnabled(
         {
           orderUUID,
           paymentHash,
@@ -112,7 +112,7 @@ contract('EtherSwap - Funding', accounts => {
       );
       expect(res.logs).to.shallowDeepEqual([
         {
-          event: 'OrderFundingReceived',
+          event: 'OrderFundingReceivedWithAdminRefundEnabled',
           args: {
             orderUUID,
             paymentHash,
