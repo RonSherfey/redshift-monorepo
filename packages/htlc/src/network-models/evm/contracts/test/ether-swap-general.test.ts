@@ -12,7 +12,7 @@ contract('EtherSwap - General', accounts => {
   });
 
   it('should return the contract owner', async () => {
-    const owner = await swapInstance.owner();
+    const owner = await swapInstance.owner.call();
     assert.equal(owner, deployer, 'Owner is deployer');
   });
 
@@ -47,7 +47,7 @@ contract('EtherSwap - General', accounts => {
   it('should allow transfer ownership', async () => {
     const newOwner = accounts[1];
     await swapInstance.transferOwnership(newOwner);
-    const owner = await swapInstance.owner();
+    const owner = await swapInstance.owner.call();
     assert.equal(owner, newOwner, 'New owner is deployer');
   });
 

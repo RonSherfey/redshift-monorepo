@@ -6,45 +6,124 @@ const Swap = artifacts.require('EtherSwap');
 Swap.numberFormat = 'String';
 
 contract('EtherSwap - Funding', accounts => {
-  const [{ orderUUID, hash, refundDelay }] = config.valid;
+  const [{ orderUUID, paymentHash, refundHash, refundDelay }] = config.valid;
   let swapInstance: EtherSwapInstance;
-  before(async () => {
-    swapInstance = await Swap.deployed();
+
+  describe('fund', () => {
+    before(async () => {
+      swapInstance = await Swap.new();
+    });
+
+    it('should emit the expected logs when a valid funding payment is received', async () => {
+      const res = await swapInstance.fund(
+        {
+          orderUUID,
+          paymentHash,
+        },
+        {
+          from: accounts[1],
+          value: etherToWei(0.01),
+        },
+      );
+      expect(res.logs).to.shallowDeepEqual([
+        {
+          event: 'OrderFundingReceived',
+          args: {
+            orderUUID,
+            paymentHash,
+            onchainAmount: etherToWei(0.01),
+            refundBlockHeight: String(res.receipt.blockNumber + refundDelay),
+          },
+        },
+      ]);
+    });
+
+    it('should increment the on chain amount when a second valid funding payment is received', async () => {
+      const res = await swapInstance.fund(
+        {
+          orderUUID,
+          paymentHash,
+        },
+        {
+          from: accounts[1],
+          value: etherToWei(0.01),
+          gas: 200000,
+        },
+      );
+      expect(res.logs).to.shallowDeepEqual([
+        {
+          event: 'OrderFundingReceived',
+          args: {
+            orderUUID,
+            paymentHash,
+            onchainAmount: etherToWei(0.01 * 2),
+            refundBlockHeight: String(
+              res.receipt.blockNumber + refundDelay - 1,
+            ), // because 1 function call: fund
+          },
+        },
+      ]);
+    });
   });
 
-  it('should change the order state when a valid funding payment is received', async () => {
-    const res = await swapInstance.fund(orderUUID, hash, {
-      from: accounts[1],
-      value: etherToWei(0.01),
+  describe('fundWithRefundHashlock', () => {
+    before(async () => {
+      swapInstance = await Swap.new();
     });
-    expect(res.logs).to.shallowDeepEqual([
-      {
-        event: 'OrderFundingReceived',
-        args: {
-          orderUUID,
-          onchainAmount: etherToWei(0.01),
-          paymentHash: hash,
-          refundBlockHeight: String(res.receipt.blockNumber + refundDelay),
-        },
-      },
-    ]);
-  });
 
-  it('should increment the on chain amount when a second valid funding payment is received', async () => {
-    const res = await swapInstance.fund(orderUUID, hash, {
-      from: accounts[1],
-      value: etherToWei(0.01),
-    });
-    expect(res.logs).to.shallowDeepEqual([
-      {
-        event: 'OrderFundingReceived',
-        args: {
+    it('should emit the expected logs when a valid funding payment is received', async () => {
+      const res = await swapInstance.fundWithRefundHashlock(
+        {
           orderUUID,
-          onchainAmount: etherToWei(0.01 * 2),
-          paymentHash: hash,
-          refundBlockHeight: String(res.receipt.blockNumber + refundDelay - 1), // because 1 function call: fund
+          paymentHash,
+          refundHash,
         },
-      },
-    ]);
+        {
+          from: accounts[1],
+          value: etherToWei(0.01),
+        },
+      );
+      expect(res.logs).to.shallowDeepEqual([
+        {
+          event: 'OrderFundingReceived',
+          args: {
+            orderUUID,
+            paymentHash,
+            refundHash,
+            onchainAmount: etherToWei(0.01),
+            refundBlockHeight: String(res.receipt.blockNumber + refundDelay),
+          },
+        },
+      ]);
+    });
+
+    it('should increment the on chain amount when a second valid funding payment is received', async () => {
+      const res = await swapInstance.fundWithRefundHashlock(
+        {
+          orderUUID,
+          paymentHash,
+          refundHash,
+        },
+        {
+          from: accounts[1],
+          value: etherToWei(0.01),
+          gas: 200000,
+        },
+      );
+      expect(res.logs).to.shallowDeepEqual([
+        {
+          event: 'OrderFundingReceived',
+          args: {
+            orderUUID,
+            paymentHash,
+            refundHash,
+            onchainAmount: etherToWei(0.01 * 2),
+            refundBlockHeight: String(
+              res.receipt.blockNumber + refundDelay - 1,
+            ), // because 1 function call: fund
+          },
+        },
+      ]);
+    });
   });
 });

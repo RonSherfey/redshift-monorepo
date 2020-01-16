@@ -9,63 +9,133 @@ const ERC20Token = artifacts.require('Dummy18DecimalERC20Token');
 const ERC20Swap = artifacts.require('ERC20Swap');
 ERC20Swap.numberFormat = 'String';
 
-contract('ERC20Swap - Funding', accounts => {
-  const [{ orderUUID, hash, tokenAmount, refundDelay }] = config.valid;
+contract('ERC20Swap - Funding', () => {
+  const [
+    { orderUUID, paymentHash, refundHash, tokenAmount, refundDelay },
+  ] = config.valid;
   let erc20TokenInstance: Dummy18DecimalERC20TokenInstance;
   let erc20SwapInstance: ERC20SwapInstance;
 
   before(async () => {
     // deploy test erc20 token
     erc20TokenInstance = await ERC20Token.deployed();
-    // deploy erc20 swap contract
-    erc20SwapInstance = await ERC20Swap.deployed();
   });
 
-  it('should change the order state when a valid funding payment is received', async () => {
-    // approve token for transfer
-    await erc20TokenInstance.approve(erc20SwapInstance.address, tokenAmount);
-    // fund swap contract
-    const res = await erc20SwapInstance.fund(
-      orderUUID,
-      hash,
-      erc20TokenInstance.address,
-      tokenAmount,
-    );
-    expect(res.logs).to.shallowDeepEqual([
-      {
-        event: 'OrderFundingReceived',
-        args: {
-          orderUUID,
-          onchainAmount: tokenAmount.toString(),
-          paymentHash: hash,
-          refundBlockHeight: String(res.receipt.blockNumber + refundDelay),
-          tokenContractAddress: erc20TokenInstance.address,
+  describe('fund', () => {
+    before(async () => {
+      // deploy erc20 swap contract
+      erc20SwapInstance = await ERC20Swap.new();
+    });
+
+    it('should emit the expected logs when a valid funding payment is received', async () => {
+      // approve token for transfer
+      await erc20TokenInstance.approve(erc20SwapInstance.address, tokenAmount);
+      // fund swap contract
+      const res = await erc20SwapInstance.fund({
+        orderUUID,
+        paymentHash,
+        tokenAmount,
+        tokenContractAddress: erc20TokenInstance.address,
+      });
+      expect(res.logs).to.shallowDeepEqual([
+        {
+          event: 'OrderFundingReceived',
+          args: {
+            orderUUID,
+            paymentHash,
+            onchainAmount: tokenAmount.toString(),
+            refundBlockHeight: String(res.receipt.blockNumber + refundDelay),
+            tokenContractAddress: erc20TokenInstance.address,
+          },
         },
-      },
-    ]);
+      ]);
+    });
+
+    it('should increment the on chain amount when a second valid funding payment is received', async () => {
+      // approve token for transfer
+      await erc20TokenInstance.approve(erc20SwapInstance.address, tokenAmount);
+      // fund swap contract
+      const res = await erc20SwapInstance.fund({
+        orderUUID,
+        paymentHash,
+        tokenAmount,
+        tokenContractAddress: erc20TokenInstance.address,
+      });
+      expect(res.logs).to.shallowDeepEqual([
+        {
+          event: 'OrderFundingReceived',
+          args: {
+            orderUUID,
+            paymentHash,
+            onchainAmount: String(tokenAmount * 2),
+            refundBlockHeight: String(
+              res.receipt.blockNumber + refundDelay - 2,
+            ), // because 2 function calls: approve and fund
+            tokenContractAddress: erc20TokenInstance.address,
+          },
+        },
+      ]);
+    });
   });
 
-  it('should increment the on chain amount when a second valid funding payment is received', async () => {
-    // approve token for transfer
-    await erc20TokenInstance.approve(erc20SwapInstance.address, tokenAmount);
-    // fund swap contract
-    const res = await erc20SwapInstance.fund(
-      orderUUID,
-      hash,
-      erc20TokenInstance.address,
-      tokenAmount,
-    );
-    expect(res.logs).to.shallowDeepEqual([
-      {
-        event: 'OrderFundingReceived',
-        args: {
-          orderUUID,
-          onchainAmount: String(tokenAmount * 2),
-          paymentHash: hash,
-          refundBlockHeight: String(res.receipt.blockNumber + refundDelay - 2), // because 2 function calls: approve and fund
-          tokenContractAddress: erc20TokenInstance.address,
+  describe('fundWithRefundHashlock', () => {
+    before(async () => {
+      // deploy erc20 swap contract
+      erc20SwapInstance = await ERC20Swap.new();
+    });
+
+    it('should emit the expected logs when a valid funding payment is received', async () => {
+      // approve token for transfer
+      await erc20TokenInstance.approve(erc20SwapInstance.address, tokenAmount);
+      // fund swap contract
+      const res = await erc20SwapInstance.fundWithRefundHashlock({
+        orderUUID,
+        paymentHash,
+        refundHash,
+        tokenAmount,
+        tokenContractAddress: erc20TokenInstance.address,
+      });
+      expect(res.logs).to.shallowDeepEqual([
+        {
+          event: 'OrderFundingReceived',
+          args: {
+            orderUUID,
+            paymentHash,
+            refundHash,
+            onchainAmount: tokenAmount.toString(),
+            refundBlockHeight: String(res.receipt.blockNumber + refundDelay),
+            tokenContractAddress: erc20TokenInstance.address,
+          },
         },
-      },
-    ]);
+      ]);
+    });
+
+    it('should increment the on chain amount when a second valid funding payment is received', async () => {
+      // approve token for transfer
+      await erc20TokenInstance.approve(erc20SwapInstance.address, tokenAmount);
+      // fund swap contract
+      const res = await erc20SwapInstance.fundWithRefundHashlock({
+        orderUUID,
+        paymentHash,
+        refundHash,
+        tokenAmount,
+        tokenContractAddress: erc20TokenInstance.address,
+      });
+      expect(res.logs).to.shallowDeepEqual([
+        {
+          event: 'OrderFundingReceived',
+          args: {
+            orderUUID,
+            paymentHash,
+            refundHash,
+            onchainAmount: String(tokenAmount * 2),
+            refundBlockHeight: String(
+              res.receipt.blockNumber + refundDelay - 2,
+            ), // because 2 function calls: approve and fund
+            tokenContractAddress: erc20TokenInstance.address,
+          },
+        },
+      ]);
+    });
   });
 });
