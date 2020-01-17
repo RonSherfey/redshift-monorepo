@@ -155,9 +155,9 @@ contract EtherSwap is Swap {
     /**
      * Refund the sent amount back to the funder if a valid refund preimage is supplied.
      * This provides a better UX than a timelocked refund. It is entirely at the discretion
-     * of the entity on the opposite side of the swap as to whether the refund preimage will
-     * be provided to the funder, but is recommended once it's decided that a claim transaction
-     * will not be submitted.
+     * of the counterparty (claimer) as to whether the refund preimage will be provided to
+     * the funder, but is recommended once it's decided that a claim transaction will not
+     * be submitted.
      */
     function adminRefund(AdminRefundDetails memory details) public {
         SwapOrder storage order = orders[details.orderUUID];

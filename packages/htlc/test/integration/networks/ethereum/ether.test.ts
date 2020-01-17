@@ -2,12 +2,12 @@ import { EthereumSubnet, Network } from '@radar/redshift-types';
 import Web3 from 'web3';
 import { Contract } from 'web3-eth-contract/types';
 import {
+  EtherSwapABI,
   EVM,
   EvmHtlc,
   getContractAddressesForSubnetOrThrow,
   HTLC,
 } from '../../../../src';
-import { abi as etherAbi } from '../../../../src/network-models/evm/contract-artifacts/EtherSwap.json';
 import { config, expect, getRpcUrl } from '../../../lib/helpers';
 import { transactionResponseSchema } from '../../../lib/schemas';
 
@@ -26,7 +26,7 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
   };
   before(() => {
     web3 = new Web3(getRpcUrl(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET));
-    etherSwapContract = new web3.eth.Contract(etherAbi, etherSwap);
+    etherSwapContract = new web3.eth.Contract(EtherSwapABI, etherSwap);
   });
 
   beforeEach(() => {

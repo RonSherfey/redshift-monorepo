@@ -1,13 +1,12 @@
 import { EthereumSubnet, Network } from '@radar/redshift-types';
 import Web3 from 'web3';
 import { Contract } from 'web3-eth-contract/types';
-import { EVM, EvmHtlc, HTLC } from '../../../../src';
+import { ERC20SwapABI, EVM, EvmHtlc, HTLC } from '../../../../src';
 import { getContractAddressesForSubnetOrThrow } from '../../../../src/network-models/evm/contract-addresses';
 import {
   abi,
   bytecode,
 } from '../../../../src/network-models/evm/contract-artifacts/Dummy18DecimalERC20Token.json';
-import { abi as erc20Abi } from '../../../../src/network-models/evm/contract-artifacts/ERC20Swap.json';
 import { config, expect, getRpcUrl } from '../../../lib/helpers';
 import { transactionResponseSchema } from '../../../lib/schemas';
 
@@ -28,7 +27,7 @@ describe('EVM HTLC - Ethereum Network - 18 Decimal ERC20 Asset', () => {
   };
   before(async () => {
     web3 = new Web3(getRpcUrl(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET));
-    erc20SwapContract = new web3.eth.Contract(erc20Abi, erc20Swap);
+    erc20SwapContract = new web3.eth.Contract(ERC20SwapABI, erc20Swap);
     // Enable ERC20 token allowance
     erc20TokenContract = await new web3.eth.Contract(abi)
       .deploy({

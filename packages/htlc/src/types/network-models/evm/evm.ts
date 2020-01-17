@@ -27,6 +27,10 @@ export namespace EVM {
     amount: string;
     paymentHash: string;
   }
+
+  export interface FundDetailsWithAdminRefundEnabled extends FundDetails {
+    refundHash: string;
+  }
 }
 
 export type SwapContract<C extends EVM.Config> = C extends EVM.ERC20Config
