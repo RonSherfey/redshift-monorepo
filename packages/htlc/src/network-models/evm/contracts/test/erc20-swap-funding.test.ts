@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js';
 import {
   Dummy18DecimalERC20TokenInstance,
   ERC20SwapInstance,
@@ -67,7 +68,7 @@ contract('ERC20Swap - Funding', () => {
           args: {
             orderUUID,
             paymentHash,
-            onchainAmount: String(tokenAmount * 2),
+            onchainAmount: new BigNumber(tokenAmount).times(2).toString(),
             refundBlockHeight: String(
               res.receipt.blockNumber + refundDelay - 2,
             ), // because 2 function calls: approve and fund
@@ -128,7 +129,7 @@ contract('ERC20Swap - Funding', () => {
             orderUUID,
             paymentHash,
             refundHash,
-            onchainAmount: String(tokenAmount * 2),
+            onchainAmount: new BigNumber(tokenAmount).times(2).toString(),
             refundBlockHeight: String(
               res.receipt.blockNumber + refundDelay - 2,
             ), // because 2 function calls: approve and fund

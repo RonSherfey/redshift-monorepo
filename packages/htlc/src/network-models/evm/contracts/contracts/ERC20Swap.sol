@@ -151,7 +151,7 @@ contract ERC20Swap is Swap {
         SwapOrder storage order = orders[details.orderUUID];
 
         require(order.exist == true, "Order does not exist.");
-        require(order.state == OrderState.HasFundingBalance, "Order cannot be claimed.");
+        require(order.state == OrderState.HasFundingBalance, "Order not in claimable state.");
         require(sha256(abi.encodePacked(details.paymentPreimage)) == order.paymentHash, "Incorrect payment preimage.");
         require(block.number <= order.refundBlockHeight, "Too late to claim.");
 
@@ -174,7 +174,7 @@ contract ERC20Swap is Swap {
         SwapOrder storage order = orders[orderUUID];
 
         require(order.exist == true, "Order does not exist.");
-        require(order.state == OrderState.HasFundingBalance, "Order cannot be refunded.");
+        require(order.state == OrderState.HasFundingBalance, "Order not in refundable state.");
         require(block.number > order.refundBlockHeight, "Too early to refund.");
 
         order.state = OrderState.Refunded;
@@ -200,7 +200,7 @@ contract ERC20Swap is Swap {
         SwapOrder storage order = orders[details.orderUUID];
 
         require(order.exist == true, "Order does not exist.");
-        require(order.state == OrderState.HasFundingBalance, "Order cannot be refunded.");
+        require(order.state == OrderState.HasFundingBalance, "Order not in refundable state.");
         require(order.refundHash != 0, "Admin refund not allowed.");
         require(sha256(abi.encodePacked(details.refundPreimage)) == order.refundHash, "Incorrect refund preimage.");
 

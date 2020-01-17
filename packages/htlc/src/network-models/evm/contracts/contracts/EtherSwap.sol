@@ -51,6 +51,7 @@ contract EtherSwap is Swap {
     );
     event OrderClaimed(bytes16 orderUUID);
     event OrderRefunded(bytes16 orderUUID);
+    event OrderAdminRefunded(bytes16 orderUUID);
 
     /**
      * Delete the order data that is no longer necessary after a swap is claimed or refunded.
@@ -119,7 +120,7 @@ contract EtherSwap is Swap {
         SwapOrder storage order = orders[details.orderUUID];
 
         require(order.exist == true, "Order does not exist.");
-        require(order.state == OrderState.HasFundingBalance, "Order cannot be claimed.");
+        require(order.state == OrderState.HasFundingBalance, "Order not in claimable state.");
         require(sha256(abi.encodePacked(details.paymentPreimage)) == order.paymentHash, "Incorrect payment preimage.");
         require(block.number <= order.refundBlockHeight, "Too late to claim.");
 
@@ -139,7 +140,7 @@ contract EtherSwap is Swap {
         SwapOrder storage order = orders[orderUUID];
 
         require(order.exist == true, "Order does not exist.");
-        require(order.state == OrderState.HasFundingBalance, "Order cannot be refunded.");
+        require(order.state == OrderState.HasFundingBalance, "Order not in refundable state.");
         require(block.number > order.refundBlockHeight, "Too early to refund.");
 
         order.state = OrderState.Refunded;
@@ -162,7 +163,7 @@ contract EtherSwap is Swap {
         SwapOrder storage order = orders[details.orderUUID];
 
         require(order.exist == true, "Order does not exist.");
-        require(order.state == OrderState.HasFundingBalance, "Order cannot be refunded.");
+        require(order.state == OrderState.HasFundingBalance, "Order not in refundable state.");
         require(order.refundHash != 0, "Admin refund not allowed.");
         require(sha256(abi.encodePacked(details.refundPreimage)) == order.refundHash, "Incorrect refund preimage.");
 
@@ -172,6 +173,6 @@ contract EtherSwap is Swap {
         require(success, "Transfer failed.");
 
         deleteUnnecessaryOrderData(order);
-        emit OrderRefunded(details.orderUUID);
+        emit OrderAdminRefunded(details.orderUUID);
     }
 }

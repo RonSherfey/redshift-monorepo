@@ -12,7 +12,7 @@ export const config = {
         '0x86fcadeb5fdf76cf16d021bf857c4a97ce0f02b3a9790d02b928936b28e00e02',
       refundHash:
         '0x7dffc02f5b54c6533f7a1f3b5519f31f4f46e085b88b660c2c7e46c4e2e3fde1',
-      tokenAmount: 11,
+      tokenAmount: Math.pow(10, 18).toString(),
       refundDelay: 960,
     },
     {
@@ -27,7 +27,7 @@ export const config = {
         '0x1bf094a34d556cb68429deaa2d0c0c8de3ca8df1d8782dc3ddd8ba1a5f97357c',
       refundHash:
         '0x53eae46e1da2d5f42c44dd37be49cf87ca831e41913380d158c661177e45da6e',
-      tokenAmount: 11,
+      tokenAmount: Math.pow(10, 18).toString(),
       refundDelay: 960,
     },
   ],
