@@ -7,24 +7,28 @@ Swap.numberFormat = 'String';
 
 contract('EtherSwap - Funding', accounts => {
   const [{ orderUUID, paymentHash, refundHash, refundDelay }] = config.valid;
-  let swapInstance: EtherSwapInstance;
+
+  let swap: EtherSwapInstance;
 
   describe('fund', () => {
+    let res: Truffle.TransactionResponse;
     before(async () => {
-      swapInstance = await Swap.new();
+      swap = await Swap.new();
     });
 
-    it('should emit the expected logs when a valid funding payment is received', async () => {
-      const res = await swapInstance.fund(
+    beforeEach(async () => {
+      res = await swap.fund(
         {
           orderUUID,
           paymentHash,
         },
         {
-          from: accounts[1],
           value: etherToWei(0.01),
         },
       );
+    });
+
+    it('should emit the expected logs when a valid funding payment is received', async () => {
       expect(res.logs).to.shallowDeepEqual([
         {
           event: 'OrderFundingReceived',
@@ -39,17 +43,6 @@ contract('EtherSwap - Funding', accounts => {
     });
 
     it('should increment the on chain amount when a second valid funding payment is received', async () => {
-      const res = await swapInstance.fund(
-        {
-          orderUUID,
-          paymentHash,
-        },
-        {
-          from: accounts[1],
-          value: etherToWei(0.01),
-          gas: 200000,
-        },
-      );
       expect(res.logs).to.shallowDeepEqual([
         {
           event: 'OrderFundingReceived',
@@ -67,22 +60,25 @@ contract('EtherSwap - Funding', accounts => {
   });
 
   describe('fundWithAdminRefundEnabled', () => {
+    let res: Truffle.TransactionResponse;
     before(async () => {
-      swapInstance = await Swap.new();
+      swap = await Swap.new();
     });
 
-    it('should emit the expected logs when a valid funding payment is received', async () => {
-      const res = await swapInstance.fundWithAdminRefundEnabled(
+    beforeEach(async () => {
+      res = await swap.fundWithAdminRefundEnabled(
         {
           orderUUID,
           paymentHash,
           refundHash,
         },
         {
-          from: accounts[1],
           value: etherToWei(0.01),
         },
       );
+    });
+
+    it('should emit the expected logs when a valid funding payment is received', async () => {
       expect(res.logs).to.shallowDeepEqual([
         {
           event: 'OrderFundingReceivedWithAdminRefundEnabled',
@@ -98,18 +94,6 @@ contract('EtherSwap - Funding', accounts => {
     });
 
     it('should increment the on chain amount when a second valid funding payment is received', async () => {
-      const res = await swapInstance.fundWithAdminRefundEnabled(
-        {
-          orderUUID,
-          paymentHash,
-          refundHash,
-        },
-        {
-          from: accounts[1],
-          value: etherToWei(0.01),
-          gas: 200000,
-        },
-      );
       expect(res.logs).to.shallowDeepEqual([
         {
           event: 'OrderFundingReceivedWithAdminRefundEnabled',
