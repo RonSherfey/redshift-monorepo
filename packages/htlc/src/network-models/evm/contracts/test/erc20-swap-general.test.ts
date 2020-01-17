@@ -13,7 +13,7 @@ contract('ERC20Swap - General', accounts => {
   });
 
   it('should return the contract owner', async () => {
-    const owner = await swap.owner.call();
+    const owner = await swap.owner.call(undefined);
     assert.equal(owner, deployer, 'Owner is deployer');
   });
 

@@ -41,8 +41,10 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
   describe('Fund', () => {
     it('should build a fund transaction and return the unsigned transaction when the shouldBroadcast flag is set to false', async () => {
       const unsignedFundingTx = await htlc.fund(
-        args.amount,
-        args.paymentHash,
+        {
+          amount: args.amount,
+          paymentHash: args.paymentHash,
+        },
         false,
       );
       const fundTxResult = await web3.eth.sendTransaction({
@@ -55,8 +57,10 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
 
     it('should build and send a fund transaction when the shouldBroadcast flag is set to true', async () => {
       const fundTxResult = await htlc.fund(
-        args.amount,
-        args.paymentHash,
+        {
+          amount: args.amount,
+          paymentHash: args.paymentHash,
+        },
         true,
         {
           from: config.ethereum.accounts[0],
@@ -70,10 +74,17 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
   describe('Claim', () => {
     beforeEach(async () => {
       // Fund the swap
-      await htlc.fund(args.amount, args.paymentHash, true, {
-        from: config.ethereum.accounts[0],
-        gas: 200000,
-      });
+      await htlc.fund(
+        {
+          amount: args.amount,
+          paymentHash: args.paymentHash,
+        },
+        true,
+        {
+          from: config.ethereum.accounts[0],
+          gas: 200000,
+        },
+      );
     });
 
     it('should build a claim transaction and return the unsigned transaction when the shouldBroadcast flag is set to false', async () => {
@@ -114,10 +125,17 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
 
     beforeEach(async () => {
       // Fund the swap
-      await htlc.fund(args.amount, args.paymentHash, true, {
-        from: config.ethereum.accounts[0],
-        gas: 200000,
-      });
+      await htlc.fund(
+        {
+          amount: args.amount,
+          paymentHash: args.paymentHash,
+        },
+        true,
+        {
+          from: config.ethereum.accounts[0],
+          gas: 200000,
+        },
+      );
     });
 
     it('should build a refund transaction and return the unsigned transaction when the shouldBroadcast flag is set to false', async () => {
