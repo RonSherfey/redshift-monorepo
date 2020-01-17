@@ -142,12 +142,22 @@ const { contract } = htlc;
 
 Generate, sign, and broadcast the fund transaction using the passed provider:
 ```typescript
-const txReceipt = await htlc.fund(amount, paymentHash);
+const txReceipt = await htlc.fund(details);
+```
+
+Generate, and optionally send, the swap funding transaction with admin refund functionality enabled:
+```typescript
+const txReceipt = await htlc.fundWithAdminRefundEnabled(details);
 ```
 
 Generate and broadcast the claim transaction using the passed provider:
 ```typescript
 const txReceipt = await htlc.claim(paymentSecret);
+```
+
+Generate and broadcast the admin refund transaction using the passed provider:
+```typescript
+const txReceipt = await htlc.adminRefund(refundPreimage);
 ```
 
 Generate and broadcast the refund transaction using the passed provider:

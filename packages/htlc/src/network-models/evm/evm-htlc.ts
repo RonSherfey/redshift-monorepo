@@ -62,8 +62,8 @@ export class EvmHtlc<
   }
 
   /**
-   * Generate, and optionally send, the swap funding transaction
-   * @param details The fund amount in ether or token base units and the hash of the payment secret
+   * Generate, and optionally send, the swap funding transaction with admin refund functionality enabled
+   * @param details The fund amount in ether or token base units, hash of the payment secret, and refund hash
    * @param shouldBroadcast Whether or not the transaction should be broadcast (Default: true)
    * @param txParams The optional transaction params
    */
