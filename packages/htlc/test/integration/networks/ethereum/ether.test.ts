@@ -22,6 +22,8 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
     orderUUID: string;
     paymentSecret: string;
     paymentHash: string;
+    refundSecret: string;
+    refundHash: string;
     amount: string;
   };
   before(() => {
@@ -30,7 +32,7 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
   });
 
   beforeEach(() => {
-    args = config.random.args();
+    args = config.random.args(true);
     htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET, {
       orderUUID: args.orderUUID,
       provider: web3.currentProvider,
@@ -150,6 +152,42 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
 
     it('should build and send a refund transaction when the shouldBroadcast flag is set to true', async () => {
       const refundTxResult = await htlc.refund(true, {
+        from: config.ethereum.accounts[0],
+        gas: 200000,
+      });
+      expect(refundTxResult).to.match(config.pattern.hex256Bit);
+    });
+  });
+
+  describe('AdminRefund', () => {
+    beforeEach(async () => {
+      // Fund the swap
+      await htlc.fundWithAdminRefundEnabled(
+        {
+          amount: args.amount,
+          paymentHash: args.paymentHash,
+          refundHash: args.refundHash,
+        },
+        true,
+        {
+          from: config.ethereum.accounts[0],
+          gas: 200000,
+        },
+      );
+    });
+
+    it('should build an admin refund transaction and return the unsigned transaction when the shouldBroadcast flag is set to false', async () => {
+      const unsignedRefundTx = await htlc.adminRefund(args.refundSecret, false);
+      const refundTxResult = await web3.eth.sendTransaction({
+        ...unsignedRefundTx,
+        from: config.ethereum.accounts[0],
+        gas: 200000,
+      });
+      expect(refundTxResult).to.be.jsonSchema(transactionResponseSchema);
+    });
+
+    it('should build and send an admin refund transaction when the shouldBroadcast flag is set to true', async () => {
+      const refundTxResult = await htlc.adminRefund(args.refundSecret, true, {
         from: config.ethereum.accounts[0],
         gas: 200000,
       });

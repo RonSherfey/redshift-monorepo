@@ -151,7 +151,7 @@ export class EvmHtlc<
   ) {
     const callData = this._contract.encodeFunctionData(
       this._contract.getFunction('adminRefund'),
-      [[this._orderUUID], format.addHexPrefix(refundPreimage)],
+      [[this._orderUUID, format.addHexPrefix(refundPreimage)]],
     );
     const unsignedTx = {
       to: this._swapContractAddress,
