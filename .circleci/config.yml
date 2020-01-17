@@ -11,8 +11,7 @@ jobs:
     - checkout
     - common/setup-gcp-gcr
     - common/install-docker-compose
-    - node/install:
-        node-version: "8.12"
+    - node/install
     - run: 
         name: Setup Integration Environment
         command: |
@@ -32,10 +31,8 @@ jobs:
 workflows:
   default:
     jobs:
-    - node/install-modules:
-        node-version: "8.12"
+    - node/install-modules
     - node/lint:
-        node-version: "8.12"
         requires:
           - node/install-modules
     - test
