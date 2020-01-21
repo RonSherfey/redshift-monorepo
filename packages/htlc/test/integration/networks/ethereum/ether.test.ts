@@ -2,12 +2,12 @@ import { EthereumSubnet, Network } from '@radar/redshift-types';
 import Web3 from 'web3';
 import { Contract } from 'web3-eth-contract/types';
 import {
+  EtherSwapABI,
   EVM,
   EvmHtlc,
   getContractAddressesForSubnetOrThrow,
   HTLC,
 } from '../../../../src';
-import { abi as etherAbi } from '../../../../src/network-models/evm/contract-artifacts/EtherSwap.json';
 import { config, expect, getRpcUrl } from '../../../lib/helpers';
 import { transactionResponseSchema } from '../../../lib/schemas';
 
@@ -22,15 +22,17 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
     orderUUID: string;
     paymentSecret: string;
     paymentHash: string;
+    refundSecret: string;
+    refundHash: string;
     amount: string;
   };
   before(() => {
     web3 = new Web3(getRpcUrl(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET));
-    etherSwapContract = new web3.eth.Contract(etherAbi, etherSwap);
+    etherSwapContract = new web3.eth.Contract(EtherSwapABI, etherSwap);
   });
 
   beforeEach(() => {
-    args = config.random.args();
+    args = config.random.args(true);
     htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET, {
       orderUUID: args.orderUUID,
       provider: web3.currentProvider,
@@ -41,8 +43,10 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
   describe('Fund', () => {
     it('should build a fund transaction and return the unsigned transaction when the shouldBroadcast flag is set to false', async () => {
       const unsignedFundingTx = await htlc.fund(
-        args.amount,
-        args.paymentHash,
+        {
+          amount: args.amount,
+          paymentHash: args.paymentHash,
+        },
         false,
       );
       const fundTxResult = await web3.eth.sendTransaction({
@@ -55,8 +59,10 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
 
     it('should build and send a fund transaction when the shouldBroadcast flag is set to true', async () => {
       const fundTxResult = await htlc.fund(
-        args.amount,
-        args.paymentHash,
+        {
+          amount: args.amount,
+          paymentHash: args.paymentHash,
+        },
         true,
         {
           from: config.ethereum.accounts[0],
@@ -70,10 +76,17 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
   describe('Claim', () => {
     beforeEach(async () => {
       // Fund the swap
-      await htlc.fund(args.amount, args.paymentHash, true, {
-        from: config.ethereum.accounts[0],
-        gas: 200000,
-      });
+      await htlc.fund(
+        {
+          amount: args.amount,
+          paymentHash: args.paymentHash,
+        },
+        true,
+        {
+          from: config.ethereum.accounts[0],
+          gas: 200000,
+        },
+      );
     });
 
     it('should build a claim transaction and return the unsigned transaction when the shouldBroadcast flag is set to false', async () => {
@@ -114,10 +127,17 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
 
     beforeEach(async () => {
       // Fund the swap
-      await htlc.fund(args.amount, args.paymentHash, true, {
-        from: config.ethereum.accounts[0],
-        gas: 200000,
-      });
+      await htlc.fund(
+        {
+          amount: args.amount,
+          paymentHash: args.paymentHash,
+        },
+        true,
+        {
+          from: config.ethereum.accounts[0],
+          gas: 200000,
+        },
+      );
     });
 
     it('should build a refund transaction and return the unsigned transaction when the shouldBroadcast flag is set to false', async () => {
@@ -132,6 +152,42 @@ describe('EVM HTLC - Ethereum Network - Ether Asset', () => {
 
     it('should build and send a refund transaction when the shouldBroadcast flag is set to true', async () => {
       const refundTxResult = await htlc.refund(true, {
+        from: config.ethereum.accounts[0],
+        gas: 200000,
+      });
+      expect(refundTxResult).to.match(config.pattern.hex256Bit);
+    });
+  });
+
+  describe('AdminRefund', () => {
+    beforeEach(async () => {
+      // Fund the swap
+      await htlc.fundWithAdminRefundEnabled(
+        {
+          amount: args.amount,
+          paymentHash: args.paymentHash,
+          refundHash: args.refundHash,
+        },
+        true,
+        {
+          from: config.ethereum.accounts[0],
+          gas: 200000,
+        },
+      );
+    });
+
+    it('should build an admin refund transaction and return the unsigned transaction when the shouldBroadcast flag is set to false', async () => {
+      const unsignedRefundTx = await htlc.adminRefund(args.refundSecret, false);
+      const refundTxResult = await web3.eth.sendTransaction({
+        ...unsignedRefundTx,
+        from: config.ethereum.accounts[0],
+        gas: 200000,
+      });
+      expect(refundTxResult).to.be.jsonSchema(transactionResponseSchema);
+    });
+
+    it('should build and send an admin refund transaction when the shouldBroadcast flag is set to true', async () => {
+      const refundTxResult = await htlc.adminRefund(args.refundSecret, true, {
         from: config.ethereum.accounts[0],
         gas: 200000,
       });

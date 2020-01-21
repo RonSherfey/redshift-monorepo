@@ -2,49 +2,46 @@
   "contractName": "Owned",
   "abi": [
     {
-      "constant": true,
       "inputs": [],
-      "name": "owner",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "payable": false,
       "stateMutability": "nonpayable",
       "type": "constructor"
     },
     {
-      "constant": false,
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address payable",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
+          "internalType": "address payable",
           "name": "newOwner",
           "type": "address"
         }
       ],
       "name": "transferOwnership",
       "outputs": [],
-      "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
     }
   ],
-  "bytecode": "0x608060405234801561001057600080fd5b50336000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550610224806100606000396000f3fe608060405234801561001057600080fd5b50600436106100365760003560e01c80638da5cb5b1461003b578063f2fde38b14610085575b600080fd5b6100436100c9565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6100c76004803603602081101561009b57600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff1690602001909291905050506100ee565b005b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614610193576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260228152602001806101d76022913960400191505060405180910390fd5b806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505056fe4f6e6c79206f776e65722063616e2063616c6c20746869732066756e6374696f6e2ea165627a7a723058206c6a19382e2f509f1b9f43b5396158c6aecf6914626c53ea997f3439e7970cbc0029",
-  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100365760003560e01c80638da5cb5b1461003b578063f2fde38b14610085575b600080fd5b6100436100c9565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6100c76004803603602081101561009b57600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff1690602001909291905050506100ee565b005b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614610193576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260228152602001806101d76022913960400191505060405180910390fd5b806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505056fe4f6e6c79206f776e65722063616e2063616c6c20746869732066756e6374696f6e2ea165627a7a723058206c6a19382e2f509f1b9f43b5396158c6aecf6914626c53ea997f3439e7970cbc0029",
-  "source": "pragma solidity ^0.5.8;\n\ncontract Owned {\n    constructor() public { owner = msg.sender; }\n    address payable public owner;\n\n    modifier onlyOwner {\n        require(\n            msg.sender == owner,\n            \"Only owner can call this function.\"\n        );\n        _;\n    }\n\n    /**\n    * Allow the owner of this contract to transfer ownership to another address\n    * @param newOwner The address of the new owner\n    */\n    function transferOwnership(address payable newOwner) external onlyOwner {\n        owner = newOwner;\n    }\n}\n",
+  "bytecode": "0x608060405234801561001057600080fd5b50600080546001600160a01b031916331790556101cc806100326000396000f3fe608060405234801561001057600080fd5b50600436106100365760003560e01c80638da5cb5b1461003b578063f2fde38b1461006c575b600080fd5b6100436100a1565b6040805173ffffffffffffffffffffffffffffffffffffffff9092168252519081900360200190f35b61009f6004803603602081101561008257600080fd5b503573ffffffffffffffffffffffffffffffffffffffff166100bd565b005b60005473ffffffffffffffffffffffffffffffffffffffff1681565b60005473ffffffffffffffffffffffffffffffffffffffff16331461012d576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260228152602001806101756022913960400191505060405180910390fd5b600080547fffffffffffffffffffffffff00000000000000000000000000000000000000001673ffffffffffffffffffffffffffffffffffffffff9290921691909117905556fe4f6e6c79206f776e65722063616e2063616c6c20746869732066756e6374696f6e2ea264697066735822122003cec8ff510e232d6bfebb8e9da9ff22fea6c64909dfb440c041e0f2833a977564736f6c63430006010033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100365760003560e01c80638da5cb5b1461003b578063f2fde38b1461006c575b600080fd5b6100436100a1565b6040805173ffffffffffffffffffffffffffffffffffffffff9092168252519081900360200190f35b61009f6004803603602081101561008257600080fd5b503573ffffffffffffffffffffffffffffffffffffffff166100bd565b005b60005473ffffffffffffffffffffffffffffffffffffffff1681565b60005473ffffffffffffffffffffffffffffffffffffffff16331461012d576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260228152602001806101756022913960400191505060405180910390fd5b600080547fffffffffffffffffffffffff00000000000000000000000000000000000000001673ffffffffffffffffffffffffffffffffffffffff9290921691909117905556fe4f6e6c79206f776e65722063616e2063616c6c20746869732066756e6374696f6e2ea264697066735822122003cec8ff510e232d6bfebb8e9da9ff22fea6c64909dfb440c041e0f2833a977564736f6c63430006010033",
+  "source": "pragma solidity ^0.6.1;\n\ncontract Owned {\n    constructor() public { owner = msg.sender; }\n    address payable public owner;\n\n    modifier onlyOwner {\n        require(\n            msg.sender == owner,\n            \"Only owner can call this function.\"\n        );\n        _;\n    }\n\n    /**\n    * Allow the owner of this contract to transfer ownership to another address\n    * @param newOwner The address of the new owner\n    */\n    function transferOwnership(address payable newOwner) external onlyOwner {\n        owner = newOwner;\n    }\n}\n",
   "compiler": {
     "name": "solc",
-    "version": "0.5.8+commit.23d335f2.Emscripten.clang"
+    "version": "0.6.1+commit.e6f7d5a4.Emscripten.clang"
   },
   "networks": {},
-  "schemaVersion": "3.0.14",
+  "schemaVersion": "3.0.20",
   "userdoc": {
     "methods": {
       "transferOwnership(address)": {

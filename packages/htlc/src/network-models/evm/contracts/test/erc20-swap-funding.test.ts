@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js';
 import {
   Dummy18DecimalERC20TokenInstance,
   ERC20SwapInstance,
@@ -9,63 +10,120 @@ const ERC20Token = artifacts.require('Dummy18DecimalERC20Token');
 const ERC20Swap = artifacts.require('ERC20Swap');
 ERC20Swap.numberFormat = 'String';
 
-contract('ERC20Swap - Funding', accounts => {
-  const [{ orderUUID, hash, tokenAmount, refundDelay }] = config.valid;
-  let erc20TokenInstance: Dummy18DecimalERC20TokenInstance;
-  let erc20SwapInstance: ERC20SwapInstance;
+contract('ERC20Swap - Funding', () => {
+  const [
+    { orderUUID, paymentHash, refundHash, tokenAmount, refundDelay },
+  ] = config.valid;
+
+  let erc20Token: Dummy18DecimalERC20TokenInstance;
+  let swap: ERC20SwapInstance;
+
+  const fundSwap = async () => {
+    return swap.fund({
+      orderUUID,
+      paymentHash,
+      tokenAmount,
+      tokenContractAddress: erc20Token.address,
+    });
+  };
+
+  const fundSwapWithAdminRefundEnabled = async () => {
+    return swap.fundWithAdminRefundEnabled({
+      orderUUID,
+      paymentHash,
+      tokenAmount,
+      refundHash,
+      tokenContractAddress: erc20Token.address,
+    });
+  };
 
   before(async () => {
-    // deploy test erc20 token
-    erc20TokenInstance = await ERC20Token.deployed();
-    // deploy erc20 swap contract
-    erc20SwapInstance = await ERC20Swap.deployed();
+    erc20Token = await ERC20Token.deployed();
   });
 
-  it('should change the order state when a valid funding payment is received', async () => {
-    // approve token for transfer
-    await erc20TokenInstance.approve(erc20SwapInstance.address, tokenAmount);
-    // fund swap contract
-    const res = await erc20SwapInstance.fund(
-      orderUUID,
-      hash,
-      erc20TokenInstance.address,
-      tokenAmount,
-    );
-    expect(res.logs).to.shallowDeepEqual([
-      {
-        event: 'OrderFundingReceived',
-        args: {
-          orderUUID,
-          onchainAmount: tokenAmount.toString(),
-          paymentHash: hash,
-          refundBlockHeight: String(res.receipt.blockNumber + refundDelay),
-          tokenContractAddress: erc20TokenInstance.address,
+  describe('fund', () => {
+    before(async () => {
+      swap = await ERC20Swap.new();
+    });
+
+    it('should emit the expected logs when a valid funding payment is received', async () => {
+      await erc20Token.approve(swap.address, tokenAmount);
+      const res = await fundSwap();
+      expect(res.logs).to.shallowDeepEqual([
+        {
+          event: 'OrderFundingReceived',
+          args: {
+            orderUUID,
+            paymentHash,
+            onchainAmount: tokenAmount.toString(),
+            refundBlockHeight: String(res.receipt.blockNumber + refundDelay),
+            tokenContractAddress: erc20Token.address,
+          },
         },
-      },
-    ]);
+      ]);
+    });
+
+    it('should increment the on chain amount when a second valid funding payment is received', async () => {
+      await erc20Token.approve(swap.address, tokenAmount);
+      const res = await fundSwap();
+      expect(res.logs).to.shallowDeepEqual([
+        {
+          event: 'OrderFundingReceived',
+          args: {
+            orderUUID,
+            paymentHash,
+            onchainAmount: new BigNumber(tokenAmount).times(2).toString(),
+            refundBlockHeight: String(
+              res.receipt.blockNumber + refundDelay - 2,
+            ), // because 2 function calls: approve and fund
+            tokenContractAddress: erc20Token.address,
+          },
+        },
+      ]);
+    });
   });
 
-  it('should increment the on chain amount when a second valid funding payment is received', async () => {
-    // approve token for transfer
-    await erc20TokenInstance.approve(erc20SwapInstance.address, tokenAmount);
-    // fund swap contract
-    const res = await erc20SwapInstance.fund(
-      orderUUID,
-      hash,
-      erc20TokenInstance.address,
-      tokenAmount,
-    );
-    expect(res.logs).to.shallowDeepEqual([
-      {
-        event: 'OrderFundingReceived',
-        args: {
-          orderUUID,
-          onchainAmount: String(tokenAmount * 2),
-          paymentHash: hash,
-          refundBlockHeight: String(res.receipt.blockNumber + refundDelay - 2), // because 2 function calls: approve and fund
-          tokenContractAddress: erc20TokenInstance.address,
+  describe('fundWithAdminRefundEnabled', () => {
+    before(async () => {
+      swap = await ERC20Swap.new();
+    });
+
+    it('should emit the expected logs when a valid funding payment is received', async () => {
+      await erc20Token.approve(swap.address, tokenAmount);
+      const res = await fundSwapWithAdminRefundEnabled();
+      expect(res.logs).to.shallowDeepEqual([
+        {
+          event: 'OrderFundingReceivedWithAdminRefundEnabled',
+          args: {
+            orderUUID,
+            paymentHash,
+            refundHash,
+            onchainAmount: tokenAmount.toString(),
+            refundBlockHeight: String(res.receipt.blockNumber + refundDelay),
+            tokenContractAddress: erc20Token.address,
+          },
         },
-      },
-    ]);
+      ]);
+    });
+
+    it('should increment the on chain amount when a second valid funding payment is received', async () => {
+      await erc20Token.approve(swap.address, tokenAmount);
+      const res = await fundSwapWithAdminRefundEnabled();
+      expect(res.logs).to.shallowDeepEqual([
+        {
+          event: 'OrderFundingReceivedWithAdminRefundEnabled',
+          args: {
+            orderUUID,
+            paymentHash,
+            refundHash,
+            onchainAmount: new BigNumber(tokenAmount).times(2).toString(),
+            refundBlockHeight: String(
+              res.receipt.blockNumber + refundDelay - 2,
+            ), // because 2 function calls: approve and fund
+            tokenContractAddress: erc20Token.address,
+          },
+        },
+      ]);
+    });
   });
 });
