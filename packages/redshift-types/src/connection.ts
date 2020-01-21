@@ -5,6 +5,7 @@ export interface RpcConnectionConfig {
   username: string;
   password: string;
   https: boolean;
+  jsonrpc?: '1.0' | '2.0'; // Version of the JSON-RPC protocol. Defaults to 2.0
 }
 
 export namespace JsonRpc {
