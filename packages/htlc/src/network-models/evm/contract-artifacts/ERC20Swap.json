@@ -388,27 +388,32 @@
             {
               "indexed": false,
               "name": "orderUUID",
-              "type": "bytes16"
+              "type": "bytes16",
+              "internalType": "bytes16"
             },
             {
               "indexed": false,
               "name": "onchainAmount",
-              "type": "uint256"
+              "type": "uint256",
+              "internalType": "uint256"
             },
             {
               "indexed": false,
               "name": "paymentHash",
-              "type": "bytes32"
+              "type": "bytes32",
+              "internalType": "bytes32"
             },
             {
               "indexed": false,
               "name": "refundBlockHeight",
-              "type": "uint256"
+              "type": "uint256",
+              "internalType": "uint256"
             },
             {
               "indexed": false,
               "name": "tokenContractAddress",
-              "type": "address"
+              "type": "address",
+              "internalType": "address"
             }
           ],
           "name": "OrderFundingReceived",
@@ -421,7 +426,8 @@
             {
               "indexed": false,
               "name": "orderUUID",
-              "type": "bytes16"
+              "type": "bytes16",
+              "internalType": "bytes16"
             }
           ],
           "name": "OrderClaimed",
@@ -434,17 +440,76 @@
             {
               "indexed": false,
               "name": "orderUUID",
-              "type": "bytes16"
+              "type": "bytes16",
+              "internalType": "bytes16"
             }
           ],
           "name": "OrderRefunded",
           "type": "event",
           "signature": "0x0fc93734e5a973e72ab53332bf6e822d652e9d044fa7f4fe3b13028352c14880"
+        },
+        "0x256c781ac0247ce8da14d986d72e5f1bcb9faf03ae52a9997d1dc9e6ca165624": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes16",
+              "name": "orderUUID",
+              "type": "bytes16"
+            }
+          ],
+          "name": "OrderAdminRefunded",
+          "type": "event",
+          "signature": "0x256c781ac0247ce8da14d986d72e5f1bcb9faf03ae52a9997d1dc9e6ca165624"
+        },
+        "0xa3b5d05ac3eb95ed882ca39a4e93a2ac33f24e263e53baf9ddbbb07bc5029d33": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes16",
+              "name": "orderUUID",
+              "type": "bytes16"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "onchainAmount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "paymentHash",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "refundBlockHeight",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "tokenContractAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "refundHash",
+              "type": "bytes32"
+            }
+          ],
+          "name": "OrderFundingReceivedWithAdminRefundEnabled",
+          "type": "event",
+          "signature": "0xa3b5d05ac3eb95ed882ca39a4e93a2ac33f24e263e53baf9ddbbb07bc5029d33"
         }
       },
       "links": {},
-      "address": "0x06dedDf1BAE98256a3CD5e8434022E1863E6cfD6",
-      "transactionHash": "0x337fc4773625babd462ff160d363c11e5fd33ad3bb951c603d93a2973a4a7e54"
+      "address": "0x92a705c983CFaCC40B709CbCfc2B925Dc6B66316",
+      "transactionHash": "0xa12a039c1a6f1b7ca146e436c6a57848523108ad2814a50abe2ea5f7eee6bcfb"
     },
     "42": {
       "events": {
@@ -513,27 +578,32 @@
             {
               "indexed": false,
               "name": "orderUUID",
-              "type": "bytes16"
+              "type": "bytes16",
+              "internalType": "bytes16"
             },
             {
               "indexed": false,
               "name": "onchainAmount",
-              "type": "uint256"
+              "type": "uint256",
+              "internalType": "uint256"
             },
             {
               "indexed": false,
               "name": "paymentHash",
-              "type": "bytes32"
+              "type": "bytes32",
+              "internalType": "bytes32"
             },
             {
               "indexed": false,
               "name": "refundBlockHeight",
-              "type": "uint256"
+              "type": "uint256",
+              "internalType": "uint256"
             },
             {
               "indexed": false,
               "name": "tokenContractAddress",
-              "type": "address"
+              "type": "address",
+              "internalType": "address"
             }
           ],
           "name": "OrderFundingReceived",
@@ -546,7 +616,8 @@
             {
               "indexed": false,
               "name": "orderUUID",
-              "type": "bytes16"
+              "type": "bytes16",
+              "internalType": "bytes16"
             }
           ],
           "name": "OrderClaimed",
@@ -559,17 +630,76 @@
             {
               "indexed": false,
               "name": "orderUUID",
-              "type": "bytes16"
+              "type": "bytes16",
+              "internalType": "bytes16"
             }
           ],
           "name": "OrderRefunded",
           "type": "event",
           "signature": "0x0fc93734e5a973e72ab53332bf6e822d652e9d044fa7f4fe3b13028352c14880"
+        },
+        "0x256c781ac0247ce8da14d986d72e5f1bcb9faf03ae52a9997d1dc9e6ca165624": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes16",
+              "name": "orderUUID",
+              "type": "bytes16"
+            }
+          ],
+          "name": "OrderAdminRefunded",
+          "type": "event",
+          "signature": "0x256c781ac0247ce8da14d986d72e5f1bcb9faf03ae52a9997d1dc9e6ca165624"
+        },
+        "0xa3b5d05ac3eb95ed882ca39a4e93a2ac33f24e263e53baf9ddbbb07bc5029d33": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes16",
+              "name": "orderUUID",
+              "type": "bytes16"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "onchainAmount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "paymentHash",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "refundBlockHeight",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "tokenContractAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "refundHash",
+              "type": "bytes32"
+            }
+          ],
+          "name": "OrderFundingReceivedWithAdminRefundEnabled",
+          "type": "event",
+          "signature": "0xa3b5d05ac3eb95ed882ca39a4e93a2ac33f24e263e53baf9ddbbb07bc5029d33"
         }
       },
       "links": {},
-      "address": "0x99ae80f430462f05F7CcaB5468942D33E4FE12db",
-      "transactionHash": "0xc3dd6df90167d583fc2980556759a3dee5cf0e2f32959ec0f3d190f3c56ddb32"
+      "address": "0xA681C77e657f3d54E1c16D4749920ACe50Dc93E4",
+      "transactionHash": "0x7548b8d514dc38b4bda9b7f1202895524661e988178da81cb1e69a603582027a"
     }
   },
   "schemaVersion": "3.0.20",
