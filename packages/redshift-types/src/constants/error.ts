@@ -77,6 +77,7 @@ export enum LiquidityProviderApiError {
   INVALID_OR_MISSING_QUOTE_FIELDS = 'InvalidOrMissingQuoteFields',
   INVALID_REDEEM_SCRIPT = 'InvalidRedeemScript',
   INVALID_PAYMENT_HASH = 'InvalidPaymentHash',
+  INVALID_REFUND_HASH = 'InvalidRefundHash',
   INVALID_PAY_TO_ADDRESS = 'InvalidPayToAddress',
   INVALID_FUND_TX_VALUE = 'InvalidFundTxValue',
   INVALID_CONTRACT_DATA = 'InvalidContractData',
