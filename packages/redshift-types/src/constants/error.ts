@@ -81,6 +81,7 @@ export enum LiquidityProviderApiError {
   INVALID_PAY_TO_ADDRESS = 'InvalidPayToAddress',
   INVALID_FUND_TX_VALUE = 'InvalidFundTxValue',
   INVALID_CONTRACT_DATA = 'InvalidContractData',
+  INVALID_TOKEN_CONTRACT_ADDRESS = 'InvalidTokenContractAddress',
   INVALID_SUCCESS_VALUE = 'InvalidSuccessValue',
   INVALID_PREIMAGE = 'InvalidPreimage',
   CONTRACT_IS_NOT_WHITELISTED = 'ContractIsNotWhitelisted',
