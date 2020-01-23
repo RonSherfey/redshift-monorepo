@@ -267,3 +267,14 @@ export namespace Ws {
 export enum WebSocketSuccess {
   SOCKET_CONNECTED = 'SocketConnected',
 }
+
+/**
+ * Ethereum swap contract event names
+ */
+export enum SwapContractEvent {
+  OrderFundingReceived = 'OrderFundingReceived',
+  OrderFundingReceivedWithAdminRefundEnabled = 'OrderFundingReceivedWithAdminRefundEnabled',
+  OrderClaimed = 'OrderClaimed',
+  OrderRefunded = 'OrderRefunded',
+  OrderAdminRefunded = 'OrderAdminRefunded',
+}
