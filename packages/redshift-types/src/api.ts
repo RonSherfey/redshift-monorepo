@@ -3,6 +3,7 @@ import { TxOutput } from './blockchain';
 import {
   Network,
   PaymentFailedReason,
+  RefundType,
   Subnet,
   UserSwapState,
   UserTransactionType,
@@ -81,16 +82,31 @@ export interface EthRefundDetails {
 
 export type RefundDetails = UtxoRefundDetails | EthRefundDetails;
 
-export interface RefundDetailsResponse<
+export interface TimelockRefundDetailsResponse<
   T extends RefundDetails = RefundDetails
 > {
   market: Market;
   state: UserSwapState;
+  type: RefundType.TIMELOCK_REFUND;
   blocksRemaining: number | undefined;
   refundableAtBlockHeight: number | undefined;
   refundableBalance: string;
   details: T;
 }
+
+export interface AdminRefundDetailsResponse<
+  T extends RefundDetails = RefundDetails
+> {
+  market: Market;
+  state: UserSwapState;
+  type: RefundType.ADMIN_REFUND;
+  refundableBalance: string;
+  details: T;
+}
+
+export type RefundDetailsResponse<T extends RefundDetails = RefundDetails> =
+  | TimelockRefundDetailsResponse<T>
+  | AdminRefundDetailsResponse<T>;
 
 //#endregion
 
