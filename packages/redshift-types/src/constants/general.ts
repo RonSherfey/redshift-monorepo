@@ -278,3 +278,11 @@ export enum SwapContractEvent {
   OrderRefunded = 'OrderRefunded',
   OrderAdminRefunded = 'OrderAdminRefunded',
 }
+
+/**
+ * All possible swap refund types
+ */
+export enum RefundType {
+  ADMIN_REFUND = 'AdminRefund',
+  TIMELOCK_REFUND = 'TimelockRefund',
+}
