@@ -2,91 +2,16 @@
   "contractName": "ERC20Swap",
   "abi": [
     {
-      "constant": true,
-      "inputs": [],
-      "name": "refundDelay",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "delay",
-          "type": "uint256"
-        }
-      ],
-      "name": "setRefundDelay",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "owner",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "newOwner",
-          "type": "address"
-        }
-      ],
-      "name": "transferOwnership",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
       "anonymous": false,
       "inputs": [
         {
           "indexed": false,
+          "internalType": "bytes16",
           "name": "orderUUID",
           "type": "bytes16"
-        },
-        {
-          "indexed": false,
-          "name": "onchainAmount",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "name": "paymentHash",
-          "type": "bytes32"
-        },
-        {
-          "indexed": false,
-          "name": "refundBlockHeight",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "name": "tokenContractAddress",
-          "type": "address"
         }
       ],
-      "name": "OrderFundingReceived",
+      "name": "OrderAdminRefunded",
       "type": "event"
     },
     {
@@ -94,6 +19,7 @@
       "inputs": [
         {
           "indexed": false,
+          "internalType": "bytes16",
           "name": "orderUUID",
           "type": "bytes16"
         }
@@ -106,6 +32,87 @@
       "inputs": [
         {
           "indexed": false,
+          "internalType": "bytes16",
+          "name": "orderUUID",
+          "type": "bytes16"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "onchainAmount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "paymentHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "refundBlockHeight",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "tokenContractAddress",
+          "type": "address"
+        }
+      ],
+      "name": "OrderFundingReceived",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "bytes16",
+          "name": "orderUUID",
+          "type": "bytes16"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "onchainAmount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "paymentHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "refundBlockHeight",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "tokenContractAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "refundHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "OrderFundingReceivedWithAdminRefundEnabled",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "bytes16",
           "name": "orderUUID",
           "type": "bytes16"
         }
@@ -114,68 +121,194 @@
       "type": "event"
     },
     {
-      "constant": false,
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address payable",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [],
+      "name": "refundDelay",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
       "inputs": [
         {
-          "name": "orderUUID",
-          "type": "bytes16"
-        },
-        {
-          "name": "paymentHash",
-          "type": "bytes32"
-        },
-        {
-          "name": "tokenContractAddress",
-          "type": "address"
-        },
-        {
-          "name": "tokenAmount",
+          "internalType": "uint256",
+          "name": "delay",
           "type": "uint256"
+        }
+      ],
+      "name": "setRefundDelay",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address payable",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "bytes16",
+              "name": "orderUUID",
+              "type": "bytes16"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "paymentHash",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "address",
+              "name": "tokenContractAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "tokenAmount",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct ERC20Swap.FundDetails",
+          "name": "details",
+          "type": "tuple"
         }
       ],
       "name": "fund",
       "outputs": [],
-      "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
     },
     {
-      "constant": false,
       "inputs": [
         {
-          "name": "orderUUID",
-          "type": "bytes16"
-        },
+          "components": [
+            {
+              "internalType": "bytes16",
+              "name": "orderUUID",
+              "type": "bytes16"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "paymentHash",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "address",
+              "name": "tokenContractAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "tokenAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "refundHash",
+              "type": "bytes32"
+            }
+          ],
+          "internalType": "struct ERC20Swap.FundDetailsWithAdminRefundEnabled",
+          "name": "details",
+          "type": "tuple"
+        }
+      ],
+      "name": "fundWithAdminRefundEnabled",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
         {
-          "name": "tokenContractAddress",
-          "type": "address"
-        },
-        {
-          "name": "preimage",
-          "type": "bytes32"
+          "components": [
+            {
+              "internalType": "bytes16",
+              "name": "orderUUID",
+              "type": "bytes16"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "paymentPreimage",
+              "type": "bytes32"
+            }
+          ],
+          "internalType": "struct ERC20Swap.ClaimDetails",
+          "name": "details",
+          "type": "tuple"
         }
       ],
       "name": "claim",
       "outputs": [],
-      "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
     },
     {
-      "constant": false,
       "inputs": [
         {
+          "internalType": "bytes16",
           "name": "orderUUID",
           "type": "bytes16"
-        },
-        {
-          "name": "tokenContractAddress",
-          "type": "address"
         }
       ],
       "name": "refund",
       "outputs": [],
-      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "bytes16",
+              "name": "orderUUID",
+              "type": "bytes16"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "refundPreimage",
+              "type": "bytes32"
+            }
+          ],
+          "internalType": "struct ERC20Swap.AdminRefundDetails",
+          "name": "details",
+          "type": "tuple"
+        }
+      ],
+      "name": "adminRefund",
+      "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
     }
@@ -185,7 +318,7 @@
   "source": "pragma solidity ^0.5.8;\n\nimport \"./Swap.sol\";\nimport \"./ERC20Interface.sol\";\n\ncontract ERC20Swap is Swap {\n    enum OrderState { HasFundingBalance, Claimed, Refunded }\n\n    struct SwapOrder {\n        address user;\n        address tokenContractAddress;\n        bytes32 paymentHash;\n        bytes32 preimage;\n        uint onchainAmount;\n        uint refundBlockHeight;\n        OrderState state;\n        bool exist;\n    }\n\n    mapping(bytes16 => SwapOrder) orders;\n\n    event OrderFundingReceived(\n        bytes16 orderUUID,\n        uint onchainAmount,\n        bytes32 paymentHash,\n        uint refundBlockHeight,\n        address tokenContractAddress\n    );\n    event OrderClaimed(bytes16 orderUUID);\n    event OrderRefunded(bytes16 orderUUID);\n\n    /**\n     * Allow the sender to fund a swap in one or more transactions.\n     */\n    function fund(bytes16 orderUUID, bytes32 paymentHash, address tokenContractAddress, uint tokenAmount) external {\n        SwapOrder storage order = orders[orderUUID];\n\n        if (!order.exist) {\n            order.user = msg.sender;\n            order.tokenContractAddress = tokenContractAddress;\n            order.exist = true;\n            order.paymentHash = paymentHash;\n            order.refundBlockHeight = block.number + refundDelay;\n            order.state = OrderState.HasFundingBalance;\n            order.onchainAmount = 0;\n        } else {\n            require(order.state == OrderState.HasFundingBalance, \"Order already claimed or refunded.\");\n        }\n\n        // one token type per order\n        require(order.tokenContractAddress == tokenContractAddress, \"Incorrect token.\");\n        // fund token to this contract\n        require(ERC20Interface(tokenContractAddress).transferFrom(msg.sender, address(this), tokenAmount), \"Unable to transfer token.\");\n\n        order.onchainAmount += tokenAmount;\n\n        emit OrderFundingReceived(\n            orderUUID,\n            order.onchainAmount,\n            order.paymentHash,\n            order.refundBlockHeight,\n            order.tokenContractAddress\n        );\n    }\n\n    /**\n     * Allow the recipient to claim the funds once they know the preimage of the hashlock.\n     * Anyone can claim but tokens only send to owner.\n     */\n    function claim(bytes16 orderUUID, address tokenContractAddress, bytes32 preimage) external {\n        SwapOrder storage order = orders[orderUUID];\n\n        require(order.exist == true, \"Order does not exist.\");\n        require(order.state == OrderState.HasFundingBalance, \"Order cannot be claimed.\");\n        require(sha256(abi.encodePacked(preimage)) == order.paymentHash, \"Incorrect payment preimage.\");\n        require(block.number <= order.refundBlockHeight, \"Too late to claim.\");\n\n        order.preimage = preimage;\n        // transfer token to owner\n        ERC20Interface(tokenContractAddress).transfer(owner, order.onchainAmount);\n        order.state = OrderState.Claimed;\n\n        emit OrderClaimed(orderUUID);\n    }\n\n    /**\n     * Refund the sent token amount back to the funder if the timelock has expired.\n     */\n    function refund(bytes16 orderUUID, address tokenContractAddress) external {\n        SwapOrder storage order = orders[orderUUID];\n\n        require(order.exist == true, \"Order does not exist.\");\n        require(order.state == OrderState.HasFundingBalance, \"Order cannot be refunded.\");\n        require(block.number > order.refundBlockHeight, \"Too early to refund.\");\n\n        // transfer token to recepient\n        ERC20Interface(tokenContractAddress).transfer(order.user, order.onchainAmount);\n        order.state = OrderState.Refunded;\n\n        emit OrderRefunded(orderUUID);\n    }\n}\n",
   "compiler": {
     "name": "solc",
-    "version": "0.5.8+commit.23d335f2.Emscripten.clang"
+    "version": "0.6.1+commit.e6f7d5a4.Emscripten.clang"
   },
   "networks": {
     "1": {
@@ -255,27 +388,32 @@
             {
               "indexed": false,
               "name": "orderUUID",
-              "type": "bytes16"
+              "type": "bytes16",
+              "internalType": "bytes16"
             },
             {
               "indexed": false,
               "name": "onchainAmount",
-              "type": "uint256"
+              "type": "uint256",
+              "internalType": "uint256"
             },
             {
               "indexed": false,
               "name": "paymentHash",
-              "type": "bytes32"
+              "type": "bytes32",
+              "internalType": "bytes32"
             },
             {
               "indexed": false,
               "name": "refundBlockHeight",
-              "type": "uint256"
+              "type": "uint256",
+              "internalType": "uint256"
             },
             {
               "indexed": false,
               "name": "tokenContractAddress",
-              "type": "address"
+              "type": "address",
+              "internalType": "address"
             }
           ],
           "name": "OrderFundingReceived",
@@ -288,7 +426,8 @@
             {
               "indexed": false,
               "name": "orderUUID",
-              "type": "bytes16"
+              "type": "bytes16",
+              "internalType": "bytes16"
             }
           ],
           "name": "OrderClaimed",
@@ -301,17 +440,76 @@
             {
               "indexed": false,
               "name": "orderUUID",
-              "type": "bytes16"
+              "type": "bytes16",
+              "internalType": "bytes16"
             }
           ],
           "name": "OrderRefunded",
           "type": "event",
           "signature": "0x0fc93734e5a973e72ab53332bf6e822d652e9d044fa7f4fe3b13028352c14880"
+        },
+        "0x256c781ac0247ce8da14d986d72e5f1bcb9faf03ae52a9997d1dc9e6ca165624": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes16",
+              "name": "orderUUID",
+              "type": "bytes16"
+            }
+          ],
+          "name": "OrderAdminRefunded",
+          "type": "event",
+          "signature": "0x256c781ac0247ce8da14d986d72e5f1bcb9faf03ae52a9997d1dc9e6ca165624"
+        },
+        "0xa3b5d05ac3eb95ed882ca39a4e93a2ac33f24e263e53baf9ddbbb07bc5029d33": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes16",
+              "name": "orderUUID",
+              "type": "bytes16"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "onchainAmount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "paymentHash",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "refundBlockHeight",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "tokenContractAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "refundHash",
+              "type": "bytes32"
+            }
+          ],
+          "name": "OrderFundingReceivedWithAdminRefundEnabled",
+          "type": "event",
+          "signature": "0xa3b5d05ac3eb95ed882ca39a4e93a2ac33f24e263e53baf9ddbbb07bc5029d33"
         }
       },
       "links": {},
-      "address": "0x06dedDf1BAE98256a3CD5e8434022E1863E6cfD6",
-      "transactionHash": "0x337fc4773625babd462ff160d363c11e5fd33ad3bb951c603d93a2973a4a7e54"
+      "address": "0x92a705c983CFaCC40B709CbCfc2B925Dc6B66316",
+      "transactionHash": "0xa12a039c1a6f1b7ca146e436c6a57848523108ad2814a50abe2ea5f7eee6bcfb"
     },
     "42": {
       "events": {
@@ -380,27 +578,32 @@
             {
               "indexed": false,
               "name": "orderUUID",
-              "type": "bytes16"
+              "type": "bytes16",
+              "internalType": "bytes16"
             },
             {
               "indexed": false,
               "name": "onchainAmount",
-              "type": "uint256"
+              "type": "uint256",
+              "internalType": "uint256"
             },
             {
               "indexed": false,
               "name": "paymentHash",
-              "type": "bytes32"
+              "type": "bytes32",
+              "internalType": "bytes32"
             },
             {
               "indexed": false,
               "name": "refundBlockHeight",
-              "type": "uint256"
+              "type": "uint256",
+              "internalType": "uint256"
             },
             {
               "indexed": false,
               "name": "tokenContractAddress",
-              "type": "address"
+              "type": "address",
+              "internalType": "address"
             }
           ],
           "name": "OrderFundingReceived",
@@ -413,7 +616,8 @@
             {
               "indexed": false,
               "name": "orderUUID",
-              "type": "bytes16"
+              "type": "bytes16",
+              "internalType": "bytes16"
             }
           ],
           "name": "OrderClaimed",
@@ -426,29 +630,94 @@
             {
               "indexed": false,
               "name": "orderUUID",
-              "type": "bytes16"
+              "type": "bytes16",
+              "internalType": "bytes16"
             }
           ],
           "name": "OrderRefunded",
           "type": "event",
           "signature": "0x0fc93734e5a973e72ab53332bf6e822d652e9d044fa7f4fe3b13028352c14880"
+        },
+        "0x256c781ac0247ce8da14d986d72e5f1bcb9faf03ae52a9997d1dc9e6ca165624": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes16",
+              "name": "orderUUID",
+              "type": "bytes16"
+            }
+          ],
+          "name": "OrderAdminRefunded",
+          "type": "event",
+          "signature": "0x256c781ac0247ce8da14d986d72e5f1bcb9faf03ae52a9997d1dc9e6ca165624"
+        },
+        "0xa3b5d05ac3eb95ed882ca39a4e93a2ac33f24e263e53baf9ddbbb07bc5029d33": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes16",
+              "name": "orderUUID",
+              "type": "bytes16"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "onchainAmount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "paymentHash",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "refundBlockHeight",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "tokenContractAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "refundHash",
+              "type": "bytes32"
+            }
+          ],
+          "name": "OrderFundingReceivedWithAdminRefundEnabled",
+          "type": "event",
+          "signature": "0xa3b5d05ac3eb95ed882ca39a4e93a2ac33f24e263e53baf9ddbbb07bc5029d33"
         }
       },
       "links": {},
-      "address": "0x99ae80f430462f05F7CcaB5468942D33E4FE12db",
-      "transactionHash": "0xc3dd6df90167d583fc2980556759a3dee5cf0e2f32959ec0f3d190f3c56ddb32"
+      "address": "0xA681C77e657f3d54E1c16D4749920ACe50Dc93E4",
+      "transactionHash": "0x7548b8d514dc38b4bda9b7f1202895524661e988178da81cb1e69a603582027a"
     }
   },
-  "schemaVersion": "3.0.14",
+  "schemaVersion": "3.0.20",
   "userdoc": {
     "methods": {
-      "claim(bytes16,address,bytes32)": {
-        "notice": "Allow the recipient to claim the funds once they know the preimage of the hashlock. Anyone can claim but tokens only send to owner."
+      "adminRefund((bytes16,bytes32))": {
+        "notice": "Refund the sent amount back to the funder if a valid refund preimage is supplied. This provides a better UX than a timelocked refund. It is entirely at the discretion of the counterparty (claimer) as to whether the refund preimage will be provided to the funder, but is recommended once it's decided that a claim transaction will not be submitted."
       },
-      "fund(bytes16,bytes32,address,uint256)": {
+      "claim((bytes16,bytes32))": {
+        "notice": "Allow the recipient to claim the funds once they know the preimage of the hashlock. Anyone can claim, but the tokens will always be sent to the owner."
+      },
+      "fund((bytes16,bytes32,address,uint256))": {
         "notice": "Allow the sender to fund a swap in one or more transactions."
       },
-      "refund(bytes16,address)": {
+      "fundWithAdminRefundEnabled((bytes16,bytes32,address,uint256,bytes32))": {
+        "notice": "Allow the sender to fund a swap in one or more transactions and provide a refund hash, which can enable faster refunds if the refund preimage is supplied by the counterparty once it's decided that a claim transaction will not be submitted."
+      },
+      "refund(bytes16)": {
         "notice": "Refund the sent token amount back to the funder if the timelock has expired."
       },
       "setRefundDelay(uint256)": {
