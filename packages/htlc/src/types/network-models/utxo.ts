@@ -6,6 +6,7 @@ export namespace UTXO {
     network: N;
     subnet: SubnetMap[N];
     paymentHashRipemd160: string; // ripemd-160 hash of the payment hash hex string
+    refundHashRipemd160: string; // ripemd-160 hash of the refund hash hex string
     claimerPublicKey: string; // claim public key hex string
     refundPublicKeyHash: string; // refund pubkey hash string
     timelockType: LockType; // timelock type (absolute or relative)
@@ -24,6 +25,7 @@ export namespace UTXO {
   export interface RedeemScriptArgs {
     claimerPublicKey: string;
     paymentHash: string;
+    refundHash: string;
     refundAddress: string;
     timelock: TimeLock;
   }

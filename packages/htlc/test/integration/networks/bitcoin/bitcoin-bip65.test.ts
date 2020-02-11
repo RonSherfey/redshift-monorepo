@@ -22,6 +22,7 @@ let coinbaseUtxos: FundTxOutput[];
 let fundingUtxos: TxOutput[];
 let htlcArgs: UTXO.RedeemScriptArgs;
 let paymentSecret: string;
+let refundSecret: string;
 
 const ABSOLUTE_TIMELOCK: number = 5;
 /**
@@ -35,17 +36,21 @@ function setupTestSuite(
     await setCoinbaseUtxos();
 
     // Set the HTLC arguments being used
-    const random = config.random.args(false);
+    const paymentRandom = config.random.args(false);
+    const refundRandom = config.random.args(false);
+
     htlcArgs = {
       refundAddress,
-      paymentHash: random.paymentHash,
+      paymentHash: paymentRandom.paymentHash,
       claimerPublicKey: claimer.publicKey,
+      refundHash: refundRandom.paymentHash,
       timelock: {
         type: UTXO.LockType.ABSOLUTE,
         blockHeight: (await rpcClient.getBlockCount()) + ABSOLUTE_TIMELOCK,
       },
     };
-    paymentSecret = random.paymentSecret;
+    paymentSecret = paymentRandom.paymentSecret;
+    refundSecret = refundRandom.paymentSecret;
 
     // Create a new htlc
     htlc = HTLC.construct(Network.BITCOIN, BitcoinSubnet.SIMNET, htlcArgs);
@@ -152,6 +157,7 @@ describe('UTXO BIP65 HTLC - Bitcoin Network', () => {
         paymentSecret,
         claimer.privateKey,
       );
+
       claimTxId = await rpcClient.sendRawTransaction(claimTxHex);
       expect(claimTxId).to.be.a('string');
     });
@@ -243,6 +249,7 @@ describe('UTXO BIP65 HTLC - Bitcoin Network', () => {
           feeTokensPerVirtualByte,
           refunder.privateKey,
         );
+
         refundTxId = await rpcClient.sendRawTransaction(refundTxHex);
         expect(refundTxId).to.be.a('string');
       });
@@ -255,6 +262,69 @@ describe('UTXO BIP65 HTLC - Bitcoin Network', () => {
       });
     });
   });
+
+  describe('Admin Refund', () => {
+    describe('Success Case', () => {
+      setupTestSuite(undefined, ABSOLUTE_TIMELOCK);
+      it('should execute refund if the provided refundHash matches hash in tx and is sent from refunder', async () => {
+        const currentBlockHeight = await rpcClient.getBlockCount();
+        const adminRefundTxHex = htlc.adminRefund(
+          fundingUtxos,
+          refunder.p2pkhAddress,
+          currentBlockHeight,
+          feeTokensPerVirtualByte,
+          refundSecret,
+          refunder.privateKey,
+        );
+
+        const adminRefundTxId = await rpcClient.sendRawTransaction(
+          adminRefundTxHex,
+        );
+
+        expect(adminRefundTxId).to.be.a('string');
+      });
+    });
+
+    describe('Failure Case', () => {
+      setupTestSuite(undefined, ABSOLUTE_TIMELOCK);
+      it('should not execute refund if the provided refundHash matches hash in tx but is not sent from funder', async () => {
+        const currentBlockHeight = await rpcClient.getBlockCount();
+        const adminRefundTxHex = htlc.adminRefund(
+          fundingUtxos,
+          refunder.p2pkhAddress,
+          currentBlockHeight,
+          feeTokensPerVirtualByte,
+          refundSecret,
+          claimer.privateKey,
+        );
+
+        await expect(
+          rpcClient.sendRawTransaction(adminRefundTxHex),
+        ).to.be.rejectedWith(
+          /RpcCallFailed: TX rejected: failed to validate input/,
+        );
+      });
+
+      it('should not execute refund if the provided refundHash does not match the hash in tx and is not sent from funder', async () => {
+        const currentBlockHeight = await rpcClient.getBlockCount();
+        const adminRefundTxHex = htlc.adminRefund(
+          fundingUtxos,
+          refunder.p2pkhAddress,
+          currentBlockHeight,
+          feeTokensPerVirtualByte,
+          `${refundSecret}abc`,
+          claimer.privateKey,
+        );
+
+        await expect(
+          rpcClient.sendRawTransaction(adminRefundTxHex),
+        ).to.be.rejectedWith(
+          /RpcCallFailed: TX rejected: failed to validate input/,
+        );
+      });
+    });
+  });
+
   describe('BIP65 Library', () => {
     it('should produce the correct output for seconds input', () => {
       const bip65Encoded = bip65.encode({ utc: 600000000 });

@@ -189,6 +189,40 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
   }
 
   /**
+   * Generate the refund transaction and return the raw tx hex
+   * @param utxos The unspent funding tx outputs
+   * @param destinationAddress The address the funds will be refunded to
+   * @param currentBlockHeight The current block height on the network
+   * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
+   * @param refundSecret The adminRefund secret used to offer instant refunds
+   * @param privateKey The private key WIF string
+   */
+  public adminRefund(
+    utxos: TxOutput[],
+    destinationAddress: string,
+    currentBlockHeight: number,
+    feeTokensPerVirtualByte: number,
+    refundSecret: string,
+    privateKey: string,
+  ): string {
+    const { publicKey } = ECPair.fromWIF(
+      privateKey,
+      getBitcoinJSNetwork(this._network, this._subnet),
+    );
+
+    return this.buildTransaction(
+      utxos,
+      destinationAddress,
+      currentBlockHeight,
+      feeTokensPerVirtualByte,
+      refundSecret,
+      privateKey,
+      false,
+      publicKey.toString('hex'),
+    );
+  }
+
+  /**
    * Build the transaction using the provided params and return the raw tx hex
    * @param utxos The unspent funding tx outputs
    * @param destinationAddress The address the funds will be sent to
@@ -206,6 +240,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     unlock: string,
     privateKey: string,
     isClaim?: boolean,
+    adminRefundPublicKey?: string,
   ): string {
     // Create a new transaction instance
     const tx = new Transaction();
@@ -258,7 +293,17 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     out.value -= fee;
 
     // Set the signed witnesses
-    this.addWitnessScripts(utxos, privateKey, unlock, tx);
+    if (adminRefundPublicKey) {
+      this.addWitnessScripts(
+        utxos,
+        privateKey,
+        unlock,
+        tx,
+        adminRefundPublicKey,
+      );
+    } else {
+      this.addWitnessScripts(utxos, privateKey, unlock, tx);
+    }
 
     return tx.toHex();
   }
@@ -312,6 +357,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     privateKey: string,
     unlock: string,
     tx: Transaction,
+    adminRefundPublicKey?: string,
   ) {
     // Create the signing key from the WIF string
     const signingKey = ECPair.fromWIF(
@@ -330,11 +376,23 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
         signingKey.sign(sigHash),
         Transaction.SIGHASH_ALL,
       );
-      const witness = [
-        signature,
-        Buffer.from(unlock, 'hex'),
-        this.redeemScriptBuffer,
-      ];
+
+      let witness;
+      // if we are adminRefunding, we need another item on the stack
+      if (adminRefundPublicKey) {
+        witness = [
+          signature,
+          Buffer.from(adminRefundPublicKey, 'hex'),
+          Buffer.from(unlock, 'hex'),
+          this.redeemScriptBuffer,
+        ];
+      } else {
+        witness = [
+          signature,
+          Buffer.from(unlock, 'hex'),
+          this.redeemScriptBuffer,
+        ];
+      }
       tx.setWitness(i, witness);
     });
   }

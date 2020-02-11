@@ -66,6 +66,7 @@ export function estimateFee(
     Buffer.from(redeemScript, 'hex'),
   );
 
-  const vRatio = 4; // A witness byte weighs one weight unit; compared to four non-witness weight units.
+  // KBC-TODO: change this back / reexamine this probably
+  const vRatio = 3; // A witness byte weighs one weight unit; compared to four non-witness weight units.
   return feeTokensPerVirtualByte * Math.ceil(anticipatedWeight / vRatio);
 }

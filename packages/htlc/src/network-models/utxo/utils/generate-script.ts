@@ -56,7 +56,7 @@ function addressToPublicKeyHash(addr: string): string {
  * If false, check the lock time, pubkey hash, and push the local pubkey.
  * Check remote or local pubkey signed the transaction.
  * @param scriptArgs The script arguements for creating a swap redeem script
- * claimerPublicKey, paymentHash, refundAddress, timelock
+ * claimerPublicKey, paymentHash, refundHash, refundAddress, timelock
  * @return The hex representation of the redeem script
  */
 export function createSwapRedeemScript(
@@ -66,14 +66,16 @@ export function createSwapRedeemScript(
   const [
     claimerPublicKeyBuffer,
     paymentHashBuffer,
+    refundHashBuffer,
     refundPublicKeyHashBuffer,
   ] = [
     scriptArgs.claimerPublicKey,
     scriptArgs.paymentHash,
+    scriptArgs.refundHash,
     refundPublicKeyHash,
   ].map(i => Buffer.from(i, 'hex'));
-
   const paymentHashRipemd160Buffer = crypto.ripemd160(paymentHashBuffer);
+  const refundHashRipemd160Buffer = crypto.ripemd160(refundHashBuffer);
 
   let swapScript: (number | Buffer)[];
   if (scriptArgs.timelock.type === UTXO.LockType.RELATIVE) {
@@ -90,8 +92,15 @@ export function createSwapRedeemScript(
       opcodes.OP_DROP,
       claimerPublicKeyBuffer,
       opcodes.OP_ELSE,
+      opcodes.OP_DUP,
+      opcodes.OP_HASH160,
+      refundHashRipemd160Buffer,
+      opcodes.OP_EQUAL,
+      opcodes.OP_IF,
+      opcodes.OP_ELSE,
       nSequenceBuffer,
       opcodes.OP_CHECKSEQUENCEVERIFY,
+      opcodes.OP_ENDIF,
       opcodes.OP_DROP,
       opcodes.OP_DUP,
       opcodes.OP_HASH160,
@@ -114,8 +123,15 @@ export function createSwapRedeemScript(
       opcodes.OP_DROP,
       claimerPublicKeyBuffer,
       opcodes.OP_ELSE,
+      opcodes.OP_DUP,
+      opcodes.OP_HASH160,
+      refundHashRipemd160Buffer,
+      opcodes.OP_EQUAL,
+      opcodes.OP_IF,
+      opcodes.OP_ELSE,
       cltvBuffer,
       opcodes.OP_CHECKLOCKTIMEVERIFY,
+      opcodes.OP_ENDIF,
       opcodes.OP_DROP,
       opcodes.OP_DUP,
       opcodes.OP_HASH160,

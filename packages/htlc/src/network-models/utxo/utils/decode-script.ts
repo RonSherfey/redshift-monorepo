@@ -83,6 +83,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
 
   let claimerPublicKey: string;
   let paymentHashRipemd160: string;
+  let refundHashRipemd160: string;
   let timelock: UTXO.TimeLock;
   let refundPublicKeyHash: string;
 
@@ -97,27 +98,45 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           OP_IF,
           decompiledClaimerPublicKey,
           OP_ELSE,
+          OP_IF2,
+          OP_HASH1602,
+          decompiledRefundHashRipemd160,
+          OP_EQUAL2,
+          OP_ELSE2,
           decompiledTimeLockValue,
           OP_TIMELOCKMETHOD, // should be either OP_CHECKSEQUENCEVERIFY or OP_CHECKLOCKTIMEVERIFY
           OP_DROP,
           decompiledRefundPublicKey,
           OP_ENDIF,
+          OP_ENDIF2,
           OP_CHECKSIG,
         ] = scriptAssembly;
 
-        if (OP_HASH160 !== DecompiledOpCode.OP_HASH160) {
+        if (
+          OP_HASH160 !== DecompiledOpCode.OP_HASH160 ||
+          OP_HASH1602 !== DecompiledOpCode.OP_HASH160
+        ) {
           throw new Error(SwapError.EXPECTED_OP_HASH160);
         }
 
-        if (OP_EQUAL !== DecompiledOpCode.OP_EQUAL) {
+        if (
+          OP_EQUAL !== DecompiledOpCode.OP_EQUAL ||
+          OP_EQUAL2 !== DecompiledOpCode.OP_EQUAL
+        ) {
           throw new Error(SwapError.EXPECTED_OP_EQUAL);
         }
 
-        if (OP_IF !== DecompiledOpCode.OP_IF) {
+        if (
+          OP_IF !== DecompiledOpCode.OP_IF ||
+          OP_IF2 !== DecompiledOpCode.OP_IF
+        ) {
           throw new Error(SwapError.EXPECTED_OP_IF);
         }
 
-        if (OP_ELSE !== DecompiledOpCode.OP_ELSE) {
+        if (
+          OP_ELSE !== DecompiledOpCode.OP_ELSE ||
+          OP_ELSE2 !== DecompiledOpCode.OP_ELSE
+        ) {
           throw new Error(SwapError.EXPECTED_OP_ELSE);
         }
 
@@ -132,7 +151,10 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           throw new Error(SwapError.EXPECTED_OP_DROP);
         }
 
-        if (OP_ENDIF !== DecompiledOpCode.OP_ENDIF) {
+        if (
+          OP_ENDIF !== DecompiledOpCode.OP_ENDIF ||
+          OP_ENDIF2 !== DecompiledOpCode.OP_ENDIF
+        ) {
           throw new Error(SwapError.EXPECTED_OP_ENDIF);
         }
 
@@ -159,6 +181,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           .hash160(Buffer.from(decompiledRefundPublicKey, 'hex'))
           .toString('hex');
         paymentHashRipemd160 = decompiledPaymentHashRipemd160;
+        refundHashRipemd160 = decompiledRefundHashRipemd160;
 
         timelock = getTimeLockObjectFromDecompiledOpcode(
           OP_TIMELOCKMETHOD,
@@ -167,7 +190,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
       }
       break;
 
-    case 17:
+    case 24:
       {
         // public key hash redeem swap script
         const [
@@ -179,14 +202,21 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           OP_DROP,
           decompiledClaimerPublicKey,
           OP_ELSE,
-          decompiledTimeLockValue,
-          OP_TIMELOCKMETHOD,
-          OP_DROP2,
           OP_DUP2,
           OP_HASH1602,
+          decompiledRefundHashRipemd160,
+          OP_EQUAL2,
+          OP_IF2,
+          OP_ELSE2,
+          decompiledTimeLockValue,
+          OP_TIMELOCKMETHOD,
+          OP_ENDIF,
+          OP_DROP2,
+          OP_DUP3,
+          OP_HASH1603,
           decompiledRefundPublicKeyHash,
           OP_EQUALVERIFY,
-          OP_ENDIF,
+          OP_ENDIF2,
           OP_CHECKSIG,
         ] = scriptAssembly;
 
@@ -198,19 +228,31 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           throw new Error(SwapError.EXPECTED_OP_HASH160);
         }
 
-        if (OP_EQUAL !== DecompiledOpCode.OP_EQUAL) {
+        if (
+          OP_EQUAL !== DecompiledOpCode.OP_EQUAL ||
+          OP_EQUAL2 !== DecompiledOpCode.OP_EQUAL
+        ) {
           throw new Error(SwapError.EXPECTED_OP_EQUAL);
         }
 
-        if (OP_IF !== DecompiledOpCode.OP_IF) {
+        if (
+          OP_IF !== DecompiledOpCode.OP_IF ||
+          OP_IF2 !== DecompiledOpCode.OP_IF
+        ) {
           throw new Error(SwapError.EXPECTED_OP_IF);
         }
 
-        if (OP_DROP !== DecompiledOpCode.OP_DROP) {
+        if (
+          OP_DROP !== DecompiledOpCode.OP_DROP ||
+          OP_DROP2 !== DecompiledOpCode.OP_DROP
+        ) {
           throw new Error(SwapError.EXPECTED_OP_DROP);
         }
 
-        if (OP_ELSE !== DecompiledOpCode.OP_ELSE) {
+        if (
+          OP_ELSE !== DecompiledOpCode.OP_ELSE ||
+          OP_ELSE2 !== DecompiledOpCode.OP_ELSE
+        ) {
           throw new Error(SwapError.EXPECTED_OP_ELSE);
         }
 
@@ -229,7 +271,14 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           throw new Error(SwapError.EXPECTED_OP_DUP);
         }
 
-        if (OP_HASH1602 !== DecompiledOpCode.OP_HASH160) {
+        if (OP_DUP3 !== DecompiledOpCode.OP_DUP) {
+          throw new Error(SwapError.EXPECTED_OP_DUP);
+        }
+
+        if (
+          OP_HASH1602 !== DecompiledOpCode.OP_HASH160 ||
+          OP_HASH1603 !== DecompiledOpCode.OP_HASH160
+        ) {
           throw new Error(SwapError.EXPECTED_OP_HASH160);
         }
 
@@ -237,7 +286,10 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           throw new Error(SwapError.EXPECTED_OP_EQUALVERIFY);
         }
 
-        if (OP_ENDIF !== DecompiledOpCode.OP_ENDIF) {
+        if (
+          OP_ENDIF !== DecompiledOpCode.OP_ENDIF ||
+          OP_ENDIF2 !== DecompiledOpCode.OP_ENDIF
+        ) {
           throw new Error(SwapError.EXPECTED_OP_ENDIF);
         }
 
@@ -262,6 +314,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
         claimerPublicKey = decompiledClaimerPublicKey;
         refundPublicKeyHash = decompiledRefundPublicKeyHash;
         paymentHashRipemd160 = decompiledPaymentHashRipemd160;
+        refundHashRipemd160 = decompiledRefundHashRipemd160;
 
         timelock = getTimeLockObjectFromDecompiledOpcode(
           OP_TIMELOCKMETHOD,
@@ -311,6 +364,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
     subnet,
     claimerPublicKey,
     paymentHashRipemd160,
+    refundHashRipemd160,
     refundPublicKeyHash,
     timelockType: timelock.type,
     timelockValue: getTimelockValue(timelock),
