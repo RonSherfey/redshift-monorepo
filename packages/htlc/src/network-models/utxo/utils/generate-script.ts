@@ -66,54 +66,41 @@ export function createSwapRedeemScript(
   const [
     claimerPublicKeyBuffer,
     paymentHashBuffer,
-    refundHashBuffer,
     refundPublicKeyHashBuffer,
   ] = [
     scriptArgs.claimerPublicKey,
     scriptArgs.paymentHash,
-    scriptArgs.refundHash,
     refundPublicKeyHash,
   ].map(i => Buffer.from(i, 'hex'));
-  const paymentHashRipemd160Buffer = crypto.ripemd160(paymentHashBuffer);
-  const refundHashRipemd160Buffer = crypto.ripemd160(refundHashBuffer);
 
-  let swapScript: (number | Buffer)[];
+  let refundHashBuffer;
+  let refundHashRipemd160Buffer;
+  if (scriptArgs.refundHash) {
+    refundHashBuffer = Buffer.from(scriptArgs.refundHash, 'hex');
+    refundHashRipemd160Buffer = crypto.ripemd160(refundHashBuffer);
+  }
+
+  const paymentHashRipemd160Buffer = crypto.ripemd160(paymentHashBuffer);
+
+  // set the correct timelock values/method for swapScript
+  let timelockValue;
+  let timelockMethod;
   if (scriptArgs.timelock.type === UTXO.LockType.RELATIVE) {
-    const nSequenceBuffer = script.number.encode(
+    timelockValue = script.number.encode(
       bip68.encode({ blocks: scriptArgs.timelock.blockBuffer }),
     );
-
-    swapScript = [
-      opcodes.OP_DUP,
-      opcodes.OP_HASH160,
-      paymentHashRipemd160Buffer,
-      opcodes.OP_EQUAL,
-      opcodes.OP_IF,
-      opcodes.OP_DROP,
-      claimerPublicKeyBuffer,
-      opcodes.OP_ELSE,
-      opcodes.OP_DUP,
-      opcodes.OP_HASH160,
-      refundHashRipemd160Buffer,
-      opcodes.OP_EQUAL,
-      opcodes.OP_IF,
-      opcodes.OP_ELSE,
-      nSequenceBuffer,
-      opcodes.OP_CHECKSEQUENCEVERIFY,
-      opcodes.OP_ENDIF,
-      opcodes.OP_DROP,
-      opcodes.OP_DUP,
-      opcodes.OP_HASH160,
-      refundPublicKeyHashBuffer,
-      opcodes.OP_EQUALVERIFY,
-      opcodes.OP_ENDIF,
-      opcodes.OP_CHECKSIG,
-    ];
+    timelockMethod = opcodes.OP_CHECKSEQUENCEVERIFY;
   } else if (scriptArgs.timelock.type === UTXO.LockType.ABSOLUTE) {
-    const cltvBuffer = script.number.encode(
+    timelockValue = script.number.encode(
       bip65.encode({ blocks: scriptArgs.timelock.blockHeight }),
     );
+    timelockMethod = opcodes.OP_CHECKLOCKTIMEVERIFY;
+  } else {
+    throw new Error(SwapError.INVALID_TIMELOCK_METHOD);
+  }
 
+  let swapScript: (number | Buffer)[];
+  if (refundHashRipemd160Buffer) {
     swapScript = [
       opcodes.OP_DUP,
       opcodes.OP_HASH160,
@@ -129,8 +116,8 @@ export function createSwapRedeemScript(
       opcodes.OP_EQUAL,
       opcodes.OP_IF,
       opcodes.OP_ELSE,
-      cltvBuffer,
-      opcodes.OP_CHECKLOCKTIMEVERIFY,
+      timelockValue,
+      timelockMethod,
       opcodes.OP_ENDIF,
       opcodes.OP_DROP,
       opcodes.OP_DUP,
@@ -141,7 +128,25 @@ export function createSwapRedeemScript(
       opcodes.OP_CHECKSIG,
     ];
   } else {
-    throw new Error(SwapError.INVALID_TIMELOCK_METHOD);
+    swapScript = [
+      opcodes.OP_DUP,
+      opcodes.OP_HASH160,
+      paymentHashRipemd160Buffer,
+      opcodes.OP_EQUAL,
+      opcodes.OP_IF,
+      opcodes.OP_DROP,
+      claimerPublicKeyBuffer,
+      opcodes.OP_ELSE,
+      timelockValue,
+      timelockMethod,
+      opcodes.OP_DROP,
+      opcodes.OP_DUP,
+      opcodes.OP_HASH160,
+      refundPublicKeyHashBuffer,
+      opcodes.OP_EQUALVERIFY,
+      opcodes.OP_ENDIF,
+      opcodes.OP_CHECKSIG,
+    ];
   }
 
   // We convert to hex, make a buffer, decompile, then convert to hex in case nSequence < 17. Decompile will append OP_ to those cases.
