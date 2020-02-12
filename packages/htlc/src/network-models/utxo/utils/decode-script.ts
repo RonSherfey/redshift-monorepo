@@ -89,6 +89,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
 
   // all scripts assume public key hash redeem swap script
   switch (scriptAssembly.length) {
+    // no adminRefund included in script
     case 17:
       const [
         OP_DUP,
@@ -188,7 +189,6 @@ export function getSwapRedeemScriptDetails<N extends Network>(
       );
       break;
 
-    // no adminRefund included in script
     case 23:
       {
         const [
