@@ -173,7 +173,10 @@ describe('UTXO BIP65 HTLC - Bitcoin Network', () => {
         .to.be.above(0.009)
         .and.below(0.01); // Claim Output less tx fee
     });
+  });
 
+  describe('Malicious Claim', () => {
+    setupTestSuite();
     it('should reject transaction if claim is attempted by someone besides the claimer', async () => {
       const currentBlockHeight = await rpcClient.getBlockCount();
       const claimTxHex = htlc.claim(
@@ -184,7 +187,6 @@ describe('UTXO BIP65 HTLC - Bitcoin Network', () => {
         paymentSecret,
         funder.privateKey, // sending from a 'non-claimer' account...should error
       );
-
       await expect(rpcClient.sendRawTransaction(claimTxHex)).to.be.rejectedWith(
         /RpcCallFailed: TX rejected: failed to validate input/,
       );
