@@ -4,7 +4,7 @@ import {
   SubnetMap,
   SwapError,
 } from '@radar/redshift-types';
-import { crypto, payments, script } from 'bitcoinjs-lib';
+import { payments, script } from 'bitcoinjs-lib';
 import { UTXO } from '../../../types';
 import { getBitcoinJSNetwork } from './bitcoinjs-lib';
 import { makeHexEven } from './format-utils';
@@ -83,93 +83,114 @@ export function getSwapRedeemScriptDetails<N extends Network>(
 
   let claimerPublicKey: string;
   let paymentHashRipemd160: string;
+  let refundHashRipemd160: string | undefined;
   let timelock: UTXO.TimeLock;
   let refundPublicKeyHash: string;
 
+  // all scripts assume public key hash redeem swap script
   switch (scriptAssembly.length) {
-    case 12:
-      {
-        // public key redeem swap script
-        const [
-          OP_HASH160,
-          decompiledPaymentHashRipemd160,
-          OP_EQUAL,
-          OP_IF,
-          decompiledClaimerPublicKey,
-          OP_ELSE,
-          decompiledTimeLockValue,
-          OP_TIMELOCKMETHOD, // should be either OP_CHECKSEQUENCEVERIFY or OP_CHECKLOCKTIMEVERIFY
-          OP_DROP,
-          decompiledRefundPublicKey,
-          OP_ENDIF,
-          OP_CHECKSIG,
-        ] = scriptAssembly;
+    case 17:
+      const [
+        OP_DUP,
+        OP_HASH160,
+        decompiledPaymentHashRipemd160,
+        OP_EQUAL,
+        OP_IF,
+        OP_DROP,
+        decompiledClaimerPublicKey,
+        OP_ELSE,
+        decompiledTimeLockValue,
+        OP_TIMELOCKMETHOD,
+        OP_DROP2,
+        OP_DUP2,
+        OP_HASH1602,
+        decompiledRefundPublicKeyHash,
+        OP_EQUALVERIFY,
+        OP_ENDIF,
+        OP_CHECKSIG,
+      ] = scriptAssembly;
 
-        if (OP_HASH160 !== DecompiledOpCode.OP_HASH160) {
-          throw new Error(SwapError.EXPECTED_OP_HASH160);
-        }
-
-        if (OP_EQUAL !== DecompiledOpCode.OP_EQUAL) {
-          throw new Error(SwapError.EXPECTED_OP_EQUAL);
-        }
-
-        if (OP_IF !== DecompiledOpCode.OP_IF) {
-          throw new Error(SwapError.EXPECTED_OP_IF);
-        }
-
-        if (OP_ELSE !== DecompiledOpCode.OP_ELSE) {
-          throw new Error(SwapError.EXPECTED_OP_ELSE);
-        }
-
-        if (
-          OP_TIMELOCKMETHOD !== DecompiledOpCode.OP_CHECKSEQUENCEVERIFY &&
-          OP_TIMELOCKMETHOD !== DecompiledOpCode.OP_CHECKLOCKTIMEVERIFY
-        ) {
-          throw new Error(SwapError.EXPECTED_OP_TIMELOCKMETHOD);
-        }
-
-        if (OP_DROP !== DecompiledOpCode.OP_DROP) {
-          throw new Error(SwapError.EXPECTED_OP_DROP);
-        }
-
-        if (OP_ENDIF !== DecompiledOpCode.OP_ENDIF) {
-          throw new Error(SwapError.EXPECTED_OP_ENDIF);
-        }
-
-        if (OP_CHECKSIG !== DecompiledOpCode.OP_CHECKSIG) {
-          throw new Error(SwapError.EXPECTED_OP_CHECKSIG);
-        }
-
-        if (
-          !decompiledClaimerPublicKey ||
-          decompiledClaimerPublicKey.length !== 66
-        ) {
-          throw new Error(SwapError.EXPECTED_VALID_CLAIMER_PUBKEY);
-        }
-
-        if (
-          !decompiledRefundPublicKey ||
-          decompiledRefundPublicKey.length !== 66
-        ) {
-          throw new Error(SwapError.EXPECTED_VALID_REFUND_PUBKEY);
-        }
-
-        claimerPublicKey = decompiledClaimerPublicKey;
-        refundPublicKeyHash = crypto
-          .hash160(Buffer.from(decompiledRefundPublicKey, 'hex'))
-          .toString('hex');
-        paymentHashRipemd160 = decompiledPaymentHashRipemd160;
-
-        timelock = getTimeLockObjectFromDecompiledOpcode(
-          OP_TIMELOCKMETHOD,
-          decompiledTimeLockValue,
-        );
+      if (OP_DUP !== DecompiledOpCode.OP_DUP) {
+        throw new Error(SwapError.EXPECTED_OP_DUP);
       }
+
+      if (OP_HASH160 !== DecompiledOpCode.OP_HASH160) {
+        throw new Error(SwapError.EXPECTED_OP_HASH160);
+      }
+
+      if (OP_EQUAL !== DecompiledOpCode.OP_EQUAL) {
+        throw new Error(SwapError.EXPECTED_OP_EQUAL);
+      }
+
+      if (OP_IF !== DecompiledOpCode.OP_IF) {
+        throw new Error(SwapError.EXPECTED_OP_IF);
+      }
+
+      if (
+        OP_DROP !== DecompiledOpCode.OP_DROP ||
+        OP_DROP2 !== DecompiledOpCode.OP_DROP
+      ) {
+        throw new Error(SwapError.EXPECTED_OP_DROP);
+      }
+
+      if (OP_ELSE !== DecompiledOpCode.OP_ELSE) {
+        throw new Error(SwapError.EXPECTED_OP_ELSE);
+      }
+
+      if (
+        OP_TIMELOCKMETHOD !== DecompiledOpCode.OP_CHECKSEQUENCEVERIFY &&
+        OP_TIMELOCKMETHOD !== DecompiledOpCode.OP_CHECKLOCKTIMEVERIFY
+      ) {
+        throw new Error(SwapError.EXPECTED_OP_TIMELOCKMETHOD);
+      }
+
+      if (OP_DUP2 !== DecompiledOpCode.OP_DUP) {
+        throw new Error(SwapError.EXPECTED_OP_DUP);
+      }
+
+      if (OP_HASH1602 !== DecompiledOpCode.OP_HASH160) {
+        throw new Error(SwapError.EXPECTED_OP_HASH160);
+      }
+
+      if (OP_EQUALVERIFY !== DecompiledOpCode.OP_EQUALVERIFY) {
+        throw new Error(SwapError.EXPECTED_OP_EQUALVERIFY);
+      }
+
+      if (OP_ENDIF !== DecompiledOpCode.OP_ENDIF) {
+        throw new Error(SwapError.EXPECTED_OP_ENDIF);
+      }
+
+      if (OP_CHECKSIG !== DecompiledOpCode.OP_CHECKSIG) {
+        throw new Error(SwapError.EXPECTED_OP_CHECKSIG);
+      }
+
+      if (
+        !decompiledClaimerPublicKey ||
+        decompiledClaimerPublicKey.length !== 66
+      ) {
+        throw new Error(SwapError.EXPECTED_VALID_CLAIMER_PUBKEY);
+      }
+
+      if (
+        !decompiledRefundPublicKeyHash ||
+        decompiledRefundPublicKeyHash.length !== 40
+      ) {
+        throw new Error(SwapError.EXPECTED_VALID_REFUND_PUBKEY);
+      }
+
+      claimerPublicKey = decompiledClaimerPublicKey;
+      refundPublicKeyHash = decompiledRefundPublicKeyHash;
+      paymentHashRipemd160 = decompiledPaymentHashRipemd160;
+
+      timelock = getTimeLockObjectFromDecompiledOpcode(
+        OP_TIMELOCKMETHOD,
+        decompiledTimeLockValue,
+      );
       break;
 
-    case 17:
+    // no adminRefund included in script
+    case 23:
       {
-        // public key hash redeem swap script
         const [
           OP_DUP,
           OP_HASH160,
@@ -179,26 +200,43 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           OP_DROP,
           decompiledClaimerPublicKey,
           OP_ELSE,
-          decompiledTimeLockValue,
-          OP_TIMELOCKMETHOD,
-          OP_DROP2,
           OP_DUP2,
           OP_HASH1602,
+          decompiledRefundHashRipemd160,
+          OP_EQUAL2,
+          OP_NOTIF,
+          decompiledTimeLockValue,
+          OP_TIMELOCKMETHOD,
+          OP_ENDIF,
+          OP_DROP2,
+          OP_DUP3,
+          OP_HASH1603,
           decompiledRefundPublicKeyHash,
           OP_EQUALVERIFY,
-          OP_ENDIF,
+          OP_ENDIF2,
           OP_CHECKSIG,
         ] = scriptAssembly;
 
-        if (OP_DUP !== DecompiledOpCode.OP_DUP) {
+        if (
+          OP_DUP !== DecompiledOpCode.OP_DUP ||
+          OP_DUP2 !== DecompiledOpCode.OP_DUP ||
+          OP_DUP3 !== DecompiledOpCode.OP_DUP
+        ) {
           throw new Error(SwapError.EXPECTED_OP_DUP);
         }
 
-        if (OP_HASH160 !== DecompiledOpCode.OP_HASH160) {
+        if (
+          OP_HASH160 !== DecompiledOpCode.OP_HASH160 ||
+          OP_HASH1602 !== DecompiledOpCode.OP_HASH160 ||
+          OP_HASH1603 !== DecompiledOpCode.OP_HASH160
+        ) {
           throw new Error(SwapError.EXPECTED_OP_HASH160);
         }
 
-        if (OP_EQUAL !== DecompiledOpCode.OP_EQUAL) {
+        if (
+          OP_EQUAL !== DecompiledOpCode.OP_EQUAL ||
+          OP_EQUAL2 !== DecompiledOpCode.OP_EQUAL
+        ) {
           throw new Error(SwapError.EXPECTED_OP_EQUAL);
         }
 
@@ -206,12 +244,19 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           throw new Error(SwapError.EXPECTED_OP_IF);
         }
 
-        if (OP_DROP !== DecompiledOpCode.OP_DROP) {
+        if (
+          OP_DROP !== DecompiledOpCode.OP_DROP ||
+          OP_DROP2 !== DecompiledOpCode.OP_DROP
+        ) {
           throw new Error(SwapError.EXPECTED_OP_DROP);
         }
 
         if (OP_ELSE !== DecompiledOpCode.OP_ELSE) {
           throw new Error(SwapError.EXPECTED_OP_ELSE);
+        }
+
+        if (OP_NOTIF !== DecompiledOpCode.OP_NOTIF) {
+          throw new Error(SwapError.EXPECTED_OP_NOTIF);
         }
 
         if (
@@ -221,23 +266,14 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           throw new Error(SwapError.EXPECTED_OP_TIMELOCKMETHOD);
         }
 
-        if (OP_DROP2 !== DecompiledOpCode.OP_DROP) {
-          throw new Error(SwapError.EXPECTED_OP_DROP);
-        }
-
-        if (OP_DUP2 !== DecompiledOpCode.OP_DUP) {
-          throw new Error(SwapError.EXPECTED_OP_DUP);
-        }
-
-        if (OP_HASH1602 !== DecompiledOpCode.OP_HASH160) {
-          throw new Error(SwapError.EXPECTED_OP_HASH160);
-        }
-
         if (OP_EQUALVERIFY !== DecompiledOpCode.OP_EQUALVERIFY) {
           throw new Error(SwapError.EXPECTED_OP_EQUALVERIFY);
         }
 
-        if (OP_ENDIF !== DecompiledOpCode.OP_ENDIF) {
+        if (
+          OP_ENDIF !== DecompiledOpCode.OP_ENDIF ||
+          OP_ENDIF2 !== DecompiledOpCode.OP_ENDIF
+        ) {
           throw new Error(SwapError.EXPECTED_OP_ENDIF);
         }
 
@@ -262,6 +298,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
         claimerPublicKey = decompiledClaimerPublicKey;
         refundPublicKeyHash = decompiledRefundPublicKeyHash;
         paymentHashRipemd160 = decompiledPaymentHashRipemd160;
+        refundHashRipemd160 = decompiledRefundHashRipemd160;
 
         timelock = getTimeLockObjectFromDecompiledOpcode(
           OP_TIMELOCKMETHOD,
@@ -306,7 +343,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
     hash: refundPublicKeyHashBuffer,
   }).address;
 
-  return {
+  const decodedScript = {
     network,
     subnet,
     claimerPublicKey,
@@ -323,5 +360,11 @@ export function getSwapRedeemScriptDetails<N extends Network>(
     refundP2wpkhAddress: p2wpkhRefundAddress || '',
     refundP2pkhAddress: p2pkhRefundAddress || '',
     redeemScript: redeemScriptHex || '',
-  };
+  } as UTXO.Details<N>;
+
+  if (refundHashRipemd160) {
+    decodedScript.refundHashRipemd160 = refundHashRipemd160;
+  }
+
+  return decodedScript;
 }

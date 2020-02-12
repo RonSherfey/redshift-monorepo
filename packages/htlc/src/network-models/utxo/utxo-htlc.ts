@@ -189,12 +189,45 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
   }
 
   /**
+   * Generate the refund transaction and return the raw tx hex
+   * @param utxos The unspent funding tx outputs
+   * @param destinationAddress The address the funds will be refunded to
+   * @param currentBlockHeight The current block height on the network
+   * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
+   * @param refundSecret The adminRefund secret used to offer instant refunds
+   * @param privateKey The private key WIF string
+   */
+  public adminRefund(
+    utxos: TxOutput[],
+    destinationAddress: string,
+    currentBlockHeight: number,
+    feeTokensPerVirtualByte: number,
+    refundSecret: string,
+    privateKey: string,
+  ): string {
+    const { publicKey } = ECPair.fromWIF(
+      privateKey,
+      getBitcoinJSNetwork(this._network, this._subnet),
+    );
+
+    return this.buildTransaction(
+      utxos,
+      destinationAddress,
+      currentBlockHeight,
+      feeTokensPerVirtualByte,
+      [publicKey.toString('hex'), refundSecret],
+      privateKey,
+      false,
+    );
+  }
+
+  /**
    * Build the transaction using the provided params and return the raw tx hex
    * @param utxos The unspent funding tx outputs
    * @param destinationAddress The address the funds will be sent to
    * @param currentBlockHeight The current block height on the network
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
-   * @param unlock Claim secret (preimage) or refund public key
+   * @param unlock Claim secret (preimage) or refund public key or refund secret _and_ refundPublicKey
    * @param privateKey The private key WIF string
    * @param isClaim Whether it is a claim transaction or not
    */
@@ -203,7 +236,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     destinationAddress: string,
     currentBlockHeight: number,
     feeTokensPerVirtualByte: number,
-    unlock: string,
+    unlock: string | [string, string],
     privateKey: string,
     isClaim?: boolean,
   ): string {
@@ -304,13 +337,13 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * have been added. Otherwise, you'll end up with a different sig hash.
    * @param utxos The utxos we're spending
    * @param privateKey The private key WIF string
-   * @param unlock Claim secret (preimage) or refund public key
+   * @param unlock Claim secret (preimage) or refund public key or refund secret _and_ refund public key
    * @param tx The tx instance
    */
   private addWitnessScripts(
     utxos: TxOutput[],
     privateKey: string,
-    unlock: string,
+    unlock: string | [string, string],
     tx: Transaction,
   ) {
     // Create the signing key from the WIF string
@@ -330,11 +363,21 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
         signingKey.sign(sigHash),
         Transaction.SIGHASH_ALL,
       );
-      const witness = [
-        signature,
-        Buffer.from(unlock, 'hex'),
-        this.redeemScriptBuffer,
-      ];
+
+      let witness;
+      // if we are adminRefunding, we need another item on the stack
+      if (Array.isArray(unlock)) {
+        const [publicKey, refundSecret] = unlock.map(i =>
+          Buffer.from(i, 'hex'),
+        );
+        witness = [signature, publicKey, refundSecret, this.redeemScriptBuffer];
+      } else {
+        witness = [
+          signature,
+          Buffer.from(unlock, 'hex'),
+          this.redeemScriptBuffer,
+        ];
+      }
       tx.setWitness(i, witness);
     });
   }

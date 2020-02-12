@@ -22,7 +22,6 @@ let coinbaseUtxos: FundTxOutput[];
 let fundingUtxos: TxOutput[];
 let htlcArgs: UTXO.RedeemScriptArgs;
 let paymentSecret: string;
-let refundSecret: string;
 
 const ABSOLUTE_TIMELOCK: number = 5;
 /**
@@ -37,20 +36,17 @@ function setupTestSuite(
 
     // Set the HTLC arguments being used
     const paymentRandom = config.random.args(false);
-    const refundRandom = config.random.args(false);
 
     htlcArgs = {
       refundAddress,
       paymentHash: paymentRandom.paymentHash,
       claimerPublicKey: claimer.publicKey,
-      refundHash: refundRandom.paymentHash,
       timelock: {
         type: UTXO.LockType.ABSOLUTE,
         blockHeight: (await rpcClient.getBlockCount()) + ABSOLUTE_TIMELOCK,
       },
     };
     paymentSecret = paymentRandom.paymentSecret;
-    refundSecret = refundRandom.paymentSecret;
 
     // Create a new htlc
     htlc = HTLC.construct(Network.BITCOIN, BitcoinSubnet.SIMNET, htlcArgs);
@@ -107,7 +103,7 @@ async function setCoinbaseUtxos() {
   ];
 }
 
-describe('UTXO BIP65 HTLC - Bitcoin Network', () => {
+describe('UTXO BIP65 HTLC - No Admin Refund - Bitcoin Network', () => {
   before(async () => {
     // Mine 400 blocks ahead of the coinbase transaction. Segwit activates around 300.
     await mineBlocks(400);
@@ -172,24 +168,6 @@ describe('UTXO BIP65 HTLC - Bitcoin Network', () => {
       expect(claimTx.vout[0].value)
         .to.be.above(0.009)
         .and.below(0.01); // Claim Output less tx fee
-    });
-  });
-
-  describe('Malicious Claim', () => {
-    setupTestSuite();
-    it('should reject transaction if claim is attempted by someone besides the claimer', async () => {
-      const currentBlockHeight = await rpcClient.getBlockCount();
-      const claimTxHex = htlc.claim(
-        fundingUtxos,
-        claimer.p2pkhAddress,
-        currentBlockHeight,
-        feeTokensPerVirtualByte,
-        paymentSecret,
-        funder.privateKey, // sending from a 'non-claimer' account...should error
-      );
-      await expect(rpcClient.sendRawTransaction(claimTxHex)).to.be.rejectedWith(
-        /RpcCallFailed: TX rejected: failed to validate input/,
-      );
     });
   });
 
@@ -277,68 +255,6 @@ describe('UTXO BIP65 HTLC - Bitcoin Network', () => {
         expect(refundTx.vout[0].value)
           .to.be.above(0.009)
           .and.below(0.01); // Refund Output less tx fee
-      });
-    });
-  });
-
-  describe('Admin Refund', () => {
-    describe('Success Case', () => {
-      setupTestSuite(undefined, ABSOLUTE_TIMELOCK);
-      it('should execute refund if the provided refundHash matches hash in tx and is sent from refunder', async () => {
-        const currentBlockHeight = await rpcClient.getBlockCount();
-        const adminRefundTxHex = htlc.adminRefund(
-          fundingUtxos,
-          refunder.p2pkhAddress,
-          currentBlockHeight,
-          feeTokensPerVirtualByte,
-          refundSecret,
-          refunder.privateKey,
-        );
-
-        const adminRefundTxId = await rpcClient.sendRawTransaction(
-          adminRefundTxHex,
-        );
-
-        expect(adminRefundTxId).to.be.a('string');
-      });
-    });
-
-    describe('Failure Case', () => {
-      setupTestSuite(undefined, ABSOLUTE_TIMELOCK);
-      it('should not execute refund if the provided refundHash matches hash in tx but is not sent from funder', async () => {
-        const currentBlockHeight = await rpcClient.getBlockCount();
-        const adminRefundTxHex = htlc.adminRefund(
-          fundingUtxos,
-          refunder.p2pkhAddress,
-          currentBlockHeight,
-          feeTokensPerVirtualByte,
-          refundSecret,
-          claimer.privateKey,
-        );
-
-        await expect(
-          rpcClient.sendRawTransaction(adminRefundTxHex),
-        ).to.be.rejectedWith(
-          /RpcCallFailed: TX rejected: failed to validate input/,
-        );
-      });
-
-      it('should not execute refund if the provided refundHash does not match the hash in tx and is not sent from funder', async () => {
-        const currentBlockHeight = await rpcClient.getBlockCount();
-        const adminRefundTxHex = htlc.adminRefund(
-          fundingUtxos,
-          refunder.p2pkhAddress,
-          currentBlockHeight,
-          feeTokensPerVirtualByte,
-          `${refundSecret}abc`,
-          claimer.privateKey,
-        );
-
-        await expect(
-          rpcClient.sendRawTransaction(adminRefundTxHex),
-        ).to.be.rejectedWith(
-          /RpcCallFailed: TX rejected: failed to validate input/,
-        );
       });
     });
   });

@@ -62,13 +62,15 @@ const networkSpecificConfigs = {
       valid: {
         absoluteTimeLock: {
           redeemScript:
-            '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256702e10bb17576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
+            '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256776a9145c86f3f039e4b4f0bd46780dcc73e45db4040683876402e10bb1687576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
           htlc: {
             args: {
               claimerPublicKey:
                 '0398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25',
               paymentHash:
                 'e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d',
+              refundHash:
+                'd114f92c11e639d7f715c5ab314ae9614d5daa12754a0f07e5c6b55421237c67',
               refundAddress: 'ST3cmHBZSa5KsDrbgFMmDaj78DhDa9US3J',
               timelock: {
                 type: UTXO.LockType.ABSOLUTE as UTXO.LockType.ABSOLUTE, // cast to narrow type
@@ -81,29 +83,30 @@ const networkSpecificConfigs = {
               claimerPublicKey:
                 '0398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25',
               paymentHashRipemd160: 'c15949a2e2a414b5c641f32c4c2ee07be644e165',
+              refundHashRipemd160: '5c86f3f039e4b4f0bd46780dcc73e45db4040683',
               refundPublicKeyHash: '3f1857b3db895b4d481a46e5a0129cb2b04781c8',
               timelockType: UTXO.LockType.ABSOLUTE,
               timelockValue: 3041,
               p2shOutputScript:
-                'a914c62820678cf19902ad2be6905fb7ea87a4bc81ed87',
-              p2shAddress: 'rodwyPBBTFooEpUoWnVYSeAX2PNbESEfcj',
-              p2shP2wshAddress: 'rpY9hikYMcsrwnb8fAPMLMunNk2Ck6rbmH',
+                'a9146770d4a681e134dce5b39dc2b319bc2af25fbc8e87',
+              p2shAddress: 'rf18sjADU2pGHQkgq2t5anbuF38eSDXDcx',
+              p2shP2wshAddress: 'rax5LMmSgk3rYih3ycv8s9zFeoMgzunwmp',
               p2shP2wshOutputScript:
-                'a914d0078c5b4b93ef5ef598ad2bb7a4dffc9c9b9db587',
+                'a9143afc1fb7da97e69395f4e18f695138760f642ccb87',
               p2wshAddress:
-                'sb1qe60gt270wluxfy0epq4dgg3sxv67eqede7ym5w4yt62mwu2l0u7syfcpqg',
+                'sb1qj9jxecc09z2jlauqyrlswntnddrsvpym8r6tyc3nfxjtl28gfm3qc4e4w7',
               p2wshOutputScript:
-                '0020ce9e85abcf77f86491f9082ad422303335ec832dcf89ba3aa45e95b7715f7f3d',
+                '002091646ce30f28952ff78020ff074d736b4706049b38f4b2623349a4bfa8e84ee2',
               refundP2wpkhAddress: 'sb1q8uv90v7m39d56jq6gmj6qy5uk2cy0qwgfu40g6',
               refundP2pkhAddress: 'ST3cmHBZSa5KsDrbgFMmDaj78DhDa9US3J',
               redeemScript:
-                '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256702e10bb17576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
+                '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256776a9145c86f3f039e4b4f0bd46780dcc73e45db4040683876402e10bb1687576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
             },
           },
         },
         relativeTimeLock: {
           redeemScript:
-            '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25670114b27576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
+            '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256776a9145c86f3f039e4b4f0bd46780dcc73e45db404068387640114b2687576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
           htlc: {
             args: {
               claimerPublicKey:
@@ -111,6 +114,8 @@ const networkSpecificConfigs = {
               paymentHash:
                 'e0531eaf4c51c77afc74a0ae13ebe7b1832c4a1c864abde6ca3e2eb280aa413d',
               refundAddress: 'ST3cmHBZSa5KsDrbgFMmDaj78DhDa9US3J',
+              refundHash:
+                'd114f92c11e639d7f715c5ab314ae9614d5daa12754a0f07e5c6b55421237c67',
               timelock: {
                 type: UTXO.LockType.RELATIVE as UTXO.LockType.RELATIVE, // cast to narrow type
                 blockBuffer: 20,
@@ -122,23 +127,24 @@ const networkSpecificConfigs = {
               claimerPublicKey:
                 '0398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25',
               paymentHashRipemd160: 'c15949a2e2a414b5c641f32c4c2ee07be644e165',
+              refundHashRipemd160: '5c86f3f039e4b4f0bd46780dcc73e45db4040683',
               refundPublicKeyHash: '3f1857b3db895b4d481a46e5a0129cb2b04781c8',
               timelockType: UTXO.LockType.RELATIVE,
               timelockValue: 20,
               p2shOutputScript:
-                'a914abbe2fd62eca9b6f4fcac561b1dd20f9e2499e1787',
-              p2shAddress: 'rmEHVaJE1SKHNzVZjye1Nq6vcSJn9k4d7Z',
-              p2shP2wshAddress: 'raHc4bACRGaoxMSTEeExXupKLaZitzAQJW',
+                'a9147c0c4664f688d45745a85408588336af26d4b98d87',
+              p2shAddress: 'rgt6c2NaCBuFjGZSg46J7FxKJRzvRifWwa',
+              p2shP2wshAddress: 'riNBRspCJXF4jSpEExTgdnrX4zCcmY2HCJ',
               p2shP2wshOutputScript:
-                'a91433b58d4b5f5ef4bed6c35afeaf817d880146703787',
+                'a9148c54134fa9798c9a6dee7b1d45d6a5fb63ca37f887',
               p2wshAddress:
-                'sb1qxlce8hcm59dpgp5v0yn8ydh3t6q6namkfaxmuce8pdmaj4d5l7ts0u9ch3',
+                'sb1q6202tcsvefl7qc7p5xlesgu43e72f6frn4s68ejw0tjz4u5cu2kq8vs8fv',
               p2wshOutputScript:
-                '002037f193df1ba15a14068c79267236f15e81a9f7764f4dbe63270b77d955b4ff97',
+                '0020d29ea5e20cca7fe063c1a1bf9823958e7ca4e9239d61a3e64e7ae42af298e2ac',
               refundP2wpkhAddress: 'sb1q8uv90v7m39d56jq6gmj6qy5uk2cy0qwgfu40g6',
               refundP2pkhAddress: 'ST3cmHBZSa5KsDrbgFMmDaj78DhDa9US3J',
               redeemScript:
-                '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d25670114b27576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
+                '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256776a9145c86f3f039e4b4f0bd46780dcc73e45db404068387640114b2687576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
             },
           },
         },

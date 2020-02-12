@@ -56,7 +56,7 @@ function addressToPublicKeyHash(addr: string): string {
  * If false, check the lock time, pubkey hash, and push the local pubkey.
  * Check remote or local pubkey signed the transaction.
  * @param scriptArgs The script arguements for creating a swap redeem script
- * claimerPublicKey, paymentHash, refundAddress, timelock
+ * claimerPublicKey, paymentHash, refundHash, refundAddress, timelock
  * @return The hex representation of the redeem script
  */
 export function createSwapRedeemScript(
@@ -73,38 +73,34 @@ export function createSwapRedeemScript(
     refundPublicKeyHash,
   ].map(i => Buffer.from(i, 'hex'));
 
+  let refundHashBuffer;
+  let refundHashRipemd160Buffer;
+  if (scriptArgs.refundHash) {
+    refundHashBuffer = Buffer.from(scriptArgs.refundHash, 'hex');
+    refundHashRipemd160Buffer = crypto.ripemd160(refundHashBuffer);
+  }
+
   const paymentHashRipemd160Buffer = crypto.ripemd160(paymentHashBuffer);
 
-  let swapScript: (number | Buffer)[];
+  // set the correct timelock values/method for swapScript
+  let timelockValue: Buffer;
+  let timelockMethod: number;
   if (scriptArgs.timelock.type === UTXO.LockType.RELATIVE) {
-    const nSequenceBuffer = script.number.encode(
+    timelockValue = script.number.encode(
       bip68.encode({ blocks: scriptArgs.timelock.blockBuffer }),
     );
-
-    swapScript = [
-      opcodes.OP_DUP,
-      opcodes.OP_HASH160,
-      paymentHashRipemd160Buffer,
-      opcodes.OP_EQUAL,
-      opcodes.OP_IF,
-      opcodes.OP_DROP,
-      claimerPublicKeyBuffer,
-      opcodes.OP_ELSE,
-      nSequenceBuffer,
-      opcodes.OP_CHECKSEQUENCEVERIFY,
-      opcodes.OP_DROP,
-      opcodes.OP_DUP,
-      opcodes.OP_HASH160,
-      refundPublicKeyHashBuffer,
-      opcodes.OP_EQUALVERIFY,
-      opcodes.OP_ENDIF,
-      opcodes.OP_CHECKSIG,
-    ];
+    timelockMethod = opcodes.OP_CHECKSEQUENCEVERIFY;
   } else if (scriptArgs.timelock.type === UTXO.LockType.ABSOLUTE) {
-    const cltvBuffer = script.number.encode(
+    timelockValue = script.number.encode(
       bip65.encode({ blocks: scriptArgs.timelock.blockHeight }),
     );
+    timelockMethod = opcodes.OP_CHECKLOCKTIMEVERIFY;
+  } else {
+    throw new Error(SwapError.INVALID_TIMELOCK_METHOD);
+  }
 
+  let swapScript: (number | Buffer)[];
+  if (refundHashRipemd160Buffer) {
     swapScript = [
       opcodes.OP_DUP,
       opcodes.OP_HASH160,
@@ -114,8 +110,14 @@ export function createSwapRedeemScript(
       opcodes.OP_DROP,
       claimerPublicKeyBuffer,
       opcodes.OP_ELSE,
-      cltvBuffer,
-      opcodes.OP_CHECKLOCKTIMEVERIFY,
+      opcodes.OP_DUP,
+      opcodes.OP_HASH160,
+      refundHashRipemd160Buffer,
+      opcodes.OP_EQUAL,
+      opcodes.OP_NOTIF,
+      timelockValue,
+      timelockMethod,
+      opcodes.OP_ENDIF,
       opcodes.OP_DROP,
       opcodes.OP_DUP,
       opcodes.OP_HASH160,
@@ -125,7 +127,25 @@ export function createSwapRedeemScript(
       opcodes.OP_CHECKSIG,
     ];
   } else {
-    throw new Error(SwapError.INVALID_TIMELOCK_METHOD);
+    swapScript = [
+      opcodes.OP_DUP,
+      opcodes.OP_HASH160,
+      paymentHashRipemd160Buffer,
+      opcodes.OP_EQUAL,
+      opcodes.OP_IF,
+      opcodes.OP_DROP,
+      claimerPublicKeyBuffer,
+      opcodes.OP_ELSE,
+      timelockValue,
+      timelockMethod,
+      opcodes.OP_DROP,
+      opcodes.OP_DUP,
+      opcodes.OP_HASH160,
+      refundPublicKeyHashBuffer,
+      opcodes.OP_EQUALVERIFY,
+      opcodes.OP_ENDIF,
+      opcodes.OP_CHECKSIG,
+    ];
   }
 
   // We convert to hex, make a buffer, decompile, then convert to hex in case nSequence < 17. Decompile will append OP_ to those cases.
