@@ -1,6 +1,6 @@
 {
   "name": "@radar/eth-htlc-contracts",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Simple Ethereum HTLCs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -19,20 +19,22 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@truffle/core": "^5.1.8",
+    "@truffle/decoder": "^4.0.5",
+    "@truffle/environment": "^0.1.24",
+    "@truffle/hdwallet-provider": "^1.0.28",
     "@types/bignumber.js": "^5.0.0",
     "@types/chai-as-promised": "^7.1.0",
     "bignumber.js": "^8.0.1",
     "chai-as-promised": "^7.1.1",
     "chai-shallow-deep-equal": "^1.4.6",
-    "truffle-core": "^5.0.34",
-    "truffle-environment": "^0.1.10",
-    "truffle-hdwallet-provider": "^1.0.17",
     "truffle-typings": "^1.0.8",
     "ts-generator": "^0.0.8",
-    "ts-node": "^7.0.1",
+    "ts-node": "^8.6.2",
     "typechain": "^0.3.20"
   },
   "dependencies": {
-    "truffle": "^5.0.34"
+    "solc": "0.6.1",
+    "truffle": "^5.1.8"
   }
 }

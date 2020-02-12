@@ -1,3 +1,4 @@
+import { Interface } from '@ethersproject/abi';
 import {
   EthereumSubnet,
   EvmUnsignedTx,
@@ -8,8 +9,8 @@ import {
 } from '@radar/redshift-types';
 import { format } from '@radar/redshift-utils';
 import Big from 'big.js';
-import abi from 'ethereumjs-abi';
 import uuidToHex from 'uuid-to-hex';
+import { ERC20SwapABI, EtherSwapABI } from '.';
 import { EVM, Provider } from '../../types';
 import { BaseHtlc } from '../shared';
 import { getContractAddressesForSubnetOrThrow } from './contract-addresses';
@@ -18,11 +19,12 @@ export class EvmHtlc<
   N extends Network,
   C extends EVM.Config = EVM.Config
 > extends BaseHtlc<N> {
-  private _assetType: EVM.AssetType;
-  private _provider: Provider | undefined;
-  private _swapContractAddress: string;
-  private _tokenContractAddress: string;
-  private _orderUUID: string;
+  private readonly _contract: Interface;
+  private readonly _assetType: EVM.AssetType;
+  private readonly _provider: Provider | undefined;
+  private readonly _swapContractAddress: string;
+  private readonly _tokenContractAddress: string;
+  private readonly _orderUUID: string;
 
   /**
    * Create a new Ethereum HTLC instance
@@ -32,6 +34,7 @@ export class EvmHtlc<
    */
   constructor(network: N, subnet: SubnetMap[N], config: C) {
     super(network, subnet);
+    this._contract = this.getContractInterfaceForAssetType(config.assetType);
     this._assetType = config.assetType;
     this._orderUUID = this.formatOrderUUID(config.orderUUID);
     this._provider = config.provider;
@@ -41,20 +44,36 @@ export class EvmHtlc<
 
   /**
    * Generate, and optionally send, the swap funding transaction
-   * @param amount The fund amount in ether or token base units
-   * @param paymentHash The hash of the payment secret
+   * @param details The fund amount in ether or token base units and the hash of the payment secret
    * @param shouldBroadcast Whether or not the transaction should be broadcast (Default: true)
    * @param txParams The optional transaction params
    */
   public async fund(
-    amount: string,
-    paymentHash: string,
+    details: EVM.FundDetails,
     shouldBroadcast: boolean = true,
     txParams?: PartialEvmTxParams,
   ) {
-    const unsignedTx = this.createFundTxForAssetType(
-      amount,
-      paymentHash,
+    const unsignedTx = this.createFundTxForAssetType(details, txParams);
+
+    if (!shouldBroadcast || !this._provider) {
+      return unsignedTx;
+    }
+    return this._provider.send('eth_sendTransaction', unsignedTx);
+  }
+
+  /**
+   * Generate, and optionally send, the swap funding transaction with admin refund functionality enabled
+   * @param details The fund amount in ether or token base units, hash of the payment secret, and refund hash
+   * @param shouldBroadcast Whether or not the transaction should be broadcast (Default: true)
+   * @param txParams The optional transaction params
+   */
+  public async fundWithAdminRefundEnabled(
+    details: EVM.FundDetailsWithAdminRefundEnabled,
+    shouldBroadcast: boolean = true,
+    txParams?: PartialEvmTxParams,
+  ) {
+    const unsignedTx = this.createFundTxWithAdminRefundEnabled(
+      details,
       txParams,
     );
 
@@ -75,7 +94,15 @@ export class EvmHtlc<
     shouldBroadcast: boolean = true,
     txParams?: PartialEvmTxParams,
   ) {
-    const unsignedTx = this.createClaimTxForAssetType(paymentSecret, txParams);
+    const callData = this._contract.encodeFunctionData(
+      this._contract.getFunction('claim'),
+      [[this._orderUUID, format.addHexPrefix(paymentSecret)]],
+    );
+    const unsignedTx = {
+      to: this._swapContractAddress,
+      data: format.addHexPrefix(callData),
+      ...txParams,
+    };
 
     if (!shouldBroadcast || !this._provider) {
       return unsignedTx;
@@ -92,7 +119,45 @@ export class EvmHtlc<
     shouldBroadcast: boolean = true,
     txParams?: PartialEvmTxParams,
   ) {
-    const unsignedTx = this.createRefundTxForAssetType(txParams);
+    const callData = this._contract.encodeFunctionData(
+      this._contract.getFunction('refund'),
+      [this._orderUUID],
+    );
+    const unsignedTx = {
+      to: this._swapContractAddress,
+      data: format.addHexPrefix(callData),
+      ...txParams,
+    };
+
+    if (!shouldBroadcast || !this._provider) {
+      return unsignedTx;
+    }
+    return this._provider.send('eth_sendTransaction', unsignedTx);
+  }
+
+  /**
+   * Generate, and optionally send, the transaction to execute an admin refund of the on-chain asset
+   * to the funder. This method can be used to unlock funds irrespective of the refund timelock. It
+   * is entirely at the discretion of the counterparty (claimer) as to whether the refund preimage
+   * will be provided to the funder.
+   * @param refundPreimage The refund secret used to unlock funds irrespective of the refund timelock
+   * @param shouldBroadcast Whether or not the transaction should be broadcast
+   * @param txParams The optional transaction params
+   */
+  public async adminRefund(
+    refundPreimage: string,
+    shouldBroadcast: boolean = true,
+    txParams?: PartialEvmTxParams,
+  ) {
+    const callData = this._contract.encodeFunctionData(
+      this._contract.getFunction('adminRefund'),
+      [[this._orderUUID, format.addHexPrefix(refundPreimage)]],
+    );
+    const unsignedTx = {
+      to: this._swapContractAddress,
+      data: format.addHexPrefix(callData),
+      ...txParams,
+    };
 
     if (!shouldBroadcast || !this._provider) {
       return unsignedTx;
@@ -132,118 +197,105 @@ export class EvmHtlc<
 
   /**
    * Create a fund transaction for the provided asset type
-   * @param amount The fund amount in ether or token base units
-   * @param paymentHash The hash of the payment secret
+   * @param details The fund amount in ether or token base units and the hash of the payment secret
    * @param txParams The optional transaction params
    */
   private createFundTxForAssetType(
-    amount: string,
-    paymentHash: string,
+    details: EVM.FundDetails,
     txParams?: PartialEvmTxParams,
   ): EvmUnsignedTx {
     switch (this._assetType) {
       case EVM.AssetType.ERC20:
-        const erc20MethodArgs = abi
-          .simpleEncode(
-            'fund(bytes16,bytes32,address,uint)',
-            this._orderUUID,
-            format.addHexPrefix(paymentHash),
-            this._tokenContractAddress,
-            amount,
-          )
-          .toString('hex');
+        const erc20CallData = this._contract.encodeFunctionData(
+          this._contract.getFunction('fund'),
+          [
+            [
+              this._orderUUID,
+              format.addHexPrefix(details.paymentHash),
+              this._tokenContractAddress,
+              details.amount,
+            ],
+          ],
+        );
         return {
           to: this._swapContractAddress,
-          data: format.addHexPrefix(erc20MethodArgs),
+          data: format.addHexPrefix(erc20CallData),
           ...txParams,
         };
       case EVM.AssetType.ETHER:
-        const etherMethodArgs = abi
-          .simpleEncode(
-            'fund(bytes16,bytes32)',
-            this._orderUUID,
-            format.addHexPrefix(paymentHash),
-          )
-          .toString('hex');
+        const etherCallData = this._contract.encodeFunctionData(
+          this._contract.getFunction('fund'),
+          [[this._orderUUID, format.addHexPrefix(details.paymentHash)]],
+        );
         return {
           to: this._swapContractAddress,
-          data: format.addHexPrefix(etherMethodArgs),
-          value: new Big(amount).times(1e18).toString(), // Ether to Wei
+          data: format.addHexPrefix(etherCallData),
+          value: new Big(details.amount).times(1e18).toString(), // Ether to Wei
           ...txParams,
         };
     }
   }
 
   /**
-   * Create a claim transaction for the provided asset type
-   * @param paymentSecret The payment secret
+   * Create a fund transaction with admin refund functionality enabled for the provided asset type
+   * @param details The fund amount in ether or token base units and the hash of the payment secret
    * @param txParams The optional transaction params
    */
-  private createClaimTxForAssetType(
-    paymentSecret: string,
+  private createFundTxWithAdminRefundEnabled(
+    details: EVM.FundDetailsWithAdminRefundEnabled,
     txParams?: PartialEvmTxParams,
   ): EvmUnsignedTx {
     switch (this._assetType) {
       case EVM.AssetType.ERC20:
-        const erc20MethodArgs = abi
-          .simpleEncode(
-            'claim(bytes16,address,bytes32)',
-            this._orderUUID,
-            this._tokenContractAddress,
-            format.addHexPrefix(paymentSecret),
-          )
-          .toString('hex');
+        const erc20CallData = this._contract.encodeFunctionData(
+          this._contract.getFunction('fundWithAdminRefundEnabled'),
+          [
+            [
+              this._orderUUID,
+              format.addHexPrefix(details.paymentHash),
+              this._tokenContractAddress,
+              details.amount,
+              format.addHexPrefix(details.refundHash),
+            ],
+          ],
+        );
         return {
           to: this._swapContractAddress,
-          data: format.addHexPrefix(erc20MethodArgs),
+          data: format.addHexPrefix(erc20CallData),
           ...txParams,
         };
       case EVM.AssetType.ETHER:
-        const etherMethodArgs = abi
-          .simpleEncode(
-            'claim(bytes16,bytes32)',
-            this._orderUUID,
-            format.addHexPrefix(paymentSecret),
-          )
-          .toString('hex');
+        const etherCallData = this._contract.encodeFunctionData(
+          this._contract.getFunction('fundWithAdminRefundEnabled'),
+          [
+            [
+              this._orderUUID,
+              format.addHexPrefix(details.paymentHash),
+              format.addHexPrefix(details.refundHash),
+            ],
+          ],
+        );
         return {
           to: this._swapContractAddress,
-          data: format.addHexPrefix(etherMethodArgs),
+          data: format.addHexPrefix(etherCallData),
+          value: new Big(details.amount).times(1e18).toString(), // Ether to Wei
           ...txParams,
         };
     }
   }
 
   /**
-   * Create a refund transaction for the provided asset type
-   * @param txParams The optional transaction params
+   * Get the contract interface for the active asset type
+   * @param type The asset type
    */
-  private createRefundTxForAssetType(
-    txParams?: PartialEvmTxParams,
-  ): EvmUnsignedTx {
-    switch (this._assetType) {
+  private getContractInterfaceForAssetType(type: EVM.AssetType) {
+    switch (type) {
       case EVM.AssetType.ERC20:
-        const erc20MethodArgs = abi
-          .simpleEncode(
-            'refund(bytes16,address)',
-            this._orderUUID,
-            this._tokenContractAddress,
-          )
-          .toString('hex');
-        return {
-          to: this._swapContractAddress,
-          data: format.addHexPrefix(erc20MethodArgs),
-          ...txParams,
-        };
+        return new Interface(ERC20SwapABI);
       case EVM.AssetType.ETHER:
-        const etherMethodArgs = abi
-          .simpleEncode('refund(bytes16)', this._orderUUID)
-          .toString('hex');
-        return {
-          to: this._swapContractAddress,
-          data: format.addHexPrefix(etherMethodArgs),
-          ...txParams,
-        };
+        return new Interface(EtherSwapABI);
+      default:
+        throw new Error(NetworkError.INVALID_ASSET);
     }
   }
 }
