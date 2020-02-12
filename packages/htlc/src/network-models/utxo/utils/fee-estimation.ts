@@ -13,7 +13,7 @@ const sequenceLength = 4; // Sequence Number Byte Length
  * @param redeem The redeem script buffer
  */
 export function estimateWeightWithInputs(
-  unlock: string,
+  unlock: string | [string, string],
   utxos: TxOutput[],
   weight: number,
   redeem: Buffer,
@@ -30,6 +30,23 @@ export function estimateWeightWithInputs(
     throw new Error(WeightEstimationError.EXPECTED_UNSIGNED_TX_WEIGHT);
   }
 
+  // if adminRefund, unlock is an array of the publicKey and refundSecret
+  if (Array.isArray(unlock)) {
+    const [refundSecret, publicKey] = unlock;
+    return utxos.reduce(sum => {
+      return [
+        shortPushdataLength,
+        ecdsaSignatureLength,
+        shortPushdataLength,
+        Buffer.from(publicKey, 'hex').length,
+        shortPushdataLength,
+        Buffer.from(refundSecret, 'hex').length,
+        sequenceLength,
+        redeem.length,
+        sum,
+      ].reduce((sum, n) => sum + n);
+    }, weight);
+  }
   return utxos.reduce(sum => {
     return [
       shortPushdataLength,
@@ -54,7 +71,7 @@ export function estimateWeightWithInputs(
 export function estimateFee(
   redeemScript: string,
   utxos: TxOutput[],
-  unlock: string,
+  unlock: string | [string, string],
   txWeight: number,
   feeTokensPerVirtualByte: number,
 ) {
@@ -66,7 +83,6 @@ export function estimateFee(
     Buffer.from(redeemScript, 'hex'),
   );
 
-  // KBC-TODO: change this back / reexamine this probably
-  const vRatio = 3; // A witness byte weighs one weight unit; compared to four non-witness weight units.
+  const vRatio = 4; // A witness byte weighs one weight unit; compared to four non-witness weight units.
   return feeTokensPerVirtualByte * Math.ceil(anticipatedWeight / vRatio);
 }

@@ -231,6 +231,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * @param unlock Claim secret (preimage) or refund public key
    * @param privateKey The private key WIF string
    * @param isClaim Whether it is a claim transaction or not
+   * @param adminRefundPublicKey The public key allowed to retrieve funds via adminRefund
    */
   private buildTransaction(
     utxos: TxOutput[],
@@ -273,14 +274,25 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     // Add the inputs being spent to the transaction
     this.addInputs(utxos, tx, nSequence, this.generateInputScript());
 
+    let fee;
     // Estimate the tx fee
-    const fee = estimateFee(
-      this.redeemScript,
-      utxos,
-      unlock,
-      tx.weight(),
-      feeTokensPerVirtualByte,
-    );
+    if (adminRefundPublicKey) {
+      fee = estimateFee(
+        this.redeemScript,
+        utxos,
+        [unlock, adminRefundPublicKey],
+        tx.weight(),
+        feeTokensPerVirtualByte,
+      );
+    } else {
+      fee = estimateFee(
+        this.redeemScript,
+        utxos,
+        unlock,
+        tx.weight(),
+        feeTokensPerVirtualByte,
+      );
+    }
 
     // Exit early when the ratio of the amount spent on fees would be too high
     const dustRatio = 1 / 3; // Fee exceeds one third of tx value
@@ -351,6 +363,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * @param privateKey The private key WIF string
    * @param unlock Claim secret (preimage) or refund public key
    * @param tx The tx instance
+   * @param adminRefundPublicKey The public key allowed to retrieve funds via adminRefund
    */
   private addWitnessScripts(
     utxos: TxOutput[],

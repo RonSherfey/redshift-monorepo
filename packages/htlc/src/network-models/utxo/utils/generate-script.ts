@@ -83,8 +83,8 @@ export function createSwapRedeemScript(
   const paymentHashRipemd160Buffer = crypto.ripemd160(paymentHashBuffer);
 
   // set the correct timelock values/method for swapScript
-  let timelockValue;
-  let timelockMethod;
+  let timelockValue: Buffer;
+  let timelockMethod: number;
   if (scriptArgs.timelock.type === UTXO.LockType.RELATIVE) {
     timelockValue = script.number.encode(
       bip68.encode({ blocks: scriptArgs.timelock.blockBuffer }),
