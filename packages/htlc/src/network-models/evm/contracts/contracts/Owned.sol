@@ -1,4 +1,4 @@
-pragma solidity ^0.6.1;
+pragma solidity ^0.5.8;
 
 contract Owned {
     constructor() public { owner = msg.sender; }

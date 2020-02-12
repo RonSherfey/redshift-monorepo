@@ -22,15 +22,6 @@ export namespace EVM {
   }
 
   export type Config = EtherConfig | ERC20Config;
-
-  export interface FundDetails {
-    amount: string;
-    paymentHash: string;
-  }
-
-  export interface FundDetailsWithAdminRefundEnabled extends FundDetails {
-    refundHash: string;
-  }
 }
 
 export type SwapContract<C extends EVM.Config> = C extends EVM.ERC20Config

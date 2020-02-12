@@ -32,21 +32,15 @@ function generateRandomIdSecretAndHashValues(prefixHex: boolean) {
   const orderUUID = uuidv4();
   let paymentSecret = sha256Hash(generateRandomHexString());
   let paymentHash = sha256Hash(paymentSecret);
-  let refundSecret = sha256Hash(generateRandomHexString());
-  let refundHash = sha256Hash(paymentSecret);
 
   if (prefixHex) {
     paymentSecret = format.addHexPrefix(paymentSecret);
     paymentHash = format.addHexPrefix(paymentHash);
-    refundSecret = format.addHexPrefix(paymentSecret);
-    refundHash = format.addHexPrefix(paymentHash);
   }
   return {
     orderUUID,
     paymentSecret,
     paymentHash,
-    refundSecret,
-    refundHash,
     amount: Math.random()
       .toFixed(2)
       .toString(),

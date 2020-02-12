@@ -43,7 +43,7 @@ export abstract class BaseRpcClient {
     const data: JsonRpc.Request = {
       params,
       id: 1,
-      jsonrpc: this._connectionConfig.jsonrpc || '2.0',
+      jsonrpc: !!this._connectionConfig.port ? '1.0' : '2.0',
       method: command,
     };
 

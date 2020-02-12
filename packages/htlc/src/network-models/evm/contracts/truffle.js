@@ -1,21 +1,10 @@
 require("ts-node/register");
 var path = require("path");
-var HDWalletProvider = require("@truffle/hdwallet-provider");
+var HDWalletProvider = require("truffle-hdwallet-provider");
 
 var mnemonic = "REPLACE_ME_WITH_TESTNET_MNEMONIC";
 
 module.exports = {
-  compilers: {
-    solc: {
-      version: "^0.6.1",
-      settings: {
-        optimizer: {
-          enabled: true,
-          runs: 100000,
-        },
-      },
-    },
-  },
   networks: {
     dev: {
       host: "127.0.0.1",

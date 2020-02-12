@@ -2,33 +2,36 @@
   "contractName": "Owned",
   "abi": [
     {
-      "inputs": [],
-      "stateMutability": "nonpayable",
-      "type": "constructor"
-    },
-    {
+      "constant": true,
       "inputs": [],
       "name": "owner",
       "outputs": [
         {
-          "internalType": "address payable",
           "name": "",
           "type": "address"
         }
       ],
+      "payable": false,
       "stateMutability": "view",
       "type": "function"
     },
     {
+      "inputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "constant": false,
       "inputs": [
         {
-          "internalType": "address payable",
           "name": "newOwner",
           "type": "address"
         }
       ],
       "name": "transferOwnership",
       "outputs": [],
+      "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
     }
@@ -38,10 +41,10 @@
   "source": "pragma solidity ^0.5.8;\n\ncontract Owned {\n    constructor() public { owner = msg.sender; }\n    address payable public owner;\n\n    modifier onlyOwner {\n        require(\n            msg.sender == owner,\n            \"Only owner can call this function.\"\n        );\n        _;\n    }\n\n    /**\n    * Allow the owner of this contract to transfer ownership to another address\n    * @param newOwner The address of the new owner\n    */\n    function transferOwnership(address payable newOwner) external onlyOwner {\n        owner = newOwner;\n    }\n}\n",
   "compiler": {
     "name": "solc",
-    "version": "0.6.1+commit.e6f7d5a4.Emscripten.clang"
+    "version": "0.5.8+commit.23d335f2.Emscripten.clang"
   },
   "networks": {},
-  "schemaVersion": "3.0.20",
+  "schemaVersion": "3.0.14",
   "userdoc": {
     "methods": {
       "transferOwnership(address)": {

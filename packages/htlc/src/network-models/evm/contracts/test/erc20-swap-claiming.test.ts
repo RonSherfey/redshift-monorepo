@@ -8,50 +8,57 @@ import { config, expect } from './lib';
 const ERC20Token = artifacts.require('Dummy18DecimalERC20Token');
 const ERC20Swap = artifacts.require('ERC20Swap');
 
-contract('ERC20Swap - Claiming', () => {
+contract('ERC20Swap - Claiming', accounts => {
   const [validArgs] = config.valid;
   const invalidArgs = config.invalid;
 
-  let erc20Token: Dummy18DecimalERC20TokenInstance;
-  let swap: ERC20SwapInstance;
-
-  beforeEach(async () => {
-    erc20Token = await ERC20Token.new();
-    swap = await ERC20Swap.new();
-
-    await erc20Token.approve(swap.address, validArgs.tokenAmount);
-
-    await swap.fund({
-      orderUUID: validArgs.orderUUID,
-      paymentHash: validArgs.paymentHash,
-      tokenContractAddress: erc20Token.address,
-      tokenAmount: validArgs.tokenAmount,
-    });
+  let erc20TokenInstance: Dummy18DecimalERC20TokenInstance;
+  let erc20SwapInstance: ERC20SwapInstance;
+  before(async () => {
+    // deploy test erc20 token
+    erc20TokenInstance = await ERC20Token.deployed();
+    // deploy erc20 swap contract
+    erc20SwapInstance = await ERC20Swap.deployed();
+    // approve token for transfer
+    await erc20TokenInstance.approve(
+      erc20SwapInstance.address,
+      validArgs.tokenAmount,
+    );
+    // fund swap contract
+    await erc20SwapInstance.fund(
+      validArgs.orderUUID,
+      validArgs.hash,
+      erc20TokenInstance.address,
+      validArgs.tokenAmount,
+    );
   });
 
   it('should revert if the order does not exist', async () => {
     await expect(
-      swap.claim({
-        orderUUID: invalidArgs.orderUUID,
-        paymentPreimage: validArgs.paymentPreimage,
-      }),
-    ).to.be.rejectedWith(/Order does not exist./);
+      erc20SwapInstance.claim(
+        invalidArgs.orderUUID,
+        erc20TokenInstance.address,
+        validArgs.preimage,
+      ),
+    ).to.be.rejectedWith(/VM Exception while processing transaction: revert/);
   });
 
   it('should revert if the preimage is incorrect', async () => {
     await expect(
-      swap.claim({
-        orderUUID: validArgs.orderUUID,
-        paymentPreimage: invalidArgs.paymentPreimage,
-      }),
-    ).to.be.rejectedWith(/Incorrect payment preimage./);
+      erc20SwapInstance.claim(
+        validArgs.orderUUID,
+        erc20TokenInstance.address,
+        invalidArgs.preimage,
+      ),
+    ).to.be.rejectedWith(/VM Exception while processing transaction: revert/);
   });
 
-  it('should succeed if the order exists and the payment preimage is correct', async () => {
-    const res = await swap.claim({
-      orderUUID: validArgs.orderUUID,
-      paymentPreimage: validArgs.paymentPreimage,
-    });
+  it('should succeed if the args are valid', async () => {
+    const res = await erc20SwapInstance.claim(
+      validArgs.orderUUID,
+      erc20TokenInstance.address,
+      validArgs.preimage,
+    );
     expect(res.logs).to.shallowDeepEqual([
       {
         event: 'OrderClaimed',
@@ -60,18 +67,5 @@ contract('ERC20Swap - Claiming', () => {
         },
       },
     ]);
-  });
-
-  it('should revert if already claimed', async () => {
-    await swap.claim({
-      orderUUID: validArgs.orderUUID,
-      paymentPreimage: validArgs.paymentPreimage,
-    });
-    await expect(
-      swap.claim({
-        orderUUID: validArgs.orderUUID,
-        paymentPreimage: validArgs.paymentPreimage,
-      }),
-    ).to.be.rejectedWith(/Order not in claimable state./);
   });
 });

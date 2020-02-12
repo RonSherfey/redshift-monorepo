@@ -31,7 +31,6 @@ export const transactionResponseSchema = {
     },
     logs: {
       type: 'array',
-      minItems: 1,
     },
     status: {
       type: 'string',

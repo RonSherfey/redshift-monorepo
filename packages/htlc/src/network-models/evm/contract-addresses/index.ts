@@ -7,16 +7,16 @@ export interface ContractAddresses {
 
 const subnetToAddresses: { [subnet: string]: ContractAddresses } = {
   [EthereumSubnet.MAINNET]: {
-    etherSwap: '0x2de4ffCFc958395348a8b3F90f48a3BeeaC83Af2',
-    erc20Swap: '0x92a705c983CFaCC40B709CbCfc2B925Dc6B66316',
+    etherSwap: '0x46340430971885eFfA5757eE03356eD228258ac0',
+    erc20Swap: '0x06dedDf1BAE98256a3CD5e8434022E1863E6cfD6',
   },
   [EthereumSubnet.KOVAN_TESTNET]: {
-    etherSwap: '0x3328f84d5Aa084a64f4f703241683E95203aD401',
-    erc20Swap: '0xA681C77e657f3d54E1c16D4749920ACe50Dc93E4',
+    etherSwap: '0xd4589fB5b5ABB44e1A8cb95CfF0Ca9E0e78D9D5d',
+    erc20Swap: '0x99ae80f430462f05F7CcaB5468942D33E4FE12db',
   },
   [EthereumSubnet.GANACHE_SIMNET]: {
-    etherSwap: '0xA4b3e1659c473623287b2cc13b194705cd792525',
-    erc20Swap: '0x2eBb94Cc79D7D0F1195300aAf191d118F53292a8',
+    etherSwap: '0xe704967449b57b2382B7FA482718748c13C63190',
+    erc20Swap: '0x72D5A2213bfE46dF9FbDa08E22f536aC6Ca8907e',
   },
 };
 

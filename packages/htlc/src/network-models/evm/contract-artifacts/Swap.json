@@ -2,54 +2,58 @@
   "contractName": "Swap",
   "abi": [
     {
-      "inputs": [],
-      "name": "owner",
-      "outputs": [
-        {
-          "internalType": "address payable",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
+      "constant": true,
       "inputs": [],
       "name": "refundDelay",
       "outputs": [
         {
-          "internalType": "uint256",
           "name": "",
           "type": "uint256"
         }
       ],
+      "payable": false,
       "stateMutability": "view",
       "type": "function"
     },
     {
+      "constant": true,
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
       "inputs": [
         {
-          "internalType": "address payable",
           "name": "newOwner",
           "type": "address"
         }
       ],
       "name": "transferOwnership",
       "outputs": [],
+      "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
     },
     {
+      "constant": false,
       "inputs": [
         {
-          "internalType": "uint256",
           "name": "delay",
           "type": "uint256"
         }
       ],
       "name": "setRefundDelay",
       "outputs": [],
+      "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
     }
@@ -59,10 +63,10 @@
   "source": "pragma solidity ^0.5.8;\n\nimport \"./Owned.sol\";\n\ncontract Swap is Owned {\n    // Refund delay. Default: 4 hours\n    uint public refundDelay = 4 * 60 * 4;\n\n    // Max possible refund delay: 5 days\n    uint constant MAX_REFUND_DELAY = 60 * 60 * 2 * 4;\n\n    /**\n     * Set the block height at which a refund will successfully process.\n     */\n    function setRefundDelay(uint delay) external onlyOwner {\n        require(delay <= MAX_REFUND_DELAY, \"Delay is too large.\");\n        refundDelay = delay;\n    }\n}\n",
   "compiler": {
     "name": "solc",
-    "version": "0.6.1+commit.e6f7d5a4.Emscripten.clang"
+    "version": "0.5.8+commit.23d335f2.Emscripten.clang"
   },
   "networks": {},
-  "schemaVersion": "3.0.20",
+  "schemaVersion": "3.0.14",
   "userdoc": {
     "methods": {
       "setRefundDelay(uint256)": {
