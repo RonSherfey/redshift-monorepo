@@ -103,7 +103,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
         decompiledTimeLockValue,
         OP_TIMELOCKMETHOD,
         OP_DROP2,
-        OP_DUP3,
+        OP_DUP2,
         OP_HASH1602,
         decompiledRefundPublicKeyHash,
         OP_EQUALVERIFY,
@@ -145,11 +145,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
         throw new Error(SwapError.EXPECTED_OP_TIMELOCKMETHOD);
       }
 
-      if (OP_DROP2 !== DecompiledOpCode.OP_DROP) {
-        throw new Error(SwapError.EXPECTED_OP_DROP);
-      }
-
-      if (OP_DUP3 !== DecompiledOpCode.OP_DUP) {
+      if (OP_DUP2 !== DecompiledOpCode.OP_DUP) {
         throw new Error(SwapError.EXPECTED_OP_DUP);
       }
 
@@ -222,11 +218,19 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           OP_CHECKSIG,
         ] = scriptAssembly;
 
-        if (OP_DUP !== DecompiledOpCode.OP_DUP) {
+        if (
+          OP_DUP !== DecompiledOpCode.OP_DUP ||
+          OP_DUP2 !== DecompiledOpCode.OP_DUP ||
+          OP_DUP3 !== DecompiledOpCode.OP_DUP
+        ) {
           throw new Error(SwapError.EXPECTED_OP_DUP);
         }
 
-        if (OP_HASH160 !== DecompiledOpCode.OP_HASH160) {
+        if (
+          OP_HASH160 !== DecompiledOpCode.OP_HASH160 ||
+          OP_HASH1602 !== DecompiledOpCode.OP_HASH160 ||
+          OP_HASH1603 !== DecompiledOpCode.OP_HASH160
+        ) {
           throw new Error(SwapError.EXPECTED_OP_HASH160);
         }
 
@@ -261,25 +265,6 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           OP_TIMELOCKMETHOD !== DecompiledOpCode.OP_CHECKLOCKTIMEVERIFY
         ) {
           throw new Error(SwapError.EXPECTED_OP_TIMELOCKMETHOD);
-        }
-
-        if (OP_DROP2 !== DecompiledOpCode.OP_DROP) {
-          throw new Error(SwapError.EXPECTED_OP_DROP);
-        }
-
-        if (OP_DUP2 !== DecompiledOpCode.OP_DUP) {
-          throw new Error(SwapError.EXPECTED_OP_DUP);
-        }
-
-        if (OP_DUP3 !== DecompiledOpCode.OP_DUP) {
-          throw new Error(SwapError.EXPECTED_OP_DUP);
-        }
-
-        if (
-          OP_HASH1602 !== DecompiledOpCode.OP_HASH160 ||
-          OP_HASH1603 !== DecompiledOpCode.OP_HASH160
-        ) {
-          throw new Error(SwapError.EXPECTED_OP_HASH160);
         }
 
         if (OP_EQUALVERIFY !== DecompiledOpCode.OP_EQUALVERIFY) {
