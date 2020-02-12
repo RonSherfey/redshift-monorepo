@@ -215,10 +215,9 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
       destinationAddress,
       currentBlockHeight,
       feeTokensPerVirtualByte,
-      refundSecret,
+      [publicKey.toString('hex'), refundSecret],
       privateKey,
       false,
-      publicKey.toString('hex'),
     );
   }
 
@@ -228,20 +227,18 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * @param destinationAddress The address the funds will be sent to
    * @param currentBlockHeight The current block height on the network
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
-   * @param unlock Claim secret (preimage) or refund public key
+   * @param unlock Claim secret (preimage) or refund public key or refund secret _and_ refundPublicKey
    * @param privateKey The private key WIF string
    * @param isClaim Whether it is a claim transaction or not
-   * @param adminRefundPublicKey The public key allowed to retrieve funds via adminRefund
    */
   private buildTransaction(
     utxos: TxOutput[],
     destinationAddress: string,
     currentBlockHeight: number,
     feeTokensPerVirtualByte: number,
-    unlock: string,
+    unlock: string | [string, string],
     privateKey: string,
     isClaim?: boolean,
-    adminRefundPublicKey?: string,
   ): string {
     // Create a new transaction instance
     const tx = new Transaction();
@@ -274,25 +271,14 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     // Add the inputs being spent to the transaction
     this.addInputs(utxos, tx, nSequence, this.generateInputScript());
 
-    let fee;
     // Estimate the tx fee
-    if (adminRefundPublicKey) {
-      fee = estimateFee(
-        this.redeemScript,
-        utxos,
-        [unlock, adminRefundPublicKey],
-        tx.weight(),
-        feeTokensPerVirtualByte,
-      );
-    } else {
-      fee = estimateFee(
-        this.redeemScript,
-        utxos,
-        unlock,
-        tx.weight(),
-        feeTokensPerVirtualByte,
-      );
-    }
+    const fee = estimateFee(
+      this.redeemScript,
+      utxos,
+      unlock,
+      tx.weight(),
+      feeTokensPerVirtualByte,
+    );
 
     // Exit early when the ratio of the amount spent on fees would be too high
     const dustRatio = 1 / 3; // Fee exceeds one third of tx value
@@ -305,17 +291,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     out.value -= fee;
 
     // Set the signed witnesses
-    if (adminRefundPublicKey) {
-      this.addWitnessScripts(
-        utxos,
-        privateKey,
-        unlock,
-        tx,
-        adminRefundPublicKey,
-      );
-    } else {
-      this.addWitnessScripts(utxos, privateKey, unlock, tx);
-    }
+    this.addWitnessScripts(utxos, privateKey, unlock, tx);
 
     return tx.toHex();
   }
@@ -361,16 +337,14 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * have been added. Otherwise, you'll end up with a different sig hash.
    * @param utxos The utxos we're spending
    * @param privateKey The private key WIF string
-   * @param unlock Claim secret (preimage) or refund public key
+   * @param unlock Claim secret (preimage) or refund public key or refund secret _and_ refund public key
    * @param tx The tx instance
-   * @param adminRefundPublicKey The public key allowed to retrieve funds via adminRefund
    */
   private addWitnessScripts(
     utxos: TxOutput[],
     privateKey: string,
-    unlock: string,
+    unlock: string | [string, string],
     tx: Transaction,
-    adminRefundPublicKey?: string,
   ) {
     // Create the signing key from the WIF string
     const signingKey = ECPair.fromWIF(
@@ -392,13 +366,11 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
 
       let witness;
       // if we are adminRefunding, we need another item on the stack
-      if (adminRefundPublicKey) {
-        witness = [
-          signature,
-          Buffer.from(adminRefundPublicKey, 'hex'),
-          Buffer.from(unlock, 'hex'),
-          this.redeemScriptBuffer,
-        ];
+      if (Array.isArray(unlock)) {
+        const [publicKey, refundSecret] = unlock.map(i =>
+          Buffer.from(i, 'hex'),
+        );
+        witness = [signature, publicKey, refundSecret, this.redeemScriptBuffer];
       } else {
         witness = [
           signature,
