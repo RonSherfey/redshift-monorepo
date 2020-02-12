@@ -62,7 +62,7 @@ const networkSpecificConfigs = {
       valid: {
         absoluteTimeLock: {
           redeemScript:
-            '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256776a9145c86f3f039e4b4f0bd46780dcc73e45db404068387636702e10bb1687576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
+            '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256776a9145c86f3f039e4b4f0bd46780dcc73e45db4040683876402e10bb1687576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
           htlc: {
             args: {
               claimerPublicKey:
@@ -88,25 +88,25 @@ const networkSpecificConfigs = {
               timelockType: UTXO.LockType.ABSOLUTE,
               timelockValue: 3041,
               p2shOutputScript:
-                'a914e67dd5271e12612c99e7c9a4ce886343dbae8b0587',
-              p2shAddress: 'rravGUvrtgnGMm7HNAtoVqic5NHAMuQNX8',
-              p2shP2wshAddress: 'rp3asdrM68t9JNw3ZayhRHwQujxh8Mef9u',
+                'a9146770d4a681e134dce5b39dc2b319bc2af25fbc8e87',
+              p2shAddress: 'rf18sjADU2pGHQkgq2t5anbuF38eSDXDcx',
+              p2shP2wshAddress: 'rax5LMmSgk3rYih3ycv8s9zFeoMgzunwmp',
               p2shP2wshOutputScript:
-                'a914caa07f3d8ff2d3286d2ea6d5ca1fac0f11ae31dc87',
+                'a9143afc1fb7da97e69395f4e18f695138760f642ccb87',
               p2wshAddress:
-                'sb1qjjupwr987zq3qf9s5pefdjryfh9a535saqkd876e2mel7c33fk7seu87zd',
+                'sb1qj9jxecc09z2jlauqyrlswntnddrsvpym8r6tyc3nfxjtl28gfm3qc4e4w7',
               p2wshOutputScript:
-                '002094b8170ca7f0811024b0a07296c8644dcbda4690e82cd3fb5956f3ff62314dbd',
+                '002091646ce30f28952ff78020ff074d736b4706049b38f4b2623349a4bfa8e84ee2',
               refundP2wpkhAddress: 'sb1q8uv90v7m39d56jq6gmj6qy5uk2cy0qwgfu40g6',
               refundP2pkhAddress: 'ST3cmHBZSa5KsDrbgFMmDaj78DhDa9US3J',
               redeemScript:
-                '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256776a9145c86f3f039e4b4f0bd46780dcc73e45db404068387636702e10bb1687576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
+                '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256776a9145c86f3f039e4b4f0bd46780dcc73e45db4040683876402e10bb1687576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
             },
           },
         },
         relativeTimeLock: {
           redeemScript:
-            '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256776a9145c86f3f039e4b4f0bd46780dcc73e45db40406838763670114b2687576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
+            '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256776a9145c86f3f039e4b4f0bd46780dcc73e45db404068387640114b2687576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
           htlc: {
             args: {
               claimerPublicKey:
@@ -132,19 +132,19 @@ const networkSpecificConfigs = {
               timelockType: UTXO.LockType.RELATIVE,
               timelockValue: 20,
               p2shOutputScript:
-                'a9140f9cc96530dfb02f0aaa54706b7fdc62211a9d5387',
-              p2shAddress: 'rWzk4xx1EEfphCHfU2GC5fut4TXVmVL9Rh',
-              p2shP2wshAddress: 'rpLJf4uGMBNHuunXMiG2hJCpRBQHNGkHkZ',
+                'a9147c0c4664f688d45745a85408588336af26d4b98d87',
+              p2shAddress: 'rgt6c2NaCBuFjGZSg46J7FxKJRzvRifWwa',
+              p2shP2wshAddress: 'riNBRspCJXF4jSpEExTgdnrX4zCcmY2HCJ',
               p2shP2wshOutputScript:
-                'a914cdca0807f3608d3b6095f8470436800e2c37bc0c87',
+                'a9148c54134fa9798c9a6dee7b1d45d6a5fb63ca37f887',
               p2wshAddress:
-                'sb1qjl7jrekhwwkvajg9p0xnpe94c5xmayzkzgcgq55udkm66qyue40ql4jj25',
+                'sb1q6202tcsvefl7qc7p5xlesgu43e72f6frn4s68ejw0tjz4u5cu2kq8vs8fv',
               p2wshOutputScript:
-                '002097fd21e6d773accec9050bcd30e4b5c50dbe9056123080529c6db7ad009ccd5e',
+                '0020d29ea5e20cca7fe063c1a1bf9823958e7ca4e9239d61a3e64e7ae42af298e2ac',
               refundP2wpkhAddress: 'sb1q8uv90v7m39d56jq6gmj6qy5uk2cy0qwgfu40g6',
               refundP2pkhAddress: 'ST3cmHBZSa5KsDrbgFMmDaj78DhDa9US3J',
               redeemScript:
-                '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256776a9145c86f3f039e4b4f0bd46780dcc73e45db40406838763670114b2687576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
+                '76a914c15949a2e2a414b5c641f32c4c2ee07be644e165876375210398c9a44bed9f59c6041a574602aab0af6a08f3f0fb847fd9a167f7afd71b8d256776a9145c86f3f039e4b4f0bd46780dcc73e45db404068387640114b2687576a9143f1857b3db895b4d481a46e5a0129cb2b04781c88868ac',
             },
           },
         },

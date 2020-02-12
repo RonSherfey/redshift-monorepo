@@ -194,7 +194,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
       break;
 
     // no adminRefund included in script
-    case 24:
+    case 23:
       {
         const [
           OP_DUP,
@@ -209,8 +209,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           OP_HASH1602,
           decompiledRefundHashRipemd160,
           OP_EQUAL2,
-          OP_IF2,
-          OP_ELSE2,
+          OP_NOTIF,
           decompiledTimeLockValue,
           OP_TIMELOCKMETHOD,
           OP_ENDIF,
@@ -238,10 +237,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           throw new Error(SwapError.EXPECTED_OP_EQUAL);
         }
 
-        if (
-          OP_IF !== DecompiledOpCode.OP_IF ||
-          OP_IF2 !== DecompiledOpCode.OP_IF
-        ) {
+        if (OP_IF !== DecompiledOpCode.OP_IF) {
           throw new Error(SwapError.EXPECTED_OP_IF);
         }
 
@@ -252,11 +248,12 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           throw new Error(SwapError.EXPECTED_OP_DROP);
         }
 
-        if (
-          OP_ELSE !== DecompiledOpCode.OP_ELSE ||
-          OP_ELSE2 !== DecompiledOpCode.OP_ELSE
-        ) {
+        if (OP_ELSE !== DecompiledOpCode.OP_ELSE) {
           throw new Error(SwapError.EXPECTED_OP_ELSE);
+        }
+
+        if (OP_NOTIF !== DecompiledOpCode.OP_NOTIF) {
+          throw new Error(SwapError.EXPECTED_OP_NOTIF);
         }
 
         if (
