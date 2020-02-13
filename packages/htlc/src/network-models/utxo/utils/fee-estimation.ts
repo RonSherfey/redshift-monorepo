@@ -7,7 +7,7 @@ const sequenceLength = 4; // Sequence Number Byte Length
 
 /**
  * Estimate the weight of a transaction after signed SegWit inputs are added
- * @param unlock Claim secret (preimage) or refund public key
+ * @param unlock Claim secret (preimage) OR refund public key OR refund public key AND refund secret
  * @param utxos The funding utxos
  * @param weight Weight Without Signed Inputs Number
  * @param redeem The redeem script buffer
@@ -64,7 +64,7 @@ export function estimateWeightWithInputs(
  * Estimate the transaction fee for a specific tx using target fee
  * per kilobyte of the passed network and the transaction's weight
  * @param swap The swap stored in Redis
- * @param unlock Claim Preimage, Refund Pubkey, Dummy Preimage Hex String
+ * @param unlock Claim secret (preimage) OR refund public key OR refund public key AND refund secret
  * @param txWeight The transaction's weight in weight units
  * @param daemon The target daemon. Different daemon's can support different RPC methods
  */

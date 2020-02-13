@@ -66,6 +66,8 @@ function getTimelockValue(timelock: UTXO.TimeLock) {
 
 /**
  * Decompiles a redeem script and constructs a Details object
+ * Note: All scripts lock to a refund public key hash, which allows users
+ * to provide a refund address, rather than public key, for UX purposes
  * @param subnet The network subnet the redeem script will execute on
  * @param redeemScriptHex The hex representation of the redeem script
  * @throws If the redeemScriptHex is of unknown length or contains unexpected OPs
@@ -87,7 +89,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
   let timelock: UTXO.TimeLock;
   let refundPublicKeyHash: string;
 
-  // all scripts assume public key hash redeem swap script
+  // Admin refund disabled
   switch (scriptAssembly.length) {
     case 17:
       const [
@@ -188,7 +190,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
       );
       break;
 
-    // no adminRefund included in script
+    // Admin refund enabled
     case 23:
       {
         const [

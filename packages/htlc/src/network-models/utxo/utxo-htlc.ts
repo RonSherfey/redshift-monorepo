@@ -194,7 +194,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * @param destinationAddress The address the funds will be refunded to
    * @param currentBlockHeight The current block height on the network
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
-   * @param refundSecret The adminRefund secret used to offer instant refunds
+   * @param refundSecret The admin refund secret used to offer instant refunds
    * @param privateKey The private key WIF string
    */
   public adminRefund(
@@ -227,7 +227,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * @param destinationAddress The address the funds will be sent to
    * @param currentBlockHeight The current block height on the network
    * @param feeTokensPerVirtualByte The fee per byte (satoshi/byte)
-   * @param unlock Claim secret (preimage) or refund public key or refund secret _and_ refundPublicKey
+   * @param unlock Claim secret (preimage) OR refund public key OR refund public key AND refund secret
    * @param privateKey The private key WIF string
    * @param isClaim Whether it is a claim transaction or not
    */
@@ -337,7 +337,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
    * have been added. Otherwise, you'll end up with a different sig hash.
    * @param utxos The utxos we're spending
    * @param privateKey The private key WIF string
-   * @param unlock Claim secret (preimage) or refund public key or refund secret _and_ refund public key
+   * @param unlock Claim secret (preimage) OR refund public key OR refund public key AND refund secret
    * @param tx The tx instance
    */
   private addWitnessScripts(
@@ -365,7 +365,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
       );
 
       let witness;
-      // if we are adminRefunding, we need another item on the stack
+      // If admin refunding, the public key AND refund secret must be added to the stack
       if (Array.isArray(unlock)) {
         const [publicKey, refundSecret] = unlock.map(i =>
           Buffer.from(i, 'hex'),
