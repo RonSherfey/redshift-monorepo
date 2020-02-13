@@ -62,45 +62,48 @@ function addressToPublicKeyHash(addr: string): string {
 export function createSwapRedeemScript(
   scriptArgs: UTXO.RedeemScriptArgs,
 ): string {
-  const refundPublicKeyHash = addressToPublicKeyHash(scriptArgs.refundAddress);
+  const {
+    refundAddress,
+    claimerPublicKey,
+    paymentHash,
+    refundHash,
+    timelock,
+  } = scriptArgs;
+  const refundPublicKeyHash = addressToPublicKeyHash(refundAddress);
   const [
     claimerPublicKeyBuffer,
     paymentHashBuffer,
     refundPublicKeyHashBuffer,
-  ] = [
-    scriptArgs.claimerPublicKey,
-    scriptArgs.paymentHash,
-    refundPublicKeyHash,
-  ].map(i => Buffer.from(i, 'hex'));
-
-  let refundHashBuffer;
-  let refundHashRipemd160Buffer;
-  if (scriptArgs.refundHash) {
-    refundHashBuffer = Buffer.from(scriptArgs.refundHash, 'hex');
-    refundHashRipemd160Buffer = crypto.ripemd160(refundHashBuffer);
-  }
-
+  ] = [claimerPublicKey, paymentHash, refundPublicKeyHash].map(i =>
+    Buffer.from(i, 'hex'),
+  );
   const paymentHashRipemd160Buffer = crypto.ripemd160(paymentHashBuffer);
 
-  // set the correct timelock values/method for swapScript
+  // Set the correct timelock values/method for swap script
   let timelockValue: Buffer;
   let timelockMethod: number;
-  if (scriptArgs.timelock.type === UTXO.LockType.RELATIVE) {
-    timelockValue = script.number.encode(
-      bip68.encode({ blocks: scriptArgs.timelock.blockBuffer }),
-    );
-    timelockMethod = opcodes.OP_CHECKSEQUENCEVERIFY;
-  } else if (scriptArgs.timelock.type === UTXO.LockType.ABSOLUTE) {
-    timelockValue = script.number.encode(
-      bip65.encode({ blocks: scriptArgs.timelock.blockHeight }),
-    );
-    timelockMethod = opcodes.OP_CHECKLOCKTIMEVERIFY;
-  } else {
-    throw new Error(SwapError.INVALID_TIMELOCK_METHOD);
+  switch (timelock.type) {
+    case UTXO.LockType.RELATIVE:
+      timelockValue = script.number.encode(
+        bip68.encode({ blocks: timelock.blockBuffer }),
+      );
+      timelockMethod = opcodes.OP_CHECKSEQUENCEVERIFY;
+      break;
+    case UTXO.LockType.ABSOLUTE:
+      timelockValue = script.number.encode(
+        bip65.encode({ blocks: timelock.blockHeight }),
+      );
+      timelockMethod = opcodes.OP_CHECKLOCKTIMEVERIFY;
+      break;
+    default:
+      throw new Error(SwapError.INVALID_TIMELOCK_METHOD);
   }
 
   let swapScript: (number | Buffer)[];
-  if (refundHashRipemd160Buffer) {
+  if (refundHash) {
+    const refundHashRipemd160Buffer = crypto.ripemd160(
+      Buffer.from(refundHash, 'hex'),
+    );
     swapScript = [
       opcodes.OP_DUP,
       opcodes.OP_HASH160,
