@@ -8,7 +8,8 @@ export namespace UTXO {
     paymentHashRipemd160: string; // ripemd-160 hash of the payment hash hex string
     refundHashRipemd160?: string; // ripemd-160 hash of the refund hash hex string
     claimerPublicKey: string; // claim public key hex string
-    refundPublicKeyHash: string; // refund pubkey hash string
+    refundPublicKeyHash?: string; // refund pubkey hash string
+    refundPublicKey?: string; // refund pubkey string
     timelockType: LockType; // timelock type (absolute or relative)
     timelockValue: number; // timelock value (block height or block buffer)
     p2shOutputScript: string; // pay to script hash output hex string
@@ -26,7 +27,8 @@ export namespace UTXO {
     claimerPublicKey: string;
     paymentHash: string;
     refundHash?: string;
-    refundAddress: string;
+    refundPublicKey?: string; // refund pubkey string
+    refundAddress?: string;
     timelock: TimeLock;
   }
 
