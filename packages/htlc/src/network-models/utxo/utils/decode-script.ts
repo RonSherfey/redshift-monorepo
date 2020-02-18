@@ -87,8 +87,8 @@ export function getSwapRedeemScriptDetails<N extends Network>(
   let paymentHashRipemd160: string;
   let refundHashRipemd160: string | undefined;
   let timelock: UTXO.TimeLock;
-  let refundPublicKeyHash: string | undefined = undefined;
-  let refundPublicKey: string | undefined = undefined;
+  let refundPublicKeyHash: string | undefined;
+  let refundPublicKey: string | undefined;
 
   // Admin refund disabled
   switch (scriptAssembly.length) {
@@ -573,11 +573,15 @@ export function getSwapRedeemScriptDetails<N extends Network>(
   }
 
   if (refundPublicKeyHash) {
-    decodedScript.refundPublicKeyHash = refundPublicKeyHash;
+    (decodedScript as UTXO.DetailsPublicKeyHash<
+      Network
+    >).refundPublicKeyHash = refundPublicKeyHash;
   }
 
   if (refundPublicKey) {
-    decodedScript.refundPublicKey = refundPublicKey;
+    (decodedScript as UTXO.DetailsPublicKey<
+      Network
+    >).refundPublicKey = refundPublicKey;
   }
 
   return decodedScript;

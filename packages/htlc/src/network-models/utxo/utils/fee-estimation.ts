@@ -13,15 +13,11 @@ const sequenceLength = 4; // Sequence Number Byte Length
  * @param redeem The redeem script buffer
  */
 export function estimateWeightWithInputs(
-  unlock: string | [string, string] | undefined,
   utxos: TxOutput[],
   weight: number,
   redeem: Buffer,
+  unlock?: string | [string, string],
 ): number {
-  // if (!isDefined(unlock)) {
-  //   throw new Error(WeightEstimationError.EXPECTED_UNLOCK_ELEMENT);
-  // }
-
   if (!isArray(utxos)) {
     throw new Error(WeightEstimationError.EXPECTED_UTXOS);
   }
@@ -30,48 +26,29 @@ export function estimateWeightWithInputs(
     throw new Error(WeightEstimationError.EXPECTED_UNSIGNED_TX_WEIGHT);
   }
 
-  let feeEstimation: number;
+  const feeEstimateFactors = [shortPushdataLength, ecdsaSignatureLength];
+
   // if adminRefund, unlock is an array of the publicKey and refundSecret
   if (Array.isArray(unlock)) {
     const [refundSecret, publicKey] = unlock;
-    feeEstimation = utxos.reduce(sum => {
-      return [
-        shortPushdataLength,
-        ecdsaSignatureLength,
-        shortPushdataLength,
-        Buffer.from(publicKey, 'hex').length,
-        shortPushdataLength,
-        Buffer.from(refundSecret, 'hex').length,
-        sequenceLength,
-        redeem.length,
-        sum,
-      ].reduce((sum, n) => sum + n);
-    }, weight);
+    feeEstimateFactors.push(
+      shortPushdataLength,
+      Buffer.from(publicKey, 'hex').length,
+      shortPushdataLength,
+      Buffer.from(refundSecret, 'hex').length,
+    );
   } else if (unlock) {
-    feeEstimation = utxos.reduce(sum => {
-      return [
-        shortPushdataLength,
-        ecdsaSignatureLength,
-        !!unlock ? shortPushdataLength : [].length,
-        Buffer.from(unlock, 'hex').length,
-        sequenceLength,
-        redeem.length,
-        sum,
-      ].reduce((sum, n) => sum + n);
-    }, weight);
-  } else {
-    feeEstimation = utxos.reduce(sum => {
-      return [
-        shortPushdataLength,
-        ecdsaSignatureLength,
-        sequenceLength,
-        redeem.length,
-        sum,
-      ].reduce((sum, n) => sum + n);
-    }, weight);
+    feeEstimateFactors.push(
+      !!unlock ? shortPushdataLength : [].length,
+      Buffer.from(unlock, 'hex').length,
+    );
   }
 
-  return feeEstimation;
+  feeEstimateFactors.push(sequenceLength, redeem.length);
+
+  return utxos.reduce(sum => {
+    return [...feeEstimateFactors, sum].reduce((sum, n) => sum + n);
+  }, weight);
 }
 
 /**
@@ -85,16 +62,16 @@ export function estimateWeightWithInputs(
 export function estimateFee(
   redeemScript: string,
   utxos: TxOutput[],
-  unlock: string | [string, string] | undefined,
   txWeight: number,
   feeTokensPerVirtualByte: number,
+  unlock?: string | [string, string],
 ) {
   // Guess at the final weight of the transaction for fee/vbyte calculation
   const anticipatedWeight = estimateWeightWithInputs(
-    unlock,
     utxos,
     txWeight,
     Buffer.from(redeemScript, 'hex'),
+    unlock,
   );
 
   const vRatio = 4; // A witness byte weighs one weight unit; compared to four non-witness weight units.

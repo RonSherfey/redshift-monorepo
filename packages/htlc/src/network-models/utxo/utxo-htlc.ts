@@ -25,6 +25,8 @@ import {
   estimateFee,
   getBitcoinJSNetwork,
   getSwapRedeemScriptDetails,
+  isRefundPublicKeyHashRedeemScript,
+  isRefundPublicKeyRedeemScript,
   toReversedByteOrderBuffer,
 } from './utils';
 
@@ -179,10 +181,11 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
       getBitcoinJSNetwork(this._network, this._subnet),
     );
 
+    // is refundPublicKeyDetails
     let unlock: string | undefined = undefined;
-    if (this._details.refundPublicKey) {
-      unlock = this._details.refundPublicKeyHash;
-    } else if (this._details.refundPublicKeyHash) {
+    if (isRefundPublicKeyRedeemScript(this._details)) {
+      unlock = undefined;
+    } else if (isRefundPublicKeyHashRedeemScript(this.details)) {
       unlock = publicKey.toString('hex');
     }
 
@@ -220,7 +223,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
 
     // if publicKey, only put refundSecret on stack
     let unlock: string | [string, string];
-    if (this._details.refundPublicKey) {
+    if (isRefundPublicKeyRedeemScript(this._details)) {
       unlock = refundSecret;
     } else {
       unlock = [publicKey.toString('hex'), refundSecret];
@@ -291,9 +294,9 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     const fee = estimateFee(
       this.redeemScript,
       utxos,
-      unlock,
       tx.weight(),
       feeTokensPerVirtualByte,
+      unlock,
     );
 
     // Exit early when the ratio of the amount spent on fees would be too high
@@ -387,8 +390,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
         const [publicKey, refundSecret] = unlock.map(i =>
           Buffer.from(i, 'hex'),
         );
-        witness.push(publicKey);
-        witness.push(refundSecret);
+        witness.push(publicKey, refundSecret);
       } else if (unlock) {
         witness.push(Buffer.from(unlock, 'hex'));
       }
