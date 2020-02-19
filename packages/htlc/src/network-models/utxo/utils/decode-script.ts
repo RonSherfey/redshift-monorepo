@@ -5,8 +5,8 @@ import {
   SwapError,
 } from '@radar/redshift-types';
 import Ajv from 'ajv';
+import AjvErrors from 'ajv-errors';
 import { payments, script } from 'bitcoinjs-lib';
-// @ts-ignore
 import {
   uTXOAdminRefundPubKeyHashRedeemScriptSchema,
   uTXOAdminRefundPubKeyRedeemScriptSchema,
@@ -18,7 +18,7 @@ import { getBitcoinJSNetwork } from './bitcoinjs-lib';
 import { makeHexEven } from './format-utils';
 
 const ajv = new Ajv({ allErrors: true, schemaId: 'auto' });
-require('ajv-errors')(ajv);
+AjvErrors(ajv);
 /**
  * Build the timelock object using the decompiled timelock opcode and value
  * @param timelockValue The timelock value
@@ -111,7 +111,7 @@ export function getSwapRedeemScriptDetails<N extends Network>(
           scriptAssembly,
         );
         if (!valid && ajv.errors) {
-          throw new Error(ajv.errors && ajv.errors[0].message);
+          throw new Error(ajv.errors[0].message);
         }
 
         claimerPublicKey = scriptAssembly[6];

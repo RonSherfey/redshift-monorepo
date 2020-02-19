@@ -107,4 +107,4 @@ export const uTXOAdminRefundPubKeyRedeemScriptSchema = {
       errorMessage: SwapError.EXPECTED_OP_CHECKSIG,
     },
   ],
-} as any;
+};

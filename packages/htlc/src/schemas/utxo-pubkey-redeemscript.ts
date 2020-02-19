@@ -76,4 +76,4 @@ export const uTXOPubKeyRedeemScriptSchema = {
       errorMessage: SwapError.EXPECTED_OP_CHECKSIG,
     },
   ],
-} as any;
+};

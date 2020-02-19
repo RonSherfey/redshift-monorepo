@@ -15,6 +15,7 @@
     "@ethersproject/abi": "^5.0.0-beta.144",
     "@radar/redshift-types": "^0.5.12",
     "@radar/redshift-utils": "^0.1.13",
+    "@types/ajv-errors": "^1.0.2",
     "@types/big.js": "^4.0.5",
     "@types/bip32": "^1.0.1",
     "@types/bitcoinjs-lib": "4.0.0",

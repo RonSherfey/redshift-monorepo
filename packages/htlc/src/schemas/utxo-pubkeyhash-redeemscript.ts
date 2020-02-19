@@ -1,7 +1,7 @@
 import { DecompiledOpCode, SwapError } from '@radar/redshift-types';
 
-export const uTXOAdminRefundPubKeyHashRedeemScriptSchema = {
-  id: '/UTXOAdminRefundPubKeyHashRedeemScriptSchema',
+export const uTXOPubKeyHashRedeemScriptSchema = {
+  id: '/UTXOPubKeyHashRedeemScriptSchema',
   type: 'array',
   items: [
     {
@@ -45,30 +45,6 @@ export const uTXOAdminRefundPubKeyHashRedeemScriptSchema = {
       errorMessage: SwapError.EXPECTED_OP_ELSE,
     },
     {
-      type: 'string',
-      enum: [DecompiledOpCode.OP_DUP],
-      errorMessage: SwapError.EXPECTED_OP_DUP,
-    },
-    {
-      type: 'string',
-      enum: [DecompiledOpCode.OP_HASH160],
-      errorMessage: SwapError.EXPECTED_OP_HASH160,
-    },
-    {
-      // decompiledRefundHashRipemd160
-      type: 'string',
-    },
-    {
-      type: 'string',
-      enum: [DecompiledOpCode.OP_EQUAL],
-      errorMessage: SwapError.EXPECTED_OP_EQUAL,
-    },
-    {
-      type: 'string',
-      enum: [DecompiledOpCode.OP_NOTIF],
-      errorMessage: SwapError.EXPECTED_OP_NOTIF,
-    },
-    {
       // decompiledTimeLockValue
       type: 'string',
     },
@@ -79,11 +55,6 @@ export const uTXOAdminRefundPubKeyHashRedeemScriptSchema = {
         DecompiledOpCode.OP_CHECKLOCKTIMEVERIFY,
       ],
       errorMessage: SwapError.INVALID_TIMELOCK_METHOD,
-    },
-    {
-      type: 'string',
-      enum: [DecompiledOpCode.OP_ENDIF],
-      errorMessage: SwapError.EXPECTED_OP_ENDIF,
     },
     {
       type: 'string',
@@ -103,8 +74,7 @@ export const uTXOAdminRefundPubKeyHashRedeemScriptSchema = {
     {
       // decompiledRefundPublicKeyHash
       type: 'string',
-      length: 66,
-      errorMessage: 'Invalid Refund Public Key',
+      length: 40,
     },
     {
       type: 'string',
@@ -122,4 +92,4 @@ export const uTXOAdminRefundPubKeyHashRedeemScriptSchema = {
       errorMessage: SwapError.EXPECTED_OP_CHECKSIG,
     },
   ],
-} as any;
+};
