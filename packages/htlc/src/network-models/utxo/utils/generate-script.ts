@@ -73,7 +73,9 @@ export function createSwapRedeemScript(
 
   if (!refundAddress && !refundPublicKey) {
     throw new Error('refundAddress or refundPublicKey required');
-  } else if (refundAddress && refundPublicKey) {
+  }
+
+  if (refundAddress && refundPublicKey) {
     throw new Error(
       'Only one of either refundAddress or refundPublicKey should be provided',
     );
@@ -215,7 +217,7 @@ export function createSwapRedeemScript(
     }
   }
 
-  if (!!!swapScript) {
+  if (!swapScript) {
     throw new Error('Invalid Swap Script Options');
   }
 

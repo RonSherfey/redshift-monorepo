@@ -181,11 +181,8 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
       getBitcoinJSNetwork(this._network, this._subnet),
     );
 
-    // is refundPublicKeyDetails
     let unlock: string | undefined = undefined;
-    if (isRefundPublicKeyRedeemScript(this._details)) {
-      unlock = undefined;
-    } else if (isRefundPublicKeyHashRedeemScript(this.details)) {
+    if (isRefundPublicKeyHashRedeemScript(this.details)) {
       unlock = publicKey.toString('hex');
     }
 
