@@ -25,6 +25,8 @@ import {
   estimateFee,
   getBitcoinJSNetwork,
   getSwapRedeemScriptDetails,
+  isRefundPublicKeyHashRedeemScript,
+  isRefundPublicKeyRedeemScript,
   toReversedByteOrderBuffer,
 } from './utils';
 
@@ -178,12 +180,18 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
       privateKey,
       getBitcoinJSNetwork(this._network, this._subnet),
     );
+
+    let unlock: string | undefined = undefined;
+    if (isRefundPublicKeyHashRedeemScript(this.details)) {
+      unlock = publicKey.toString('hex');
+    }
+
     return this.buildTransaction(
       utxos,
       destinationAddress,
       currentBlockHeight,
       feeTokensPerVirtualByte,
-      publicKey.toString('hex'),
+      unlock,
       privateKey,
     );
   }
@@ -210,12 +218,20 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
       getBitcoinJSNetwork(this._network, this._subnet),
     );
 
+    // if publicKey, only put refundSecret on stack
+    let unlock: string | [string, string];
+    if (isRefundPublicKeyRedeemScript(this._details)) {
+      unlock = refundSecret;
+    } else {
+      unlock = [publicKey.toString('hex'), refundSecret];
+    }
+
     return this.buildTransaction(
       utxos,
       destinationAddress,
       currentBlockHeight,
       feeTokensPerVirtualByte,
-      [publicKey.toString('hex'), refundSecret],
+      unlock,
       privateKey,
       false,
     );
@@ -236,7 +252,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     destinationAddress: string,
     currentBlockHeight: number,
     feeTokensPerVirtualByte: number,
-    unlock: string | [string, string],
+    unlock: string | [string, string] | undefined,
     privateKey: string,
     isClaim?: boolean,
   ): string {
@@ -275,9 +291,9 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     const fee = estimateFee(
       this.redeemScript,
       utxos,
-      unlock,
       tx.weight(),
       feeTokensPerVirtualByte,
+      unlock,
     );
 
     // Exit early when the ratio of the amount spent on fees would be too high
@@ -291,7 +307,7 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
     out.value -= fee;
 
     // Set the signed witnesses
-    this.addWitnessScripts(utxos, privateKey, unlock, tx);
+    this.addWitnessScripts(utxos, privateKey, tx, unlock);
 
     return tx.toHex();
   }
@@ -343,8 +359,8 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
   private addWitnessScripts(
     utxos: TxOutput[],
     privateKey: string,
-    unlock: string | [string, string],
     tx: Transaction,
+    unlock?: string | [string, string],
   ) {
     // Create the signing key from the WIF string
     const signingKey = ECPair.fromWIF(
@@ -364,20 +380,19 @@ export class UtxoHtlc<N extends Network> extends BaseHtlc<N> {
         Transaction.SIGHASH_ALL,
       );
 
-      let witness;
+      const witness = [signature];
+
       // If admin refunding, the public key AND refund secret must be added to the stack
       if (Array.isArray(unlock)) {
         const [publicKey, refundSecret] = unlock.map(i =>
           Buffer.from(i, 'hex'),
         );
-        witness = [signature, publicKey, refundSecret, this.redeemScriptBuffer];
-      } else {
-        witness = [
-          signature,
-          Buffer.from(unlock, 'hex'),
-          this.redeemScriptBuffer,
-        ];
+        witness.push(publicKey, refundSecret);
+      } else if (unlock) {
+        witness.push(Buffer.from(unlock, 'hex'));
       }
+
+      witness.push(this.redeemScriptBuffer);
       tx.setWitness(i, witness);
     });
   }

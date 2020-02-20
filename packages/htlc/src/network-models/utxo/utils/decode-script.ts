@@ -4,19 +4,29 @@ import {
   SubnetMap,
   SwapError,
 } from '@radar/redshift-types';
+import Ajv from 'ajv';
+import AjvErrors from 'ajv-errors';
 import { payments, script } from 'bitcoinjs-lib';
+import {
+  uTXOAdminRefundPubKeyHashRedeemScriptSchema,
+  uTXOAdminRefundPubKeyRedeemScriptSchema,
+  uTXOPubKeyHashRedeemScriptSchema,
+  uTXOPubKeyRedeemScriptSchema,
+} from '../../../schemas';
 import { UTXO } from '../../../types';
 import { getBitcoinJSNetwork } from './bitcoinjs-lib';
 import { makeHexEven } from './format-utils';
 
+const ajv = new Ajv({ allErrors: true, schemaId: 'auto' });
+AjvErrors(ajv);
 /**
  * Build the timelock object using the decompiled timelock opcode and value
- * @param timelockOpcode The timelock opcode
  * @param timelockValue The timelock value
+ * @param timelockOpcode The timelock opcode
  */
 function getTimeLockObjectFromDecompiledOpcode(
-  timelockOpcode: DecompiledOpCode,
   timelockValue: string,
+  timelockOpcode: string,
 ): UTXO.TimeLock {
   switch (timelockOpcode) {
     case DecompiledOpCode.OP_CHECKSEQUENCEVERIFY: {
@@ -68,6 +78,7 @@ function getTimelockValue(timelock: UTXO.TimeLock) {
  * Decompiles a redeem script and constructs a Details object
  * Note: All scripts lock to a refund public key hash, which allows users
  * to provide a refund address, rather than public key, for UX purposes
+ * @param network The network the redeem script will execute on
  * @param subnet The network subnet the redeem script will execute on
  * @param redeemScriptHex The hex representation of the redeem script
  * @throws If the redeemScriptHex is of unknown length or contains unexpected OPs
@@ -87,228 +98,97 @@ export function getSwapRedeemScriptDetails<N extends Network>(
   let paymentHashRipemd160: string;
   let refundHashRipemd160: string | undefined;
   let timelock: UTXO.TimeLock;
-  let refundPublicKeyHash: string;
+  let refundPublicKeyHash: string | undefined;
+  let refundPublicKey: string | undefined;
 
   // Admin refund disabled
   switch (scriptAssembly.length) {
-    case 17:
-      const [
-        OP_DUP,
-        OP_HASH160,
-        decompiledPaymentHashRipemd160,
-        OP_EQUAL,
-        OP_IF,
-        OP_DROP,
-        decompiledClaimerPublicKey,
-        OP_ELSE,
-        decompiledTimeLockValue,
-        OP_TIMELOCKMETHOD,
-        OP_DROP2,
-        OP_DUP2,
-        OP_HASH1602,
-        decompiledRefundPublicKeyHash,
-        OP_EQUALVERIFY,
-        OP_ENDIF,
-        OP_CHECKSIG,
-      ] = scriptAssembly;
-
-      if (OP_DUP !== DecompiledOpCode.OP_DUP) {
-        throw new Error(SwapError.EXPECTED_OP_DUP);
-      }
-
-      if (OP_HASH160 !== DecompiledOpCode.OP_HASH160) {
-        throw new Error(SwapError.EXPECTED_OP_HASH160);
-      }
-
-      if (OP_EQUAL !== DecompiledOpCode.OP_EQUAL) {
-        throw new Error(SwapError.EXPECTED_OP_EQUAL);
-      }
-
-      if (OP_IF !== DecompiledOpCode.OP_IF) {
-        throw new Error(SwapError.EXPECTED_OP_IF);
-      }
-
-      if (
-        OP_DROP !== DecompiledOpCode.OP_DROP ||
-        OP_DROP2 !== DecompiledOpCode.OP_DROP
-      ) {
-        throw new Error(SwapError.EXPECTED_OP_DROP);
-      }
-
-      if (OP_ELSE !== DecompiledOpCode.OP_ELSE) {
-        throw new Error(SwapError.EXPECTED_OP_ELSE);
-      }
-
-      if (
-        OP_TIMELOCKMETHOD !== DecompiledOpCode.OP_CHECKSEQUENCEVERIFY &&
-        OP_TIMELOCKMETHOD !== DecompiledOpCode.OP_CHECKLOCKTIMEVERIFY
-      ) {
-        throw new Error(SwapError.EXPECTED_OP_TIMELOCKMETHOD);
-      }
-
-      if (OP_DUP2 !== DecompiledOpCode.OP_DUP) {
-        throw new Error(SwapError.EXPECTED_OP_DUP);
-      }
-
-      if (OP_HASH1602 !== DecompiledOpCode.OP_HASH160) {
-        throw new Error(SwapError.EXPECTED_OP_HASH160);
-      }
-
-      if (OP_EQUALVERIFY !== DecompiledOpCode.OP_EQUALVERIFY) {
-        throw new Error(SwapError.EXPECTED_OP_EQUALVERIFY);
-      }
-
-      if (OP_ENDIF !== DecompiledOpCode.OP_ENDIF) {
-        throw new Error(SwapError.EXPECTED_OP_ENDIF);
-      }
-
-      if (OP_CHECKSIG !== DecompiledOpCode.OP_CHECKSIG) {
-        throw new Error(SwapError.EXPECTED_OP_CHECKSIG);
-      }
-
-      if (
-        !decompiledClaimerPublicKey ||
-        decompiledClaimerPublicKey.length !== 66
-      ) {
-        throw new Error(SwapError.EXPECTED_VALID_CLAIMER_PUBKEY);
-      }
-
-      if (
-        !decompiledRefundPublicKeyHash ||
-        decompiledRefundPublicKeyHash.length !== 40
-      ) {
-        throw new Error(SwapError.EXPECTED_VALID_REFUND_PUBKEY);
-      }
-
-      claimerPublicKey = decompiledClaimerPublicKey;
-      refundPublicKeyHash = decompiledRefundPublicKeyHash;
-      paymentHashRipemd160 = decompiledPaymentHashRipemd160;
-
-      timelock = getTimeLockObjectFromDecompiledOpcode(
-        OP_TIMELOCKMETHOD,
-        decompiledTimeLockValue,
-      );
-      break;
-
-    // Admin refund enabled
-    case 23:
+    case 14:
       {
-        const [
-          OP_DUP,
-          OP_HASH160,
-          decompiledPaymentHashRipemd160,
-          OP_EQUAL,
-          OP_IF,
-          OP_DROP,
-          decompiledClaimerPublicKey,
-          OP_ELSE,
-          OP_DUP2,
-          OP_HASH1602,
-          decompiledRefundHashRipemd160,
-          OP_EQUAL2,
-          OP_NOTIF,
-          decompiledTimeLockValue,
-          OP_TIMELOCKMETHOD,
-          OP_ENDIF,
-          OP_DROP2,
-          OP_DUP3,
-          OP_HASH1603,
-          decompiledRefundPublicKeyHash,
-          OP_EQUALVERIFY,
-          OP_ENDIF2,
-          OP_CHECKSIG,
-        ] = scriptAssembly;
-
-        if (
-          OP_DUP !== DecompiledOpCode.OP_DUP ||
-          OP_DUP2 !== DecompiledOpCode.OP_DUP ||
-          OP_DUP3 !== DecompiledOpCode.OP_DUP
-        ) {
-          throw new Error(SwapError.EXPECTED_OP_DUP);
+        // adminRefund disabled, refundPublicKey
+        const valid = ajv.validate(
+          uTXOPubKeyRedeemScriptSchema,
+          scriptAssembly,
+        );
+        if (!valid && ajv.errors) {
+          throw new Error(ajv.errors[0].message);
         }
 
-        if (
-          OP_HASH160 !== DecompiledOpCode.OP_HASH160 ||
-          OP_HASH1602 !== DecompiledOpCode.OP_HASH160 ||
-          OP_HASH1603 !== DecompiledOpCode.OP_HASH160
-        ) {
-          throw new Error(SwapError.EXPECTED_OP_HASH160);
-        }
-
-        if (
-          OP_EQUAL !== DecompiledOpCode.OP_EQUAL ||
-          OP_EQUAL2 !== DecompiledOpCode.OP_EQUAL
-        ) {
-          throw new Error(SwapError.EXPECTED_OP_EQUAL);
-        }
-
-        if (OP_IF !== DecompiledOpCode.OP_IF) {
-          throw new Error(SwapError.EXPECTED_OP_IF);
-        }
-
-        if (
-          OP_DROP !== DecompiledOpCode.OP_DROP ||
-          OP_DROP2 !== DecompiledOpCode.OP_DROP
-        ) {
-          throw new Error(SwapError.EXPECTED_OP_DROP);
-        }
-
-        if (OP_ELSE !== DecompiledOpCode.OP_ELSE) {
-          throw new Error(SwapError.EXPECTED_OP_ELSE);
-        }
-
-        if (OP_NOTIF !== DecompiledOpCode.OP_NOTIF) {
-          throw new Error(SwapError.EXPECTED_OP_NOTIF);
-        }
-
-        if (
-          OP_TIMELOCKMETHOD !== DecompiledOpCode.OP_CHECKSEQUENCEVERIFY &&
-          OP_TIMELOCKMETHOD !== DecompiledOpCode.OP_CHECKLOCKTIMEVERIFY
-        ) {
-          throw new Error(SwapError.EXPECTED_OP_TIMELOCKMETHOD);
-        }
-
-        if (OP_EQUALVERIFY !== DecompiledOpCode.OP_EQUALVERIFY) {
-          throw new Error(SwapError.EXPECTED_OP_EQUALVERIFY);
-        }
-
-        if (
-          OP_ENDIF !== DecompiledOpCode.OP_ENDIF ||
-          OP_ENDIF2 !== DecompiledOpCode.OP_ENDIF
-        ) {
-          throw new Error(SwapError.EXPECTED_OP_ENDIF);
-        }
-
-        if (OP_CHECKSIG !== DecompiledOpCode.OP_CHECKSIG) {
-          throw new Error(SwapError.EXPECTED_OP_CHECKSIG);
-        }
-
-        if (
-          !decompiledClaimerPublicKey ||
-          decompiledClaimerPublicKey.length !== 66
-        ) {
-          throw new Error(SwapError.EXPECTED_VALID_CLAIMER_PUBKEY);
-        }
-
-        if (
-          !decompiledRefundPublicKeyHash ||
-          decompiledRefundPublicKeyHash.length !== 40
-        ) {
-          throw new Error(SwapError.EXPECTED_VALID_REFUND_PUBKEY);
-        }
-
-        claimerPublicKey = decompiledClaimerPublicKey;
-        refundPublicKeyHash = decompiledRefundPublicKeyHash;
-        paymentHashRipemd160 = decompiledPaymentHashRipemd160;
-        refundHashRipemd160 = decompiledRefundHashRipemd160;
+        claimerPublicKey = scriptAssembly[6];
+        refundPublicKey = scriptAssembly[11];
+        paymentHashRipemd160 = scriptAssembly[2];
 
         timelock = getTimeLockObjectFromDecompiledOpcode(
-          OP_TIMELOCKMETHOD,
-          decompiledTimeLockValue,
+          scriptAssembly[8],
+          scriptAssembly[9],
         );
       }
       break;
+    case 17:
+      {
+        // adminRefund disabled, refundPublicKeyHash
+        const valid = ajv.validate(
+          uTXOPubKeyHashRedeemScriptSchema,
+          scriptAssembly,
+        );
+        if (!valid && ajv.errors) {
+          throw new Error(ajv.errors && ajv.errors[0].message);
+        }
 
+        claimerPublicKey = scriptAssembly[6];
+        refundPublicKeyHash = scriptAssembly[13];
+        paymentHashRipemd160 = scriptAssembly[2];
+
+        timelock = getTimeLockObjectFromDecompiledOpcode(
+          scriptAssembly[8],
+          scriptAssembly[9],
+        );
+      }
+      break;
+    case 20:
+      {
+        // adminRefund, publicKey
+        const valid = ajv.validate(
+          uTXOAdminRefundPubKeyRedeemScriptSchema,
+          scriptAssembly,
+        );
+        if (!valid && ajv.errors) {
+          throw new Error(ajv.errors && ajv.errors[0].message);
+        }
+
+        paymentHashRipemd160 = scriptAssembly[2];
+        claimerPublicKey = scriptAssembly[6];
+        refundHashRipemd160 = scriptAssembly[10];
+        refundPublicKey = scriptAssembly[17];
+
+        timelock = getTimeLockObjectFromDecompiledOpcode(
+          scriptAssembly[13],
+          scriptAssembly[14],
+        );
+      }
+      break;
+    case 23:
+      {
+        // adminRefund enabled, publicKeyHash
+        const valid = ajv.validate(
+          uTXOAdminRefundPubKeyHashRedeemScriptSchema,
+          scriptAssembly,
+        );
+        if (!valid && ajv.errors) {
+          throw new Error(ajv.errors && ajv.errors[0].message);
+        }
+
+        paymentHashRipemd160 = scriptAssembly[2];
+        claimerPublicKey = scriptAssembly[6];
+        refundHashRipemd160 = scriptAssembly[10];
+        refundPublicKeyHash = scriptAssembly[19];
+
+        timelock = getTimeLockObjectFromDecompiledOpcode(
+          scriptAssembly[13],
+          scriptAssembly[14],
+        );
+      }
+      break;
     default:
       throw new Error(SwapError.INVALID_REDEEM_SCRIPT_LENGTH);
   }
@@ -335,7 +215,15 @@ export function getSwapRedeemScriptDetails<N extends Network>(
   const p2shWrappedWitnessOutput = p2shWrappedWitnessResult.output;
   const p2shWrappedWitnessAddress = p2shWrappedWitnessResult.address;
 
-  const refundPublicKeyHashBuffer = Buffer.from(refundPublicKeyHash, 'hex');
+  let refundPublicKeyHashBuffer: Buffer | undefined;
+  if (refundPublicKeyHash) {
+    refundPublicKeyHashBuffer = Buffer.from(refundPublicKeyHash, 'hex');
+  } else if (refundPublicKey) {
+    refundPublicKeyHashBuffer = payments.p2pkh({
+      pubkey: Buffer.from(refundPublicKey, 'hex'),
+      network: networkPayload,
+    }).hash;
+  }
   const p2pkhRefundAddress = payments.p2pkh({
     network: networkPayload,
     hash: refundPublicKeyHashBuffer,
@@ -350,7 +238,6 @@ export function getSwapRedeemScriptDetails<N extends Network>(
     subnet,
     claimerPublicKey,
     paymentHashRipemd160,
-    refundPublicKeyHash,
     timelockType: timelock.type,
     timelockValue: getTimelockValue(timelock),
     p2shAddress: p2shAddress || '',
@@ -366,6 +253,18 @@ export function getSwapRedeemScriptDetails<N extends Network>(
 
   if (refundHashRipemd160) {
     decodedScript.refundHashRipemd160 = refundHashRipemd160;
+  }
+
+  if (refundPublicKeyHash) {
+    (decodedScript as UTXO.DetailsPublicKeyHash<
+      N
+    >).refundPublicKeyHash = refundPublicKeyHash;
+  }
+
+  if (refundPublicKey) {
+    (decodedScript as UTXO.DetailsPublicKey<
+      N
+    >).refundPublicKey = refundPublicKey;
   }
 
   return decodedScript;

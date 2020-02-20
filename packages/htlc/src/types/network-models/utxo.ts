@@ -2,13 +2,12 @@ import { Network, SubnetMap } from '@radar/redshift-types';
 
 export namespace UTXO {
   export type Config = string | RedeemScriptArgs;
-  export interface Details<N extends Network> {
+  export interface DetailsBase<N extends Network> {
     network: N;
     subnet: SubnetMap[N];
     paymentHashRipemd160: string; // ripemd-160 hash of the payment hash hex string
     refundHashRipemd160?: string; // ripemd-160 hash of the refund hash hex string
     claimerPublicKey: string; // claim public key hex string
-    refundPublicKeyHash: string; // refund pubkey hash string
     timelockType: LockType; // timelock type (absolute or relative)
     timelockValue: number; // timelock value (block height or block buffer)
     p2shOutputScript: string; // pay to script hash output hex string
@@ -22,11 +21,25 @@ export namespace UTXO {
     redeemScript: string; // redeem script hex string
   }
 
+  export interface DetailsPublicKey<N extends Network> extends DetailsBase<N> {
+    refundPublicKey: string; // refund pubkey string
+  }
+
+  export interface DetailsPublicKeyHash<N extends Network>
+    extends DetailsBase<N> {
+    refundPublicKeyHash: string; // refund pubkey hash string
+  }
+
+  export type Details<N extends Network> =
+    | DetailsPublicKey<N>
+    | DetailsPublicKeyHash<N>;
+
   export interface RedeemScriptArgs {
     claimerPublicKey: string;
     paymentHash: string;
     refundHash?: string;
-    refundAddress: string;
+    refundPublicKey?: string; // refund pubkey string
+    refundAddress?: string;
     timelock: TimeLock;
   }
 
