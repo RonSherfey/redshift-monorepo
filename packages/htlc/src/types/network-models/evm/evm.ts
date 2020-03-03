@@ -1,3 +1,4 @@
+import { JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers';
 import { ERC20SwapContract, EtherSwapContract } from './contracts';
 
 export namespace EVM {
@@ -38,5 +39,8 @@ export type SwapContract<C extends EVM.Config> = C extends EVM.ERC20Config
   : EtherSwapContract;
 
 export declare class Provider {
-  send(method: string, params: any): Promise<any>;
+  send(
+    payload: JsonRpcPayload,
+    callback: (error: Error | null, result?: JsonRpcResponse) => void,
+  ): void;
 }

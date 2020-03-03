@@ -21,10 +21,10 @@ export const transactionResponseSchema = {
       type: 'string',
     },
     gasUsed: {
-      type: 'string',
+      type: 'integer',
     },
     cumulativeGasUsed: {
-      type: 'string',
+      type: 'integer',
     },
     contractAddress: {
       type: ['null', 'string'],
@@ -34,7 +34,7 @@ export const transactionResponseSchema = {
       minItems: 1,
     },
     status: {
-      type: 'string',
+      type: 'boolean',
     },
     logsBloom: {
       type: 'string',

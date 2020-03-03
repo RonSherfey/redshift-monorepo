@@ -10,6 +10,7 @@ import {
 import { format } from '@radar/redshift-utils';
 import Big from 'big.js';
 import uuidToHex from 'uuid-to-hex';
+import { JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers';
 import { ERC20SwapABI, EtherSwapABI } from '.';
 import { EVM, Provider } from '../../types';
 import { BaseHtlc } from '../shared';
@@ -25,6 +26,11 @@ export class EvmHtlc<
   private readonly _swapContractAddress: string;
   private readonly _tokenContractAddress: string;
   private readonly _orderUUID: string;
+  private readonly _sendTransactionJsonRpcPayload: JsonRpcPayload = {
+    params: [],
+    jsonrpc: '2.0',
+    method: 'eth_sendTransaction',
+  };
 
   /**
    * Create a new Ethereum HTLC instance
@@ -58,7 +64,15 @@ export class EvmHtlc<
     if (!shouldBroadcast || !this._provider) {
       return unsignedTx;
     }
-    return this._provider.send('eth_sendTransaction', unsignedTx);
+    return new Promise(resolve => {
+      (this._provider as Provider).send(
+        {
+          ...this._sendTransactionJsonRpcPayload,
+          params: [unsignedTx],
+        },
+        (error, result) => resolve(result ? result.result : error),
+      );
+    });
   }
 
   /**
@@ -80,7 +94,15 @@ export class EvmHtlc<
     if (!shouldBroadcast || !this._provider) {
       return unsignedTx;
     }
-    return this._provider.send('eth_sendTransaction', unsignedTx);
+    return new Promise(resolve => {
+      (this._provider as Provider).send(
+        {
+          ...this._sendTransactionJsonRpcPayload,
+          params: [unsignedTx],
+        },
+        (error, result) => resolve(result ? result.result : error),
+      );
+    });
   }
 
   /**
@@ -107,7 +129,15 @@ export class EvmHtlc<
     if (!shouldBroadcast || !this._provider) {
       return unsignedTx;
     }
-    return this._provider.send('eth_sendTransaction', unsignedTx);
+    return new Promise(resolve => {
+      (this._provider as Provider).send(
+        {
+          ...this._sendTransactionJsonRpcPayload,
+          params: [unsignedTx],
+        },
+        (error, result) => resolve(result ? result.result : error),
+      );
+    });
   }
 
   /**
@@ -132,7 +162,15 @@ export class EvmHtlc<
     if (!shouldBroadcast || !this._provider) {
       return unsignedTx;
     }
-    return this._provider.send('eth_sendTransaction', unsignedTx);
+    return new Promise(resolve => {
+      (this._provider as Provider).send(
+        {
+          ...this._sendTransactionJsonRpcPayload,
+          params: [unsignedTx],
+        },
+        (error, result) => resolve(result ? result.result : error),
+      );
+    });
   }
 
   /**
@@ -162,7 +200,15 @@ export class EvmHtlc<
     if (!shouldBroadcast || !this._provider) {
       return unsignedTx;
     }
-    return this._provider.send('eth_sendTransaction', unsignedTx);
+    return new Promise(resolve => {
+      (this._provider as Provider).send(
+        {
+          ...this._sendTransactionJsonRpcPayload,
+          params: [unsignedTx],
+        },
+        (error, result) => resolve(result ? result.result : error),
+      );
+    });
   }
 
   /**
