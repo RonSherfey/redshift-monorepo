@@ -38,9 +38,18 @@ export type SwapContract<C extends EVM.Config> = C extends EVM.ERC20Config
   ? ERC20SwapContract
   : EtherSwapContract;
 
-export declare class Provider {
+export interface EIP1193Provider {
+  send(method: string, params?: any): Promise<any>;
+}
+
+export interface LegacyProvider {
   send(
-    payload: JsonRpcPayload,
-    callback: (error: Error | null, result?: JsonRpcResponse) => void,
+    request: JsonRpcPayload,
+    callback: (
+      err: Error | null,
+      response: JsonRpcResponse | undefined,
+    ) => void,
   ): void;
 }
+
+export type Provider = EIP1193Provider | LegacyProvider;

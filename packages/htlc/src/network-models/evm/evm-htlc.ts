@@ -10,9 +10,9 @@ import {
 import { format } from '@radar/redshift-utils';
 import Big from 'big.js';
 import uuidToHex from 'uuid-to-hex';
-import { JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers';
+import { JsonRpcPayload } from 'web3-core-helpers';
 import { ERC20SwapABI, EtherSwapABI } from '.';
-import { EVM, Provider } from '../../types';
+import { EIP1193Provider, EVM, LegacyProvider, Provider } from '../../types';
 import { BaseHtlc } from '../shared';
 import { getContractAddressesForSubnetOrThrow } from './contract-addresses';
 
@@ -64,15 +64,7 @@ export class EvmHtlc<
     if (!shouldBroadcast || !this._provider) {
       return unsignedTx;
     }
-    return new Promise(resolve => {
-      (this._provider as Provider).send(
-        {
-          ...this._sendTransactionJsonRpcPayload,
-          params: [unsignedTx],
-        },
-        (error, result) => resolve(result ? result.result : error),
-      );
-    });
+    return this.send(unsignedTx);
   }
 
   /**
@@ -94,15 +86,7 @@ export class EvmHtlc<
     if (!shouldBroadcast || !this._provider) {
       return unsignedTx;
     }
-    return new Promise(resolve => {
-      (this._provider as Provider).send(
-        {
-          ...this._sendTransactionJsonRpcPayload,
-          params: [unsignedTx],
-        },
-        (error, result) => resolve(result ? result.result : error),
-      );
-    });
+    return this.send(unsignedTx);
   }
 
   /**
@@ -129,15 +113,7 @@ export class EvmHtlc<
     if (!shouldBroadcast || !this._provider) {
       return unsignedTx;
     }
-    return new Promise(resolve => {
-      (this._provider as Provider).send(
-        {
-          ...this._sendTransactionJsonRpcPayload,
-          params: [unsignedTx],
-        },
-        (error, result) => resolve(result ? result.result : error),
-      );
-    });
+    return this.send(unsignedTx);
   }
 
   /**
@@ -162,15 +138,7 @@ export class EvmHtlc<
     if (!shouldBroadcast || !this._provider) {
       return unsignedTx;
     }
-    return new Promise(resolve => {
-      (this._provider as Provider).send(
-        {
-          ...this._sendTransactionJsonRpcPayload,
-          params: [unsignedTx],
-        },
-        (error, result) => resolve(result ? result.result : error),
-      );
-    });
+    return this.send(unsignedTx);
   }
 
   /**
@@ -200,15 +168,7 @@ export class EvmHtlc<
     if (!shouldBroadcast || !this._provider) {
       return unsignedTx;
     }
-    return new Promise(resolve => {
-      (this._provider as Provider).send(
-        {
-          ...this._sendTransactionJsonRpcPayload,
-          params: [unsignedTx],
-        },
-        (error, result) => resolve(result ? result.result : error),
-      );
-    });
+    return this.send(unsignedTx);
   }
 
   /**
@@ -343,5 +303,50 @@ export class EvmHtlc<
       default:
         throw new Error(NetworkError.INVALID_ASSET);
     }
+  }
+
+  /**
+   * Return if a provider is EIP1193 compliant
+   * @param provider The web3 provider
+   */
+  private isEIP1193Provider(
+    provider: Provider | undefined,
+  ): provider is EIP1193Provider {
+    return provider
+      ? provider.send.constructor.name === 'AsyncFunction'
+      : false;
+  }
+
+  /**
+   * Return if a provider is legacy
+   * @param provider The web3 provider
+   */
+  private isLegacyProvider(
+    provider: Provider | undefined,
+  ): provider is LegacyProvider {
+    return provider ? provider.send.constructor.name === 'Function' : false;
+  }
+
+  /**
+   * Send an unsigned transaction using a supported provider
+   * @param unsignedTx The unsigned evm transaction
+   */
+  private async send(unsignedTx: EvmUnsignedTx) {
+    const provider = this._provider;
+    if (this.isEIP1193Provider(provider)) {
+      return provider.send('eth_sendTransaction', unsignedTx);
+    }
+    if (this.isLegacyProvider(provider)) {
+      return new Promise(resolve => {
+        provider.send(
+          {
+            ...this._sendTransactionJsonRpcPayload,
+            params: [unsignedTx],
+          },
+          (error, result) => resolve(result ? result.result : error),
+        );
+      });
+    }
+    throw new Error('Missing or Invalid Provider');
   }
 }
