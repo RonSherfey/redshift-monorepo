@@ -190,7 +190,7 @@
   "source": "pragma solidity ^0.6.1;\n\n// ----------------------------------------------------------------------------\n// ERC Token Standard #20 Interface\n// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md\n// ----------------------------------------------------------------------------\nabstract contract IERC20 {\n    function totalSupply() virtual public view returns (uint);\n    function balanceOf(address tokenOwner) virtual public view returns (uint balance);\n    function allowance(address tokenOwner, address spender) virtual public view returns (uint remaining);\n    function transfer(address to, uint tokens) virtual public returns (bool success);\n    function approve(address spender, uint tokens) virtual public returns (bool success);\n    function transferFrom(address from, address to, uint tokens) virtual public returns (bool success);\n\n    event Transfer(address indexed from, address indexed to, uint tokens);\n    event Approval(address indexed tokenOwner, address indexed spender, uint tokens);\n}\n",
   "compiler": {
     "name": "solc",
-    "version": "0.6.1+commit.e6f7d5a4.Emscripten.clang"
+    "version": "0.6.3+commit.8dda9521.Emscripten.clang"
   },
   "networks": {},
   "schemaVersion": "3.0.20",

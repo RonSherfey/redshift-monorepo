@@ -1,7 +1,7 @@
 import { EthereumSubnet, Network } from '@radar/redshift-types';
 import Web3 from 'web3';
 import { Contract } from 'web3-eth-contract/types';
-import { ERC20SwapABI, EVM, EvmHtlc, HTLC } from '../../../../src';
+import { ERC20SwapABI, EVM, EvmHtlc, HTLC, Provider } from '../../../../src';
 import { getContractAddressesForSubnetOrThrow } from '../../../../src/network-models/evm/contract-addresses';
 import {
   abi,
@@ -49,7 +49,7 @@ describe('EVM HTLC - Ethereum Network - 18 Decimal ERC20 Asset', () => {
     args = config.random.args(true);
     htlc = HTLC.construct(Network.ETHEREUM, EthereumSubnet.GANACHE_SIMNET, {
       orderUUID: args.orderUUID,
-      provider: web3.currentProvider,
+      provider: web3.currentProvider as Provider,
       assetType: EVM.AssetType.ERC20,
       tokenContractAddress: erc20TokenContract.options.address,
     });
