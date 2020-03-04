@@ -10,9 +10,14 @@ import {
 import { format } from '@radar/redshift-utils';
 import Big from 'big.js';
 import uuidToHex from 'uuid-to-hex';
-import { JsonRpcPayload } from 'web3-core-helpers';
 import { ERC20SwapABI, EtherSwapABI } from '.';
-import { EIP1193Provider, EVM, LegacyProvider, Provider } from '../../types';
+import {
+  EIP1193Provider,
+  EVM,
+  JsonRpcPayload,
+  LegacyProvider,
+  Provider,
+} from '../../types';
 import { BaseHtlc } from '../shared';
 import { getContractAddressesForSubnetOrThrow } from './contract-addresses';
 
