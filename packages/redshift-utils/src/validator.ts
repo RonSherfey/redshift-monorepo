@@ -2,6 +2,7 @@ import {
   MainnetOnChainTicker,
   Market,
   Network,
+  OffChainTicker,
   OnChainTicker,
   Subnet,
 } from '@radar/redshift-types';
@@ -157,5 +158,30 @@ export const validator = {
       return true;
     }
     return false;
+  },
+
+  /**
+   * Determine if the invoice is for same L2 network that was specified in the market
+   * @param market The market
+   * @param invoice The invoice
+   */
+  isCorrectMarketForInvoice(market: Market, invoice: string) {
+    const offchainTicker = market.split('_')[1];
+    switch (offchainTicker) {
+      case OffChainTicker.LSBTC:
+        return invoice.startsWith('lnsb');
+      case OffChainTicker.LTBTC:
+        return invoice.startsWith('lntb');
+      case OffChainTicker.LBTC:
+        return invoice.startsWith('lnbc');
+      case OffChainTicker.LSLTC:
+        return invoice.startsWith('lnsltc');
+      case OffChainTicker.LTLTC:
+        return invoice.startsWith('lntltc');
+      case OffChainTicker.LLTC:
+        return invoice.startsWith('lnltc');
+      default:
+        return false;
+    }
   },
 };

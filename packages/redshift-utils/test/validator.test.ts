@@ -142,4 +142,24 @@ describe('validator', () => {
       ).to.be.false;
     });
   });
+
+  describe('isCorrectMarketForInvoice', () => {
+    it('should return true if the market is valid for the passed invoice', () => {
+      expect(
+        validator.isCorrectMarketForInvoice(
+          fixtures.valid.market,
+          fixtures.valid.invoice,
+        ),
+      ).to.be.true;
+    });
+
+    it('should return false if the market is invalid for the passed invoice', () => {
+      expect(
+        validator.isCorrectMarketForInvoice(
+          fixtures.invalid.market,
+          fixtures.invalid.invoice,
+        ),
+      ).to.be.false;
+    });
+  });
 });
