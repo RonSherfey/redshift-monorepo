@@ -17,7 +17,7 @@ services:
     entrypoint: ["./start-btcctl.sh"]
 
   test-ganache:
-    image: 0xorg/ganache-cli:istanbul
+    image: radarrelayinc/ganache-cli:latest
     ports:
     - "8545:8545"
 

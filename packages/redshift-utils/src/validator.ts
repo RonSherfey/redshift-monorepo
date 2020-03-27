@@ -1,12 +1,14 @@
 import {
+  BitcoinSubnet,
   MainnetOnChainTicker,
   Market,
   Network,
+  OffChainTicker,
   OnChainTicker,
   Subnet,
 } from '@radar/redshift-types';
 import { decode as base58Decode } from 'base58check';
-import { decode as bech32Decode } from 'bech32';
+import { decode as bech32Decode, fromWords } from 'bech32';
 import { isString } from 'util';
 
 export const validator = {
@@ -88,7 +90,7 @@ export const validator = {
    */
   isValidBech32(s: string): boolean {
     try {
-      bech32Decode(s, 1023);
+      bech32Decode(s, 3000);
       return true;
     } catch (error) {
       return false;
@@ -103,6 +105,54 @@ export const validator = {
   isValidBase58CheckOrBech32(s: string): boolean {
     if (this.isValidBase58Check(s) || this.isValidBech32(s)) {
       return true;
+    }
+    return false;
+  },
+
+  /**
+   * Determine if the passed bitcoin address is a valid P2PKH or P2WPKH address.
+   * If a subnet is passed, this method will validate that the address is valid
+   * for the subnet.
+   * @param address The address to validate
+   * @param subnet The optional subnet to validate against
+   */
+  isValidPublicKeyHashBitcoinAddress(
+    address: string,
+    subnet?: BitcoinSubnet,
+  ): boolean {
+    if (this.isValidBech32(address)) {
+      const { prefix, words } = bech32Decode(address, 3000);
+      const subnetPrefixes = {
+        bc: BitcoinSubnet.MAINNET,
+        tb: BitcoinSubnet.TESTNET,
+        sb: BitcoinSubnet.SIMNET,
+      };
+      const data = fromWords(words.slice(1));
+      if (data.length !== 20) {
+        return false;
+      }
+      const addressSubnet = subnetPrefixes[prefix];
+      if (subnet) {
+        return subnet === addressSubnet;
+      }
+      return !!addressSubnet;
+    }
+
+    if (this.isValidBase58Check(address)) {
+      const { prefix, data } = base58Decode(address);
+      const { length } = data;
+      if (length !== 20) {
+        return false;
+      }
+      const subnetPrefixes = {
+        0x00: BitcoinSubnet.MAINNET,
+        0x6f: BitcoinSubnet.TESTNET,
+      };
+      const addressSubnet = subnetPrefixes[prefix[0]];
+      if (subnet) {
+        return subnet === addressSubnet;
+      }
+      return !!addressSubnet;
     }
     return false;
   },
@@ -157,5 +207,30 @@ export const validator = {
       return true;
     }
     return false;
+  },
+
+  /**
+   * Determine if the invoice is for same L2 network that was specified in the market
+   * @param market The market
+   * @param invoice The invoice
+   */
+  isCorrectMarketForInvoice(market: Market, invoice: string): boolean {
+    const offchainTicker = market.split('_')[1];
+    switch (offchainTicker) {
+      case OffChainTicker.LSBTC:
+        return invoice.startsWith('lnsb');
+      case OffChainTicker.LTBTC:
+        return invoice.startsWith('lntb');
+      case OffChainTicker.LBTC:
+        return invoice.startsWith('lnbc');
+      case OffChainTicker.LSLTC:
+        return invoice.startsWith('lnsltc');
+      case OffChainTicker.LTLTC:
+        return invoice.startsWith('lntltc');
+      case OffChainTicker.LLTC:
+        return invoice.startsWith('lnltc');
+      default:
+        return false;
+    }
   },
 };
