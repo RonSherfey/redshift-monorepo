@@ -16,7 +16,7 @@ jobs:
         name: Setup Integration Environment
         command: |
           source ~/.bashrc
-          scripts/simnet-setup.sh ci
+          docker-compose up -d
     - run:
         name: Build Packages
         command: |
