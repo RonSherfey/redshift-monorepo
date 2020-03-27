@@ -162,4 +162,33 @@ describe('validator', () => {
       ).to.be.false;
     });
   });
+
+  describe('isValidPublicKeyHashBitcoinAddress', () => {
+    it('should return true if the bech32 bitcoin address is valid for the passed subnet', () => {
+      expect(
+        validator.isValidPublicKeyHashBitcoinAddress(
+          fixtures.valid.bech32,
+          fixtures.valid.subnet,
+        ),
+      ).to.be.true;
+    });
+
+    it('should return true if the base58 bitcoin address is valid for the passed subnet', () => {
+      expect(
+        validator.isValidPublicKeyHashBitcoinAddress(
+          fixtures.valid.base58Check,
+          fixtures.valid.subnet,
+        ),
+      ).to.be.true;
+    });
+
+    it('should return false if the bitcoin address is invalid for the passed subnet', () => {
+      expect(
+        validator.isValidPublicKeyHashBitcoinAddress(
+          fixtures.invalid.bech32,
+          fixtures.invalid.subnet,
+        ),
+      ).to.be.false;
+    });
+  });
 });
