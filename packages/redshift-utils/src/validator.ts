@@ -132,13 +132,10 @@ export const validator = {
         return false;
       }
       const addressSubnet = subnetPrefixes[prefix];
-      if (!addressSubnet) {
-        return false;
-      }
       if (subnet) {
         return subnet === addressSubnet;
       }
-      return true;
+      return !!addressSubnet;
     }
 
     if (this.isValidBase58Check(address)) {
@@ -152,13 +149,10 @@ export const validator = {
         0x6f: BitcoinSubnet.TESTNET,
       };
       const addressSubnet = subnetPrefixes[prefix[0]];
-      if (!addressSubnet) {
-        return false;
-      }
       if (subnet) {
         return subnet === addressSubnet;
       }
-      return true;
+      return !!addressSubnet;
     }
     return false;
   },
