@@ -1,6 +1,6 @@
 {
   "name": "@radar/htlc",
-  "version": "0.10.2",
+  "version": "0.10.3",
   "description": "A library used to construct and interact with HTLCs across multiple networks & network models",
   "main": "dist/cjs/index.js",
   "types": "dist/cjs/index.d.ts",
@@ -15,7 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "@ethersproject/abi": "^5.0.0-beta.144",
-    "@radar/redshift-types": "^0.5.15",
+    "@radar/redshift-types": "^0.5.16",
     "@radar/redshift-utils": "^0.1.14",
     "@types/ajv-errors": "^1.0.2",
     "@types/big.js": "^4.0.5",
