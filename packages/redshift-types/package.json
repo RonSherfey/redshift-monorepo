@@ -4,7 +4,10 @@
   "description": "Common types used across REDSHIFT codebases",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "scripts": {},
+  "scripts": {
+    "build": "tsc -p .",
+    "watch": "yarn build --watch"
+  },
   "keywords": [],
   "author": "RadarTech",
   "license": "MIT",

@@ -69,3 +69,12 @@ export const Subnet = {
   ...StellarSubnet,
 };
 export type Subnet = ValueOf<Pick<typeof Subnet, KnownKeys<typeof Subnet>>>;
+
+/**
+ * Supported EVM chain ids
+ */
+export enum EvmChainId {
+  Mainnet = 1,
+  Kovan = 42,
+  Ganache = 1337,
+}

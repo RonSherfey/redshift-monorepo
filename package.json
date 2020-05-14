@@ -7,7 +7,8 @@
     "test": "lerna run test --stream --parallel",
     "lint": "tslint -c tslint.json 'packages/**/*.ts' --fix",
     "clean": "rimraf packages/**/dist",
-    "lerna": "lerna"
+    "lerna": "lerna",
+    "watch": "lerna run watch --stream --parallel"
   },
   "devDependencies": {
     "@radar/tslint-config": "^5.0.0",

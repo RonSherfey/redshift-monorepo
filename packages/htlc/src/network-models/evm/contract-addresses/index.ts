@@ -1,4 +1,4 @@
-import { EthereumSubnet } from '@radar/redshift-types';
+import { EthereumSubnet, EvmChainId } from '@radar/redshift-types';
 
 export interface ContractAddresses {
   etherSwap: string;
@@ -20,6 +20,12 @@ const subnetToAddresses: { [subnet: string]: ContractAddresses } = {
   },
 };
 
+const chainIdToSubnet: { [chainId: number]: EthereumSubnet } = {
+  [EvmChainId.Mainnet]: EthereumSubnet.MAINNET,
+  [EvmChainId.Kovan]: EthereumSubnet.KOVAN_TESTNET,
+  [EvmChainId.Ganache]: EthereumSubnet.GANACHE_SIMNET,
+};
+
 /**
  * Used to get addresses of contracts that have been deployed to either the
  * Ethereum mainnet or a supported testnet. Throws if there are no known
@@ -33,8 +39,27 @@ export function getContractAddressesForSubnetOrThrow(
 ): ContractAddresses {
   if (!subnetToAddresses[subnet]) {
     throw new Error(
-      `Unknown network subnet (${subnet}). No known swap contracts have been deployed on this network.`,
+      `Unknown network subnet (${subnet}). No known redshift contracts have been deployed on this network.`,
     );
   }
   return subnetToAddresses[subnet];
+}
+
+/**
+ * Used to get addresses of contracts that have been deployed to either the
+ * Ethereum mainnet or a supported testnet. Throws if there are no known
+ * contracts deployed on the corresponding chain.
+ * @param chainId The desired chainId.
+ * @returns The set of addresses for contracts which have been deployed on the
+ * given chainId.
+ */
+export function getContractAddressesForChainOrThrow(
+  chainId: EvmChainId,
+): ContractAddresses {
+  if (!subnetToAddresses[chainIdToSubnet[chainId]]) {
+    throw new Error(
+      `Unknown chain id (${chainId}). No known redshift contracts have been deployed on this chain.`,
+    );
+  }
+  return subnetToAddresses[chainIdToSubnet[chainId]];
 }
