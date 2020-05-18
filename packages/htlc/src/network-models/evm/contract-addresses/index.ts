@@ -15,8 +15,8 @@ const subnetToAddresses: { [subnet: string]: ContractAddresses } = {
     erc20Swap: '0xA681C77e657f3d54E1c16D4749920ACe50Dc93E4',
   },
   [EthereumSubnet.GANACHE_SIMNET]: {
-    etherSwap: '0xA4b3e1659c473623287b2cc13b194705cd792525',
-    erc20Swap: '0x2eBb94Cc79D7D0F1195300aAf191d118F53292a8',
+    etherSwap: '0x5315e44798395d4a952530d131249fE00f554565',
+    erc20Swap: '0xda54ecF5A234D6CD85Ce93A955860834aCA75878',
   },
 };
 
