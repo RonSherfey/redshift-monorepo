@@ -8,8 +8,6 @@
     "lint": "tslint -c tslint.json '{src,test}/**/*.ts' --fix"
   },
   "dependencies": {
-    "@radar/redshift.js": "^0.4.10",
-    "ant-design-vue": "^1.4.3",
     "bignumber.js": "^9.0.0",
     "bolt11-decoder": "^1.2.6",
     "hex2dec": "^1.1.2",
