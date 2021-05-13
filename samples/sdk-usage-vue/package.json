@@ -8,15 +8,13 @@
     "lint": "tslint -c tslint.json '{src,test}/**/*.ts' --fix"
   },
   "dependencies": {
-    "@radar/redshift.js": "^0.4.1",
-    "ant-design-vue": "^1.7.4",
     "bignumber.js": "^9.0.0",
     "bolt11-decoder": "^1.2.6",
     "hex2dec": "^1.1.2",
     "vue": "^2.6.10",
     "vue-class-component": "^6.0.0",
     "vue-property-decorator": "^7.0.0",
-    "vue-router": "^3.0.1"
+    "vue-router": "^3.5.1"
   },
   "devDependencies": {
     "@radar/tslint-config": "^5.0.1",
