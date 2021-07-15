@@ -8,7 +8,7 @@
     "lint": "tslint -c tslint.json '{src,test}/**/*.ts' --fix"
   },
   "dependencies": {
-    "bignumber.js": "^9.0.0",
+    "bignumber.js": "^9.0.1",
     "bolt11-decoder": "^1.2.6",
     "hex2dec": "^1.1.2",
     "vue": "^2.6.10",
