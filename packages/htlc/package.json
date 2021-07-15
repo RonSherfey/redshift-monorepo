@@ -22,7 +22,7 @@
     "@types/ajv-errors": "^1.0.2",
     "@types/big.js": "^4.0.5",
     "@types/bip32": "^1.0.1",
-    "@types/bitcoinjs-lib": "4.0.0",
+    "@types/bitcoinjs-lib": "4.0.1",
     "@types/dotenv": "^6.1.0",
     "ajv": "^6.11.0",
     "ajv-errors": "^1.0.1",
